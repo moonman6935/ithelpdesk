@@ -47,7 +47,7 @@ const PCSetup = () => {
           </div>
           <div className="mt-6">
             <img 
-              src="https://images.unsplash.com/photo-1660855551550-2696677aaf28" 
+              src="https://images.pexels.com/photos/326501/pexels-photo-326501.jpeg" 
               alt="PC Components"
               className="w-full h-64 object-cover rounded-lg shadow-lg"
             />
