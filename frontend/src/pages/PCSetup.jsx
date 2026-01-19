@@ -182,7 +182,7 @@ const PCSetup = () => {
                 <div className="flex-1">
                   <span className="font-semibold text-gray-900 block mb-2">{t('pcSetup.step2.port5')}</span>
                   <p className="text-sm text-gray-600 mb-2">{t('pcSetup.step2.note')}</p>
-                  <img src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/4nnip68z_image.png" alt="Ethernet Kablo" className="w-full h-24 object-contain rounded shadow-sm bg-white" />
+                  <img src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/8q4dm2eg_image.png" alt="Ethernet Girişi" className="w-full h-24 object-contain rounded shadow-sm bg-white" />
                 </div>
               </div>
             </div>
