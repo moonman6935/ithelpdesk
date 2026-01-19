@@ -31,13 +31,6 @@ const PCSetup = () => {
               ))}
             </ul>
           </div>
-          <div className="mt-6">
-            <img 
-              src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/07u4a5r0_image.png" 
-              alt="Dikkat Edilmesi Gerekenler"
-              className="w-full rounded-lg shadow-lg"
-            />
-          </div>
         </div>
       )
     },
