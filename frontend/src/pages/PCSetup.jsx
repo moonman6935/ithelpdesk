@@ -151,7 +151,7 @@ const PCSetup = () => {
                 <Badge className="bg-red-600 text-white text-lg px-3 py-1 flex-shrink-0">1</Badge>
                 <div className="flex-1">
                   <span className="font-semibold text-gray-900 block mb-2">{t('pcSetup.step2.port1')}</span>
-                  <img src="https://images.unsplash.com/photo-1635426437250-f73b5107a6fb" alt="Güç Girişi" className="w-full h-24 object-cover rounded shadow-sm" />
+                  <img src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/4bye9ldu_image.png" alt="Güç Girişi" className="w-full h-24 object-contain rounded shadow-sm bg-white" />
                 </div>
               </div>
             </div>
@@ -161,7 +161,7 @@ const PCSetup = () => {
                 <Badge className="bg-red-600 text-white text-lg px-3 py-1 flex-shrink-0">2</Badge>
                 <div className="flex-1">
                   <span className="font-semibold text-gray-900 block mb-2">{t('pcSetup.step2.port2')}</span>
-                  <img src="https://images.unsplash.com/photo-1583259034006-5ea8361109e7" alt="HDMI Port" className="w-full h-24 object-cover rounded shadow-sm" />
+                  <img src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/4iongkwu_image.png" alt="HDMI Port" className="w-full h-24 object-contain rounded shadow-sm bg-white" />
                 </div>
               </div>
             </div>
@@ -171,7 +171,7 @@ const PCSetup = () => {
                 <Badge className="bg-red-600 text-white text-lg px-3 py-1 flex-shrink-0">3</Badge>
                 <div className="flex-1">
                   <span className="font-semibold text-gray-900 block mb-2">{t('pcSetup.step2.port3')}</span>
-                  <img src="https://images.pexels.com/photos/2881228/pexels-photo-2881228.jpeg" alt="VGA Port" className="w-full h-24 object-cover rounded shadow-sm" />
+                  <img src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/oz6wiwdy_image.png" alt="VGA Port" className="w-full h-24 object-contain rounded shadow-sm bg-white" />
                 </div>
               </div>
             </div>
@@ -181,7 +181,7 @@ const PCSetup = () => {
                 <Badge className="bg-red-600 text-white text-lg px-3 py-1 flex-shrink-0">4</Badge>
                 <div className="flex-1">
                   <span className="font-semibold text-gray-900 block mb-2">{t('pcSetup.step2.port4')}</span>
-                  <img src="https://images.unsplash.com/photo-1583259034006-5ea8361109e7" alt="DVI Port" className="w-full h-24 object-cover rounded shadow-sm" />
+                  <img src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/oz6wiwdy_image.png" alt="DVI Port" className="w-full h-24 object-contain rounded shadow-sm bg-white" />
                 </div>
               </div>
             </div>
@@ -192,7 +192,7 @@ const PCSetup = () => {
                 <div className="flex-1">
                   <span className="font-semibold text-gray-900 block mb-2">{t('pcSetup.step2.port5')}</span>
                   <p className="text-sm text-gray-600 mb-2">{t('pcSetup.step2.note')}</p>
-                  <img src="https://images.unsplash.com/photo-1681321570365-df53da7dbaa2" alt="Ethernet Port" className="w-full h-24 object-cover rounded shadow-sm" />
+                  <img src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/4nnip68z_image.png" alt="Ethernet Kablo" className="w-full h-24 object-contain rounded shadow-sm bg-white" />
                 </div>
               </div>
             </div>
@@ -203,7 +203,9 @@ const PCSetup = () => {
                 <div className="flex-1">
                   <span className="font-semibold text-gray-900 block mb-2">{t('pcSetup.step2.port6')}</span>
                   <p className="text-sm text-gray-600 mb-2">{t('pcSetup.step2.port6desc')}</p>
-                  <img src="https://images.pexels.com/photos/10359906/pexels-photo-10359906.jpeg" alt="USB Port" className="w-full h-24 object-cover rounded shadow-sm" />
+                  <div className="text-center text-gray-500 text-sm py-4 bg-gray-50 rounded">
+                    USB Port Görseli
+                  </div>
                 </div>
               </div>
             </div>
