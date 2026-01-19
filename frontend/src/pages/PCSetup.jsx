@@ -128,13 +128,6 @@ const PCSetup = () => {
             </div>
           </div>
 
-          <div className="mt-6">
-            <img 
-              src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/zpzeri3h_image.png" 
-              alt="Ekipman Tanımları"
-              className="w-full rounded-lg shadow-lg"
-            />
-          </div>
         </div>
       )
     },
