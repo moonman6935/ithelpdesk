@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Badge } from '../components/ui/badge';
 import { AlertCircle, CheckCircle, ArrowRight, ArrowLeft, AlertTriangle, Cable, Monitor, Plug, Usb } from 'lucide-react';
+import ConnectionDiagram from '../components/ConnectionDiagram';
 
 const PCSetup = () => {
   const { t } = useLanguage();
