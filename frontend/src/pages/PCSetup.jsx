@@ -264,14 +264,6 @@ const PCSetup = () => {
           <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
             <p className="text-blue-800"><strong>💡 {t('pcSetup.step4.tip')}</strong></p>
           </div>
-
-          <div className="mt-6">
-            <img 
-              src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/vfot21z0_image.png" 
-              alt="Monitör Bağlantıları"
-              className="w-full rounded-lg shadow-lg"
-            />
-          </div>
         </div>
       )
     },
