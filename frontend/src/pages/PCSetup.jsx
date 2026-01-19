@@ -11,6 +11,7 @@ import CompletionScreen from '../components/CompletionScreen';
 const PCSetup = () => {
   const { t } = useLanguage();
   const [currentStep, setCurrentStep] = useState(0);
+  const [showCompletion, setShowCompletion] = useState(false);
 
   const steps = [
     {
