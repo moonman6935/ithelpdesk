@@ -175,7 +175,7 @@ const PCSetup = () => {
           </div>
           <div className="mt-6">
             <img 
-              src="https://images.pexels.com/photos/3892372/pexels-photo-3892372.jpeg" 
+              src="https://images.pexels.com/photos/8866735/pexels-photo-8866735.jpeg" 
               alt="USB Headset"
               className="w-full h-64 object-cover rounded-lg shadow-lg"
             />
