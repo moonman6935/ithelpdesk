@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Button } from '../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Badge } from '../components/ui/badge';
-import { AlertCircle, CheckCircle, ArrowRight, ArrowLeft, Monitor, Cable, Keyboard, Headphones, Power, Settings } from 'lucide-react';
+import { AlertCircle, CheckCircle, ArrowRight, ArrowLeft, AlertTriangle, Cable, Monitor, Plug, Usb } from 'lucide-react';
 
 const PCSetup = () => {
   const { t } = useLanguage();
@@ -12,44 +12,29 @@ const PCSetup = () => {
 
   const steps = [
     {
-      icon: Monitor,
-      title: t('pcSetup.step1.title'),
+      icon: AlertTriangle,
+      title: t('pcSetup.important'),
       content: (
         <div className="space-y-4">
-          <p className="text-lg text-gray-700">{t('pcSetup.step1.desc')}</p>
-          <ul className="space-y-3">
-            <li className="flex items-start space-x-3">
-              <CheckCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
-              <span className="text-gray-700">{t('pcSetup.step1.item1')}</span>
-            </li>
-            <li className="flex items-start space-x-3">
-              <CheckCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
-              <span className="text-gray-700">{t('pcSetup.step1.item2')}</span>
-            </li>
-            <li className="flex items-start space-x-3">
-              <CheckCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
-              <span className="text-gray-700">{t('pcSetup.step1.item3')}</span>
-            </li>
-            <li className="flex items-start space-x-3">
-              <CheckCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
-              <span className="text-gray-700">{t('pcSetup.step1.item4')}</span>
-            </li>
-            <li className="flex items-start space-x-3">
-              <CheckCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
-              <span className="text-gray-700">{t('pcSetup.step1.item5')}</span>
-            </li>
-          </ul>
-          <div className="bg-red-50 border-l-4 border-red-600 p-4 rounded">
-            <div className="flex items-start space-x-3">
-              <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0" />
-              <p className="text-red-800 font-semibold">{t('pcSetup.step1.warning')}</p>
-            </div>
+          <div className="bg-red-50 border-2 border-red-600 rounded-lg p-6">
+            <h3 className="text-xl font-bold text-red-800 mb-4 flex items-center">
+              <AlertTriangle className="w-6 h-6 mr-2" />
+              {t('pcSetup.step0.title')}
+            </h3>
+            <ul className="space-y-3">
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                <li key={num} className="flex items-start space-x-3">
+                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-800">{t(`pcSetup.step0.item${num}`)}</span>
+                </li>
+              ))}
+            </ul>
           </div>
           <div className="mt-6">
             <img 
-              src="https://images.pexels.com/photos/326501/pexels-photo-326501.jpeg" 
-              alt="PC Components"
-              className="w-full h-64 object-cover rounded-lg shadow-lg"
+              src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/07u4a5r0_image.png" 
+              alt="Dikkat Edilmesi Gerekenler"
+              className="w-full rounded-lg shadow-lg"
             />
           </div>
         </div>
@@ -57,37 +42,112 @@ const PCSetup = () => {
     },
     {
       icon: Cable,
+      title: t('pcSetup.step1.title'),
+      content: (
+        <div className="space-y-6">
+          <p className="text-lg text-gray-700 font-semibold">{t('pcSetup.step1.desc')}</p>
+          
+          {/* Güç Kablosu */}
+          <div className="bg-white border-2 border-red-200 rounded-lg p-6">
+            <div className="flex items-start space-x-4 mb-3">
+              <Plug className="w-8 h-8 text-red-600 flex-shrink-0" />
+              <div>
+                <h4 className="text-xl font-bold text-gray-900">{t('pcSetup.step1.powerCable')}</h4>
+                <p className="text-gray-700 mt-2">{t('pcSetup.step1.powerDesc')}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* VGA Kablosu */}
+          <div className="bg-white border-2 border-red-200 rounded-lg p-6">
+            <div className="flex items-start space-x-4 mb-3">
+              <Cable className="w-8 h-8 text-blue-600 flex-shrink-0" />
+              <div>
+                <h4 className="text-xl font-bold text-gray-900">{t('pcSetup.step1.vgaCable')}</h4>
+                <p className="text-gray-700 mt-2">{t('pcSetup.step1.vgaDesc')}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* HDMI Kablo */}
+          <div className="bg-white border-2 border-red-200 rounded-lg p-6">
+            <div className="flex items-start space-x-4 mb-3">
+              <Cable className="w-8 h-8 text-purple-600 flex-shrink-0" />
+              <div>
+                <h4 className="text-xl font-bold text-gray-900">{t('pcSetup.step1.hdmiCable')}</h4>
+                <p className="text-gray-700 mt-2">{t('pcSetup.step1.hdmiDesc')}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <img 
+              src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/zpzeri3h_image.png" 
+              alt="Ekipman Tanımları"
+              className="w-full rounded-lg shadow-lg"
+            />
+          </div>
+        </div>
+      )
+    },
+    {
+      icon: Usb,
       title: t('pcSetup.step2.title'),
       content: (
         <div className="space-y-4">
           <p className="text-lg text-gray-700 font-semibold">{t('pcSetup.step2.desc')}</p>
-          <div className="bg-white border-2 border-red-200 rounded-lg p-6 space-y-4">
-            <div className="flex items-start space-x-4">
-              <Badge className="bg-red-600 text-white text-lg px-3 py-1">1</Badge>
-              <p className="text-gray-700 flex-1">{t('pcSetup.step2.instruction1')}</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white border-2 border-red-200 rounded-lg p-4">
+              <div className="flex items-center space-x-3 mb-2">
+                <Badge className="bg-red-600 text-white">1</Badge>
+                <span className="font-semibold text-gray-900">{t('pcSetup.step2.port1')}</span>
+              </div>
             </div>
-            <div className="flex items-start space-x-4">
-              <Badge className="bg-red-600 text-white text-lg px-3 py-1">2</Badge>
-              <p className="text-gray-700 flex-1">{t('pcSetup.step2.instruction2')}</p>
+            
+            <div className="bg-white border-2 border-red-200 rounded-lg p-4">
+              <div className="flex items-center space-x-3 mb-2">
+                <Badge className="bg-red-600 text-white">2</Badge>
+                <span className="font-semibold text-gray-900">{t('pcSetup.step2.port2')}</span>
+              </div>
             </div>
-            <div className="flex items-start space-x-4">
-              <Badge className="bg-red-600 text-white text-lg px-3 py-1">3</Badge>
-              <p className="text-gray-700 flex-1">{t('pcSetup.step2.instruction3')}</p>
+            
+            <div className="bg-white border-2 border-red-200 rounded-lg p-4">
+              <div className="flex items-center space-x-3 mb-2">
+                <Badge className="bg-red-600 text-white">3</Badge>
+                <span className="font-semibold text-gray-900">{t('pcSetup.step2.port3')}</span>
+              </div>
+            </div>
+            
+            <div className="bg-white border-2 border-red-200 rounded-lg p-4">
+              <div className="flex items-center space-x-3 mb-2">
+                <Badge className="bg-red-600 text-white">4</Badge>
+                <span className="font-semibold text-gray-900">{t('pcSetup.step2.port4')}</span>
+              </div>
+            </div>
+            
+            <div className="bg-white border-2 border-red-200 rounded-lg p-4">
+              <div className="flex items-center space-x-3 mb-2">
+                <Badge className="bg-red-600 text-white">5</Badge>
+                <span className="font-semibold text-gray-900">{t('pcSetup.step2.port5')}</span>
+              </div>
+              <p className="text-sm text-gray-600 mt-1 ml-8">{t('pcSetup.step2.note')}</p>
+            </div>
+            
+            <div className="bg-white border-2 border-red-200 rounded-lg p-4">
+              <div className="flex items-center space-x-3 mb-2">
+                <Badge className="bg-red-600 text-white">6</Badge>
+                <span className="font-semibold text-gray-900">{t('pcSetup.step2.port6')}</span>
+              </div>
+              <p className="text-sm text-gray-600 mt-1 ml-8">{t('pcSetup.step2.port6desc')}</p>
             </div>
           </div>
-          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
-            <p className="text-blue-800"><strong>💡 {t('pcSetup.step2.tip')}</strong></p>
-          </div>
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <div className="mt-6">
             <img 
-              src="https://images.pexels.com/photos/4065718/pexels-photo-4065718.jpeg" 
-              alt="PC Back Panel VGA"
-              className="w-full h-48 object-cover rounded-lg shadow-lg"
-            />
-            <img 
-              src="https://images.pexels.com/photos/2881228/pexels-photo-2881228.jpeg" 
-              alt="VGA and HDMI Cables"
-              className="w-full h-48 object-cover rounded-lg shadow-lg"
+              src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/uqxo8cnt_image.png" 
+              alt="Port Tanımları"
+              className="w-full rounded-lg shadow-lg"
             />
           </div>
         </div>
@@ -99,64 +159,76 @@ const PCSetup = () => {
       content: (
         <div className="space-y-4">
           <p className="text-lg text-gray-700 font-semibold">{t('pcSetup.step3.desc')}</p>
-          <div className="bg-white border-2 border-red-200 rounded-lg p-6 space-y-4">
-            <div className="flex items-start space-x-4">
-              <Badge className="bg-red-600 text-white text-lg px-3 py-1">1</Badge>
-              <p className="text-gray-700 flex-1">{t('pcSetup.step3.instruction1')}</p>
-            </div>
-            <div className="flex items-start space-x-4">
-              <Badge className="bg-red-600 text-white text-lg px-3 py-1">2</Badge>
-              <p className="text-gray-700 flex-1">{t('pcSetup.step3.instruction2')}</p>
-            </div>
+          
+          <div className="space-y-4">
+            {[1, 2, 3, 4, 5].map((num) => (
+              <div key={num} className="bg-white border-l-4 border-red-600 p-4 rounded-lg shadow-sm">
+                <div className="flex items-start space-x-3">
+                  <Badge className="bg-red-600 text-white">{num}</Badge>
+                  <p className="text-gray-700 flex-1">{t(`pcSetup.step3.connection${num}`)}</p>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
-            <p className="text-blue-800"><strong>💡 {t('pcSetup.step3.tip')}</strong></p>
-          </div>
+
           <div className="mt-6">
             <img 
-              src="https://images.pexels.com/photos/12997230/pexels-photo-12997230.jpeg" 
-              alt="HDMI Connection"
-              className="w-full h-64 object-cover rounded-lg shadow-lg"
+              src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/yc2x5d52_image.png" 
+              alt="PC Kasası Bağlantıları"
+              className="w-full rounded-lg shadow-lg"
             />
           </div>
         </div>
       )
     },
     {
-      icon: Keyboard,
+      icon: Monitor,
       title: t('pcSetup.step4.title'),
       content: (
         <div className="space-y-4">
           <p className="text-lg text-gray-700 font-semibold">{t('pcSetup.step4.desc')}</p>
+          
           <div className="bg-white border-2 border-red-200 rounded-lg p-6 space-y-4">
             <div className="flex items-start space-x-4">
-              <Badge className="bg-red-600 text-white text-lg px-3 py-1">1</Badge>
-              <p className="text-gray-700 flex-1">{t('pcSetup.step4.instruction1')}</p>
+              <Badge className="bg-blue-600 text-white text-lg px-3 py-1">VGA</Badge>
+              <div className="flex-1">
+                <p className="text-gray-700 mb-2">{t('pcSetup.step4.instruction1')}</p>
+                <p className="text-gray-700">{t('pcSetup.step4.instruction2')}</p>
+              </div>
             </div>
+            
+            <div className="border-t-2 border-gray-200 pt-4"></div>
+            
             <div className="flex items-start space-x-4">
-              <Badge className="bg-red-600 text-white text-lg px-3 py-1">2</Badge>
-              <p className="text-gray-700 flex-1">{t('pcSetup.step4.instruction2')}</p>
+              <Badge className="bg-purple-600 text-white text-lg px-3 py-1">HDMI</Badge>
+              <div className="flex-1">
+                <p className="text-gray-700 mb-2">{t('pcSetup.step4.instruction3')}</p>
+                <p className="text-gray-700">{t('pcSetup.step4.instruction4')}</p>
+              </div>
             </div>
           </div>
+
           <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
             <p className="text-blue-800"><strong>💡 {t('pcSetup.step4.tip')}</strong></p>
           </div>
+
           <div className="mt-6">
             <img 
-              src="https://images.pexels.com/photos/20510027/pexels-photo-20510027.jpeg" 
-              alt="Keyboard and Mouse"
-              className="w-full h-64 object-cover rounded-lg shadow-lg"
+              src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/vfot21z0_image.png" 
+              alt="Monitör Bağlantıları"
+              className="w-full rounded-lg shadow-lg"
             />
           </div>
         </div>
       )
     },
     {
-      icon: Headphones,
+      icon: Monitor,
       title: t('pcSetup.step5.title'),
       content: (
         <div className="space-y-4">
           <p className="text-lg text-gray-700 font-semibold">{t('pcSetup.step5.desc')}</p>
+          
           <div className="bg-white border-2 border-red-200 rounded-lg p-6 space-y-4">
             <div className="flex items-start space-x-4">
               <Badge className="bg-red-600 text-white text-lg px-3 py-1">1</Badge>
@@ -164,75 +236,25 @@ const PCSetup = () => {
             </div>
             <div className="flex items-start space-x-4">
               <Badge className="bg-red-600 text-white text-lg px-3 py-1">2</Badge>
-              <p className="text-gray-700 flex-1 font-semibold text-red-600">{t('pcSetup.step5.instruction2')}</p>
-            </div>
-          </div>
-          <div className="bg-red-50 border-l-4 border-red-600 p-4 rounded">
-            <div className="flex items-start space-x-3">
-              <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0" />
-              <p className="text-red-800 font-semibold">{t('pcSetup.step5.warning')}</p>
-            </div>
-          </div>
-          <div className="mt-6">
-            <img 
-              src="https://images.pexels.com/photos/8866735/pexels-photo-8866735.jpeg" 
-              alt="USB Headset"
-              className="w-full h-64 object-cover rounded-lg shadow-lg"
-            />
-          </div>
-        </div>
-      )
-    },
-    {
-      icon: Power,
-      title: t('pcSetup.step6.title'),
-      content: (
-        <div className="space-y-4">
-          <p className="text-lg text-gray-700 font-semibold">{t('pcSetup.step6.desc')}</p>
-          <div className="bg-white border-2 border-red-200 rounded-lg p-6 space-y-4">
-            <div className="flex items-start space-x-4">
-              <Badge className="bg-red-600 text-white text-lg px-3 py-1">1</Badge>
-              <p className="text-gray-700 flex-1">{t('pcSetup.step6.instruction1')}</p>
-            </div>
-            <div className="flex items-start space-x-4">
-              <Badge className="bg-red-600 text-white text-lg px-3 py-1">2</Badge>
-              <p className="text-gray-700 flex-1">{t('pcSetup.step6.instruction2')}</p>
-            </div>
-            <div className="flex items-start space-x-4">
-              <Badge className="bg-red-600 text-white text-lg px-3 py-1">3</Badge>
-              <p className="text-gray-700 flex-1">{t('pcSetup.step6.instruction3')}</p>
-            </div>
-          </div>
-        </div>
-      )
-    },
-    {
-      icon: Settings,
-      title: t('pcSetup.step7.title'),
-      content: (
-        <div className="space-y-4">
-          <p className="text-lg text-gray-700 font-semibold">{t('pcSetup.step7.desc')}</p>
-          <div className="bg-white border-2 border-red-200 rounded-lg p-6 space-y-4">
-            <div className="flex items-start space-x-4">
-              <Badge className="bg-red-600 text-white text-lg px-3 py-1">1</Badge>
               <p className="text-gray-700 flex-1">
                 <kbd className="px-3 py-1 bg-gray-800 text-white rounded text-sm">WIN</kbd> + 
                 <kbd className="px-3 py-1 bg-gray-800 text-white rounded text-sm ml-2">P</kbd>
                 <br />
-                {t('pcSetup.step7.instruction1')}
+                {t('pcSetup.step5.instruction2')}
               </p>
             </div>
             <div className="flex items-start space-x-4">
-              <Badge className="bg-red-600 text-white text-lg px-3 py-1">2</Badge>
-              <p className="text-gray-700 flex-1">{t('pcSetup.step7.instruction2')}</p>
+              <Badge className="bg-red-600 text-white text-lg px-3 py-1">3</Badge>
+              <p className="text-gray-700 flex-1">{t('pcSetup.step5.instruction3')}</p>
             </div>
             <div className="flex items-start space-x-4">
-              <Badge className="bg-red-600 text-white text-lg px-3 py-1">3</Badge>
-              <p className="text-gray-700 flex-1">{t('pcSetup.step7.instruction3')}</p>
+              <Badge className="bg-red-600 text-white text-lg px-3 py-1">4</Badge>
+              <p className="text-gray-700 flex-1">{t('pcSetup.step5.instruction4')}</p>
             </div>
           </div>
+
           <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
-            <p className="text-blue-800"><strong>💡 {t('pcSetup.step7.tip')}</strong></p>
+            <p className="text-blue-800"><strong>💡 {t('pcSetup.step5.tip')}</strong></p>
           </div>
         </div>
       )
@@ -271,7 +293,7 @@ const PCSetup = () => {
                       <StepIcon className="w-8 h-8 text-white" />
                     </div>
                     <div className="flex-1">
-                      <Badge className="bg-red-600 text-white mb-2">Step {currentStep + 1} / {steps.length}</Badge>
+                      <Badge className="bg-red-600 text-white mb-2">Adım {currentStep + 1} / {steps.length}</Badge>
                       <CardTitle className="text-2xl">{steps[currentStep].title}</CardTitle>
                     </div>
                   </div>
@@ -311,7 +333,7 @@ const PCSetup = () => {
               {/* Progress Indicator */}
               <div className="mt-8">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-gray-600">Progress</span>
+                  <span className="text-sm text-gray-600">İlerleme</span>
                   <span className="text-sm text-gray-600">{Math.round(((currentStep + 1) / steps.length) * 100)}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
@@ -336,7 +358,7 @@ const PCSetup = () => {
                             <Icon className="w-8 h-8 text-white" />
                           </div>
                           <div>
-                            <Badge className="bg-red-600 text-white mb-2">Step {index + 1}</Badge>
+                            <Badge className="bg-red-600 text-white mb-2">Adım {index + 1}</Badge>
                             <CardTitle className="text-2xl">{step.title}</CardTitle>
                           </div>
                         </div>
