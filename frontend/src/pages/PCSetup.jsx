@@ -114,7 +114,7 @@ const PCSetup = () => {
           </div>
           <div className="mt-6">
             <img 
-              src="https://images.pexels.com/photos/9140600/pexels-photo-9140600.jpeg" 
+              src="https://images.pexels.com/photos/12997230/pexels-photo-12997230.jpeg" 
               alt="HDMI Connection"
               className="w-full h-64 object-cover rounded-lg shadow-lg"
             />
