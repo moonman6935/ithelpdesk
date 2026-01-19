@@ -12,9 +12,9 @@ const Footer = () => {
           {/* Logo ve Başlık */}
           <div className="flex items-center space-x-4">
             <img 
-              src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/5tfegwm3_image.png" 
+              src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/8rtz75f4_image.png" 
               alt="DCS Logo" 
-              className="h-16 w-auto"
+              className="h-12 w-auto"
             />
             <div>
               <h3 className="text-xl font-bold text-red-500">DCS Communication Center</h3>
@@ -39,10 +39,15 @@ const Footer = () => {
           </div>
         </div>
         
-        <div className="mt-8 pt-6 border-t border-gray-700 text-center">
-          <p className="text-gray-400 text-sm">
+        <div className="mt-8 pt-6 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-gray-400 text-sm text-center md:text-left">
             {t('footer.rights')} | Bayram Can Aslan
           </p>
+          <img 
+            src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/8rtz75f4_image.png" 
+            alt="DCS Logo" 
+            className="h-8 w-auto opacity-50"
+          />
         </div>
       </div>
     </footer>
