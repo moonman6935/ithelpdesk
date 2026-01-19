@@ -51,9 +51,19 @@ const PCSetup = () => {
           <div className="bg-white border-2 border-red-200 rounded-lg p-6">
             <div className="flex items-start space-x-4 mb-3">
               <Plug className="w-8 h-8 text-red-600 flex-shrink-0" />
-              <div>
+              <div className="flex-1">
                 <h4 className="text-xl font-bold text-gray-900">{t('pcSetup.step1.powerCable')}</h4>
                 <p className="text-gray-700 mt-2">{t('pcSetup.step1.powerDesc')}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <div className="text-center">
+                <img src="https://images.unsplash.com/photo-1725304067445-60b4061d9992" alt="Güç Kablosu" className="w-full h-32 object-cover rounded-lg shadow-md" />
+                <p className="text-sm text-gray-600 mt-2 font-semibold">Güç Kablosu</p>
+              </div>
+              <div className="text-center">
+                <img src="https://images.unsplash.com/photo-1635426437250-f73b5107a6fb" alt="Güç Girişi" className="w-full h-32 object-cover rounded-lg shadow-md" />
+                <p className="text-sm text-gray-600 mt-2 font-semibold">Güç Girişi</p>
               </div>
             </div>
           </div>
@@ -62,9 +72,19 @@ const PCSetup = () => {
           <div className="bg-white border-2 border-red-200 rounded-lg p-6">
             <div className="flex items-start space-x-4 mb-3">
               <Cable className="w-8 h-8 text-blue-600 flex-shrink-0" />
-              <div>
+              <div className="flex-1">
                 <h4 className="text-xl font-bold text-gray-900">{t('pcSetup.step1.vgaCable')}</h4>
                 <p className="text-gray-700 mt-2">{t('pcSetup.step1.vgaDesc')}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <div className="text-center">
+                <img src="https://images.pexels.com/photos/7596181/pexels-photo-7596181.jpeg" alt="VGA Kablo" className="w-full h-32 object-cover rounded-lg shadow-md" />
+                <p className="text-sm text-gray-600 mt-2 font-semibold">VGA Kablo</p>
+              </div>
+              <div className="text-center">
+                <img src="https://images.pexels.com/photos/2881228/pexels-photo-2881228.jpeg" alt="VGA Port" className="w-full h-32 object-cover rounded-lg shadow-md" />
+                <p className="text-sm text-gray-600 mt-2 font-semibold">VGA Port</p>
               </div>
             </div>
           </div>
@@ -73,9 +93,19 @@ const PCSetup = () => {
           <div className="bg-white border-2 border-red-200 rounded-lg p-6">
             <div className="flex items-start space-x-4 mb-3">
               <Cable className="w-8 h-8 text-purple-600 flex-shrink-0" />
-              <div>
+              <div className="flex-1">
                 <h4 className="text-xl font-bold text-gray-900">{t('pcSetup.step1.hdmiCable')}</h4>
                 <p className="text-gray-700 mt-2">{t('pcSetup.step1.hdmiDesc')}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <div className="text-center">
+                <img src="https://images.unsplash.com/photo-1756043827134-dcc8ac7462f6" alt="HDMI Kablo" className="w-full h-32 object-cover rounded-lg shadow-md" />
+                <p className="text-sm text-gray-600 mt-2 font-semibold">HDMI Kablo</p>
+              </div>
+              <div className="text-center">
+                <img src="https://images.unsplash.com/photo-1583259034006-5ea8361109e7" alt="HDMI Port" className="w-full h-32 object-cover rounded-lg shadow-md" />
+                <p className="text-sm text-gray-600 mt-2 font-semibold">HDMI Port</p>
               </div>
             </div>
           </div>
