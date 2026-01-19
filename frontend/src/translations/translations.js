@@ -24,19 +24,34 @@ export const translations = {
       }
     },
     pcSetup: {
-      title: 'Masaüstü Bilgisayar Kurulumu',
-      subtitle: 'Bilgisayarınızı doğru şekilde kurmak için aşağıdaki adımları izleyin',
+      title: 'Bilgisayar Kurulum Kılavuzu',
+      subtitle: 'Size iletilen ekipmanların tanımları ve bilgisayar kurulumu',
       interactive: 'İnteraktif Rehber',
       scrollView: 'Tüm Adımlar',
+      important: 'Dikkat Edilmesi Gerekenler',
+      equipmentDef: 'Ekipman Tanımları',
+      step0: {
+        title: 'Dikkat Edilmesi Gerekenler',
+        item1: 'Ekran bağlamak için kullanılan HDMI ve VGA kablolarının her zaman bir ucu monitöre* diğer ucu bilgisayar kasasına takılacaktır.',
+        item2: 'Eğer kablo girişlere uymuyorsa lütfen girişi ve kabloyu zorlamayın.',
+        item3: 'Bilgisayar ve ekipmanlarını sıvı maddelerden uzak tutun.',
+        item4: 'Ekipmanlar size teslim edilirken kullanılan kutuları saklayın, ekipmanların birini veya bir kaçını bize tekrar göndereceğiniz zaman lütfen size teslim edildiği şekilde kutulayın ve kargolayın.',
+        item5: 'Ekipmanların temizliğine dikkat edin.',
+        item6: 'Bilgisayar kasasına müdahale etmeyin.',
+        item7: 'Parça sökmek, vida açmak gibi işlemlerde bulunmayın.',
+        item8: 'Kasadaki havalandırma deliklerini kapatmayın.',
+        item9: 'Bilgisayarının kasasının üzerine yanıcı madde koymayın.',
+        item10: 'İş için gerekli olmayan konularda bilgisayarı kullanmayın, indirme, yükleme gibi faaliyetlerde bulunmayın, aksi halde ekipmanın zarar görmesi durumunda mesuliyet şirkete ait değildir.'
+      },
       step1: {
-        title: 'Adım 1: Bileşenleri Tanıyın',
-        desc: 'Paketinizde şunlar bulunmaktadır:',
-        item1: '1x PC Kasası (HDMI ve VGA çıkışlı)',
-        item2: '2x Monitör (HDMI ve VGA girişli)',
-        item3: '1x Klavye',
-        item4: '1x Mouse',
-        item5: '1x USB Kulaklık (Sadece USB kulaklık kullanın)',
-        warning: 'ÖNEMLİ: Jack veya Bluetooth kulaklık KULLANMAYIN!'
+        title: 'Ekipman Tanımları',
+        desc: 'Kurulum için gerekli ekipmanlar ve kablo tanımları',
+        powerCable: 'Güç Kablosu',
+        powerDesc: 'Bu Kablo Ekran Ve Kasaya birer tane olacak şekilde takılır ve diğer ucu da elektrik prizine takılır.',
+        vgaCable: 'VGA Kablosu',
+        vgaDesc: 'Görüntü aktarımı sağlayan bu kablo HDMI KABLOSUNUN TAKILI OLMADIĞI ekrana bir ucu ekranda diğer ucu bilgisayar kasında olacak şekilde takılacaktır.',
+        hdmiCable: 'HDMI Kablo',
+        hdmiDesc: 'Görüntü aktarımı sağlayan bu kablo VGA KABLOSUNUN TAKILI OLMADIĞI ekrana bir ucu ekranda diğer ucu bilgisayar kasında olacak şekilde takılacaktır.'
       },
       step2: {
         title: 'Adım 2: İlk Monitörü Bağlayın (VGA)',
