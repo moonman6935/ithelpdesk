@@ -129,47 +129,65 @@ const PCSetup = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-white border-2 border-red-200 rounded-lg p-4">
-              <div className="flex items-center space-x-3 mb-2">
-                <Badge className="bg-red-600 text-white">1</Badge>
-                <span className="font-semibold text-gray-900">{t('pcSetup.step2.port1')}</span>
+              <div className="flex items-start space-x-3">
+                <Badge className="bg-red-600 text-white text-lg px-3 py-1 flex-shrink-0">1</Badge>
+                <div className="flex-1">
+                  <span className="font-semibold text-gray-900 block mb-2">{t('pcSetup.step2.port1')}</span>
+                  <img src="https://images.unsplash.com/photo-1635426437250-f73b5107a6fb" alt="Güç Girişi" className="w-full h-24 object-cover rounded shadow-sm" />
+                </div>
               </div>
             </div>
             
             <div className="bg-white border-2 border-red-200 rounded-lg p-4">
-              <div className="flex items-center space-x-3 mb-2">
-                <Badge className="bg-red-600 text-white">2</Badge>
-                <span className="font-semibold text-gray-900">{t('pcSetup.step2.port2')}</span>
+              <div className="flex items-start space-x-3">
+                <Badge className="bg-red-600 text-white text-lg px-3 py-1 flex-shrink-0">2</Badge>
+                <div className="flex-1">
+                  <span className="font-semibold text-gray-900 block mb-2">{t('pcSetup.step2.port2')}</span>
+                  <img src="https://images.unsplash.com/photo-1583259034006-5ea8361109e7" alt="HDMI Port" className="w-full h-24 object-cover rounded shadow-sm" />
+                </div>
               </div>
             </div>
             
             <div className="bg-white border-2 border-red-200 rounded-lg p-4">
-              <div className="flex items-center space-x-3 mb-2">
-                <Badge className="bg-red-600 text-white">3</Badge>
-                <span className="font-semibold text-gray-900">{t('pcSetup.step2.port3')}</span>
+              <div className="flex items-start space-x-3">
+                <Badge className="bg-red-600 text-white text-lg px-3 py-1 flex-shrink-0">3</Badge>
+                <div className="flex-1">
+                  <span className="font-semibold text-gray-900 block mb-2">{t('pcSetup.step2.port3')}</span>
+                  <img src="https://images.pexels.com/photos/2881228/pexels-photo-2881228.jpeg" alt="VGA Port" className="w-full h-24 object-cover rounded shadow-sm" />
+                </div>
               </div>
             </div>
             
             <div className="bg-white border-2 border-red-200 rounded-lg p-4">
-              <div className="flex items-center space-x-3 mb-2">
-                <Badge className="bg-red-600 text-white">4</Badge>
-                <span className="font-semibold text-gray-900">{t('pcSetup.step2.port4')}</span>
+              <div className="flex items-start space-x-3">
+                <Badge className="bg-red-600 text-white text-lg px-3 py-1 flex-shrink-0">4</Badge>
+                <div className="flex-1">
+                  <span className="font-semibold text-gray-900 block mb-2">{t('pcSetup.step2.port4')}</span>
+                  <img src="https://images.unsplash.com/photo-1583259034006-5ea8361109e7" alt="DVI Port" className="w-full h-24 object-cover rounded shadow-sm" />
+                </div>
               </div>
             </div>
             
             <div className="bg-white border-2 border-red-200 rounded-lg p-4">
-              <div className="flex items-center space-x-3 mb-2">
-                <Badge className="bg-red-600 text-white">5</Badge>
-                <span className="font-semibold text-gray-900">{t('pcSetup.step2.port5')}</span>
+              <div className="flex items-start space-x-3">
+                <Badge className="bg-red-600 text-white text-lg px-3 py-1 flex-shrink-0">5</Badge>
+                <div className="flex-1">
+                  <span className="font-semibold text-gray-900 block mb-2">{t('pcSetup.step2.port5')}</span>
+                  <p className="text-sm text-gray-600 mb-2">{t('pcSetup.step2.note')}</p>
+                  <img src="https://images.unsplash.com/photo-1681321570365-df53da7dbaa2" alt="Ethernet Port" className="w-full h-24 object-cover rounded shadow-sm" />
+                </div>
               </div>
-              <p className="text-sm text-gray-600 mt-1 ml-8">{t('pcSetup.step2.note')}</p>
             </div>
             
             <div className="bg-white border-2 border-red-200 rounded-lg p-4">
-              <div className="flex items-center space-x-3 mb-2">
-                <Badge className="bg-red-600 text-white">6</Badge>
-                <span className="font-semibold text-gray-900">{t('pcSetup.step2.port6')}</span>
+              <div className="flex items-start space-x-3">
+                <Badge className="bg-red-600 text-white text-lg px-3 py-1 flex-shrink-0">6</Badge>
+                <div className="flex-1">
+                  <span className="font-semibold text-gray-900 block mb-2">{t('pcSetup.step2.port6')}</span>
+                  <p className="text-sm text-gray-600 mb-2">{t('pcSetup.step2.port6desc')}</p>
+                  <img src="https://images.pexels.com/photos/10359906/pexels-photo-10359906.jpeg" alt="USB Port" className="w-full h-24 object-cover rounded shadow-sm" />
+                </div>
               </div>
-              <p className="text-sm text-gray-600 mt-1 ml-8">{t('pcSetup.step2.port6desc')}</p>
             </div>
           </div>
 
