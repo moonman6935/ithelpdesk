@@ -113,10 +113,14 @@ const PCSetup = () => {
                 <p className="text-gray-700 mt-2">Bu kablo internet bağlantısı için kullanılır. Bir ucu modeme, diğer ucu PC kasasına takılır.</p>
               </div>
             </div>
-            <div className="grid grid-cols-1 gap-4 mt-4">
+            <div className="grid grid-cols-2 gap-4 mt-4">
               <div className="text-center">
-                <img src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/4nnip68z_image.png" alt="Ethernet Kablo" className="w-full h-32 object-contain rounded-lg shadow-md bg-white p-2" />
-                <p className="text-sm text-gray-600 mt-2 font-semibold">Ethernet Kablo (RJ45)</p>
+                <img src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/pl0rvgqn_image.png" alt="Ethernet Kablo" className="w-full h-32 object-contain rounded-lg shadow-md bg-white p-2" />
+                <p className="text-sm text-gray-600 mt-2 font-semibold">Ethernet Kablo</p>
+              </div>
+              <div className="text-center">
+                <img src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/8q4dm2eg_image.png" alt="Ethernet Girişi" className="w-full h-32 object-contain rounded-lg shadow-md bg-white p-2" />
+                <p className="text-sm text-gray-600 mt-2 font-semibold">Ethernet Girişi</p>
               </div>
             </div>
           </div>
