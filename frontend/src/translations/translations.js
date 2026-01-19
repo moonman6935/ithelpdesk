@@ -214,8 +214,8 @@ export const translations = {
         port1: 'Stromkabelanschluss',
         port2: 'HDMI-Kabelanschluss',
         port3: 'VGA-Kabelanschluss',
-        port4: 'Ethernet*-Kabelanschluss',
-        port5: 'USB-Kabelanschluss',
+        port4: 'USB-Kabelanschluss',
+        port5: 'Ethernet*-Kabelanschluss',
         note: '* Internetkabel'
       },
       step3: {
