@@ -143,7 +143,7 @@ const PCSetup = () => {
           </div>
           <div className="mt-6">
             <img 
-              src="https://images.unsplash.com/photo-1674471361344-209ca7fbfbf1" 
+              src="https://images.pexels.com/photos/20510027/pexels-photo-20510027.jpeg" 
               alt="Keyboard and Mouse"
               className="w-full h-64 object-cover rounded-lg shadow-lg"
             />
