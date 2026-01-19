@@ -389,7 +389,10 @@ const PCSetup = () => {
                         <ArrowRight className="ml-2 w-4 h-4" />
                       </Button>
                     ) : (
-                      <Button className="bg-green-600 hover:bg-green-700">
+                      <Button 
+                        onClick={() => setShowCompletion(true)}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
                         <CheckCircle className="mr-2 w-4 h-4" />
                         {t('pcSetup.complete')}
                       </Button>
