@@ -275,10 +275,16 @@ const PCSetup = () => {
       icon: Monitor,
       title: t('pcSetup.step5.title'),
       content: (
-        <div className="space-y-4">
+        <div className="space-y-6">
           <p className="text-lg text-gray-700 font-semibold">{t('pcSetup.step5.desc')}</p>
           
+          {/* Bağlantı Şeması */}
+          <div className="my-8">
+            <ConnectionDiagram />
+          </div>
+          
           <div className="bg-white border-2 border-red-200 rounded-lg p-6 space-y-4">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Adım Adım Kurulum:</h3>
             <div className="flex items-start space-x-4">
               <Badge className="bg-red-600 text-white text-lg px-3 py-1">1</Badge>
               <p className="text-gray-700 flex-1">{t('pcSetup.step5.instruction1')}</p>
