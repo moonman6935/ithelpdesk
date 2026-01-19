@@ -75,32 +75,21 @@ export const translations = {
         connection5: 'Bir ucu modeme takılı olan ETHERNET kablosunun diğer ucu buraya takılacaktır.'
       },
       step4: {
-        title: 'Adım 4: Klavye ve Mouse',
-        desc: 'Klavye ve mouse\'u USB portlarına bağlayın',
-        instruction1: 'Klavyeyi kasanın ARKA panelindeki herhangi bir USB portuna takın',
-        instruction2: 'Mouse\'u kasanın ARKA panelindeki başka bir USB portuna takın',
-        tip: 'Ön panel USB portlarını kulaklık için boş bırakın'
+        title: 'Monitör Bağlantıları',
+        desc: 'VGA ve HDMI kablo bağlantıları monitöre nasıl yapılır',
+        instruction1: 'VGA kablosunun bir ucunu BİRİNCİ monitörün VGA girişine takın',
+        instruction2: 'VGA kablosunun diğer ucunu PC kasasının arka panelindeki VGA portuna takın',
+        instruction3: 'HDMI kablosunun bir ucunu İKİNCİ monitörün HDMI girişine takın',
+        instruction4: 'HDMI kablosunun diğer ucunu PC kasasının arka panelindeki HDMI portuna takın',
+        tip: 'Önemli: Bir monitör VGA, diğer monitör HDMI ile bağlanmalıdır'
       },
       step5: {
-        title: 'Adım 5: USB Kulaklık',
-        desc: 'USB kulaklığı ARKA panele takın',
-        instruction1: 'USB kulaklığı PC kasasının ARKA PANELİNDEKİ USB portuna takın',
-        instruction2: 'ÖN panel USB portlarına TAKMAYIN',
-        warning: 'SADECE USB kulaklık kullanın! Jack veya Bluetooth kulaklık KULLANMAYIN!'
-      },
-      step6: {
-        title: 'Adım 6: Güç Bağlantıları',
-        desc: 'Tüm cihazları prize bağlayın',
-        instruction1: 'PC kasasının güç kablosunu prize takın',
-        instruction2: 'Her iki monitörün güç kablolarını prize takın',
-        instruction3: 'Bilgisayarı açın ve monitörleri açın'
-      },
-      step7: {
-        title: 'Adım 7: Ekran Ayarları',
-        desc: 'Çift monitör kurulumu için ekran ayarlarını yapın',
-        instruction1: 'Klavyenizde WINDOWS tuşu + P tuşuna basın',
-        instruction2: 'Açılan menüden "Uzat" (Extend) seçeneğini seçin',
-        instruction3: 'Her iki monitörde de görüntü görmelisiniz',
+        title: 'Çift Monitör Kurulumu',
+        desc: 'Windows ayarları ile çift monitör kurulumu',
+        instruction1: 'Her iki monitörü ve bilgisayarı açın',
+        instruction2: 'Klavyenizde WINDOWS tuşu + P tuşuna basın',
+        instruction3: 'Açılan menüden "Uzat" (Extend) seçeneğini seçin',
+        instruction4: 'Her iki monitörde de görüntü görmelisiniz',
         tip: 'Uzat modu, masaüstünüzü iki ekrana yayar'
       },
       next: 'Sonraki Adım',
