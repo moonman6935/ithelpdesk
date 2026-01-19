@@ -295,9 +295,45 @@ const PCSetup = () => {
         <div className="space-y-6">
           <p className="text-lg text-gray-700 font-semibold">{t('pcSetup.step5.desc')}</p>
           
-          {/* Bağlantı Şeması */}
-          <div className="my-8">
-            <ConnectionDiagram />
+          {/* PC Kasa Arka Panel Bağlantı Şeması */}
+          <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-lg border-2 border-red-500">
+            <h3 className="text-2xl font-bold text-center text-gray-900 mb-6">PC Kasası Arka Panel Bağlantıları</h3>
+            <div className="max-w-3xl mx-auto">
+              <img 
+                src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/l36dhk02_image.png" 
+                alt="PC Kasa Arka Panel Bağlantıları" 
+                className="w-full rounded-lg shadow-2xl border-4 border-gray-300"
+              />
+              <div className="mt-6 bg-white rounded-lg p-4 shadow-md">
+                <h4 className="font-bold text-lg text-gray-900 mb-3">Bağlantı Noktaları:</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-red-600 rounded-full"></div>
+                    <span className="text-gray-700"><strong>Güç Kablosu:</strong> Elektrik prizine</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-purple-600 rounded-full"></div>
+                    <span className="text-gray-700"><strong>HDMI:</strong> 2. Monitöre</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
+                    <span className="text-gray-700"><strong>VGA:</strong> 1. Monitöre</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-cyan-600 rounded-full"></div>
+                    <span className="text-gray-700"><strong>Ethernet:</strong> Modeme/İnternete</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-green-600 rounded-full"></div>
+                    <span className="text-gray-700"><strong>USB:</strong> Klavye, Mouse</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-orange-600 rounded-full"></div>
+                    <span className="text-gray-700"><strong>USB (ARKA):</strong> Kulaklık</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           
           <div className="bg-white border-2 border-red-200 rounded-lg p-6 space-y-4">
