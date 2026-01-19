@@ -80,13 +80,13 @@ const PCSetup = () => {
           </div>
           <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
             <img 
-              src="https://images.pexels.com/photos/34190203/pexels-photo-34190203.jpeg" 
+              src="https://images.pexels.com/photos/4065718/pexels-photo-4065718.jpeg" 
               alt="PC Back Panel VGA"
               className="w-full h-48 object-cover rounded-lg shadow-lg"
             />
             <img 
-              src="https://images.unsplash.com/photo-1611648694931-1aeda329f9da" 
-              alt="Monitor VGA Input"
+              src="https://images.pexels.com/photos/2881228/pexels-photo-2881228.jpeg" 
+              alt="VGA and HDMI Cables"
               className="w-full h-48 object-cover rounded-lg shadow-lg"
             />
           </div>
