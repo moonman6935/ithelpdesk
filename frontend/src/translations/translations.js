@@ -59,8 +59,8 @@ export const translations = {
         port1: 'Güç Kablosu girişi',
         port2: 'HDMI kablo girişi',
         port3: 'VGA Kablosu girişi',
-        port4: 'Ethernet * Kablosu girişi',
-        port5: 'USB Kablosu girişi',
+        port4: 'USB Kablosu girişi',
+        port5: 'Ethernet * Kablosu girişi',
         note: '* İnternet Kablosu'
       },
       step3: {
