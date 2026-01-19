@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { Badge } from '../components/ui/badge';
 import { AlertCircle, CheckCircle, ArrowRight, ArrowLeft, AlertTriangle, Cable, Monitor, Plug, Usb } from 'lucide-react';
 import ConnectionDiagram from '../components/ConnectionDiagram';
+import CompletionScreen from '../components/CompletionScreen';
 
 const PCSetup = () => {
   const { t } = useLanguage();
