@@ -171,8 +171,8 @@ const PCSetup = () => {
                 <Badge className="bg-red-600 text-white text-lg px-3 py-1 flex-shrink-0">4</Badge>
                 <div className="flex-1">
                   <span className="font-semibold text-gray-900 block mb-2">{t('pcSetup.step2.port4')}</span>
-                  <p className="text-sm text-gray-600 mb-2">{t('pcSetup.step2.note')}</p>
-                  <img src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/8q4dm2eg_image.png" alt="Ethernet Girişi" className="w-full h-24 object-contain rounded shadow-sm bg-white" />
+                  <p className="text-sm text-gray-600 mb-2">USB Kulaklık, Mouse, Klavye ve Webcam buraya takılacaktır.</p>
+                  <img src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/c1onkm4v_image.png" alt="USB Port" className="w-full h-24 object-contain rounded shadow-sm bg-white" />
                 </div>
               </div>
             </div>
@@ -182,8 +182,8 @@ const PCSetup = () => {
                 <Badge className="bg-red-600 text-white text-lg px-3 py-1 flex-shrink-0">5</Badge>
                 <div className="flex-1">
                   <span className="font-semibold text-gray-900 block mb-2">{t('pcSetup.step2.port5')}</span>
-                  <p className="text-sm text-gray-600 mb-2">USB Kulaklık, Mouse, Klavye ve Webcam buraya takılacaktır.</p>
-                  <img src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/c1onkm4v_image.png" alt="USB Port" className="w-full h-24 object-contain rounded shadow-sm bg-white" />
+                  <p className="text-sm text-gray-600 mb-2">{t('pcSetup.step2.note')}</p>
+                  <img src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/8q4dm2eg_image.png" alt="Ethernet Girişi" className="w-full h-24 object-contain rounded shadow-sm bg-white" />
                 </div>
               </div>
             </div>
