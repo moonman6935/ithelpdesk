@@ -54,19 +54,25 @@ export const translations = {
         hdmiDesc: 'Görüntü aktarımı sağlayan bu kablo VGA KABLOSUNUN TAKILI OLMADIĞI ekrana bir ucu ekranda diğer ucu bilgisayar kasında olacak şekilde takılacaktır.'
       },
       step2: {
-        title: 'Adım 2: İlk Monitörü Bağlayın (VGA)',
-        desc: 'VGA kablosunu kullanarak ilk monitörü kasaya bağlayın',
-        instruction1: 'VGA kablosunun bir ucunu PC kasasının ARKA PANELİNDEKİ VGA portuna takın',
-        instruction2: 'VGA kablosunun diğer ucunu MONİTÖRÜN VGA girişine takın',
-        instruction3: 'Vida bağlantılarını sıkın',
-        tip: 'İpucu: VGA portu mavi renkli 15 pinli D-Sub konektördür'
+        title: 'Port Tanımları',
+        desc: 'Bilgisayar kasası arka panelindeki port bağlantıları',
+        port1: 'Güç Kablosu girişi',
+        port2: 'HDMI kablo girişi',
+        port3: 'VGA Kablosu girişi',
+        port4: 'DVI Kablosu girişi',
+        port5: 'Ethernet * Kablosu girişi',
+        port6: 'USB Kablosu girişi',
+        port6desc: 'Klavye, Mouse, kulaklık, Webcam bu girişe takılacaktır.',
+        note: '* İnternet Kablosu'
       },
       step3: {
-        title: 'Adım 3: İkinci Monitörü Bağlayın (HDMI)',
-        desc: 'HDMI kablosunu kullanarak ikinci monitörü kasaya bağlayın',
-        instruction1: 'HDMI kablosunun bir ucunu PC kasasının ARKA PANELİNDEKİ HDMI portuna takın',
-        instruction2: 'HDMI kablosunun diğer ucunu İKİNCİ MONİTÖRÜN HDMI girişine takın',
-        tip: 'İpucu: HDMI portu dikdörtgen şeklinde 19 pinli konektördür'
+        title: 'Bilgisayar Kasası Bağlantıları',
+        desc: 'PC kasasının arka paneline kablo bağlantıları',
+        connection1: 'Güç Kablosu buraya takılacaktır.',
+        connection2: 'HDMI kablosu buraya takılacaktır.',
+        connection3: 'VGA kablosu buraya takılacaktır.',
+        connection4: 'Kulaklık, Fare (Mouse), Klavye, Webcam buraya takılacaktır.',
+        connection5: 'Bir ucu modeme takılı olan ETHERNET kablosunun diğer ucu buraya takılacaktır.'
       },
       step4: {
         title: 'Adım 4: Klavye ve Mouse',
