@@ -369,8 +369,8 @@ export const translations = {
         port1: 'Power Cable Input',
         port2: 'HDMI Cable Input',
         port3: 'VGA Cable Input',
-        port4: 'Ethernet* Cable Input',
-        port5: 'USB Cable Input',
+        port4: 'USB Cable Input',
+        port5: 'Ethernet* Cable Input',
         note: '* Internet Cable'
       },
       step3: {
