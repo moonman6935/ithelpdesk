@@ -338,62 +338,72 @@ export const translations = {
       }
     },
     pcSetup: {
-      title: 'Desktop Computer Setup',
-      subtitle: 'Follow these steps to properly set up your computer',
+      title: 'Computer Installation Guide',
+      subtitle: 'Definitions of equipment delivered to you and computer installation',
       interactive: 'Interactive Guide',
       scrollView: 'All Steps',
+      important: 'Important Notes',
+      equipmentDef: 'Equipment Definitions',
+      step0: {
+        title: 'Important Notes',
+        item1: 'HDMI and VGA cables used to connect the screen always have one end on the monitor* and the other end on the computer case.',
+        item2: 'If the cable does not fit the ports, please do not force the port and cable.',
+        item3: 'Keep computer and equipment away from liquids.',
+        item4: 'Keep the boxes used when equipment is delivered to you. When you send one or more equipment back to us, please pack and ship them as delivered.',
+        item5: 'Pay attention to equipment cleanliness.',
+        item6: 'Do not tamper with computer case.',
+        item7: 'Do not remove parts or unscrew anything.',
+        item8: 'Do not block ventilation holes on the case.',
+        item9: 'Do not place flammable materials on the computer case.',
+        item10: 'Do not use the computer for non-work related purposes. In case of equipment damage due to downloading or installing, liability is not with the company.'
+      },
       step1: {
-        title: 'Step 1: Identify Components',
-        desc: 'Your package includes:',
-        item1: '1x PC Case (with HDMI and VGA output)',
-        item2: '2x Monitors (with HDMI and VGA input)',
-        item3: '1x Keyboard',
-        item4: '1x Mouse',
-        item5: '1x USB Headset (Use USB headset only)',
-        warning: 'IMPORTANT: Do NOT use jack or Bluetooth headsets!'
+        title: 'Equipment Definitions',
+        desc: 'Required equipment and cable definitions for installation',
+        powerCable: 'Power Cable',
+        powerDesc: 'This cable is connected to the screen and case one each, and the other end is connected to the electrical outlet.',
+        vgaCable: 'VGA Cable',
+        vgaDesc: 'This image transfer cable will be connected to the screen WHERE THE HDMI CABLE IS NOT connected, one end at the screen and the other at the computer case.',
+        hdmiCable: 'HDMI Cable',
+        hdmiDesc: 'This image transfer cable will be connected to the screen WHERE THE VGA CABLE IS NOT connected, one end at the screen and the other at the computer case.'
       },
       step2: {
-        title: 'Step 2: Connect First Monitor (VGA)',
-        desc: 'Connect the first monitor to the case using VGA cable',
-        instruction1: 'Plug one end of the VGA cable into the VGA port on the BACK PANEL of the PC case',
-        instruction2: 'Plug the other end of the VGA cable into the VGA input of the MONITOR',
-        instruction3: 'Tighten the screw connections',
-        tip: 'Tip: VGA port is a blue 15-pin D-Sub connector'
+        title: 'Port Definitions',
+        desc: 'Port connections on the back panel of the computer case',
+        port1: 'Power Cable Input',
+        port2: 'HDMI Cable Input',
+        port3: 'VGA Cable Input',
+        port4: 'DVI Cable Input',
+        port5: 'Ethernet* Cable Input',
+        port6: 'USB Cable Input',
+        port6desc: 'Keyboard, Mouse, Headset, Webcam will be connected here.',
+        note: '* Internet Cable'
       },
       step3: {
-        title: 'Step 3: Connect Second Monitor (HDMI)',
-        desc: 'Connect the second monitor to the case using HDMI cable',
-        instruction1: 'Plug one end of the HDMI cable into the HDMI port on the BACK PANEL of the PC case',
-        instruction2: 'Plug the other end of the HDMI cable into the HDMI input of the SECOND MONITOR',
-        tip: 'Tip: HDMI port is a rectangular 19-pin connector'
+        title: 'Computer Case Connections',
+        desc: 'Cable connections to the back panel of the PC case',
+        connection1: 'Power cable will be connected here.',
+        connection2: 'HDMI cable will be connected here.',
+        connection3: 'VGA cable will be connected here.',
+        connection4: 'Headset, Mouse, Keyboard, Webcam will be connected here.',
+        connection5: 'The other end of the ETHERNET cable connected to the modem will be connected here.'
       },
       step4: {
-        title: 'Step 4: Keyboard and Mouse',
-        desc: 'Connect keyboard and mouse to USB ports',
-        instruction1: 'Plug the keyboard into any USB port on the BACK panel of the case',
-        instruction2: 'Plug the mouse into another USB port on the BACK panel of the case',
-        tip: 'Leave front panel USB ports free for headset'
+        title: 'Monitor Connections',
+        desc: 'How to make VGA and HDMI cable connections to the monitor',
+        instruction1: 'Connect one end of the VGA cable to the VGA input of the FIRST monitor',
+        instruction2: 'Connect the other end of the VGA cable to the VGA port on the back of the PC case',
+        instruction3: 'Connect one end of the HDMI cable to the HDMI input of the SECOND monitor',
+        instruction4: 'Connect the other end of the HDMI cable to the HDMI port on the back of the PC case',
+        tip: 'Important: One monitor must be connected with VGA, the other with HDMI'
       },
       step5: {
-        title: 'Step 5: USB Headset',
-        desc: 'Connect USB headset to BACK panel',
-        instruction1: 'Plug the USB headset into a USB port on the BACK PANEL of the PC case',
-        instruction2: 'Do NOT use front panel USB ports',
-        warning: 'Use USB headset ONLY! Do NOT use jack or Bluetooth headsets!'
-      },
-      step6: {
-        title: 'Step 6: Power Connections',
-        desc: 'Connect all devices to power outlet',
-        instruction1: 'Plug the PC case power cable into the outlet',
-        instruction2: 'Plug both monitors\' power cables into the outlet',
-        instruction3: 'Turn on the computer and monitors'
-      },
-      step7: {
-        title: 'Step 7: Display Settings',
-        desc: 'Configure display settings for dual monitor setup',
-        instruction1: 'Press WINDOWS key + P on your keyboard',
-        instruction2: 'Select "Extend" from the menu that appears',
-        instruction3: 'You should see display on both monitors',
+        title: 'Dual Monitor Setup',
+        desc: 'Dual monitor setup with Windows settings',
+        instruction1: 'Turn on both monitors and the computer',
+        instruction2: 'Press WINDOWS key + P on your keyboard',
+        instruction3: 'Select "Extend" from the menu that appears',
+        instruction4: 'You should see display on both monitors',
         tip: 'Extend mode spreads your desktop across two screens'
       },
       next: 'Next Step',
