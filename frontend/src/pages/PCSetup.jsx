@@ -59,11 +59,11 @@ const PCSetup = () => {
             </div>
             <div className="grid grid-cols-2 gap-4 mt-4">
               <div className="text-center">
-                <img src="https://images.unsplash.com/photo-1725304067445-60b4061d9992" alt="Güç Kablosu" className="w-full h-32 object-cover rounded-lg shadow-md" />
+                <img src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/ndprhb1q_image.png" alt="Güç Kablosu" className="w-full h-32 object-contain rounded-lg shadow-md bg-white p-2" />
                 <p className="text-sm text-gray-600 mt-2 font-semibold">Güç Kablosu</p>
               </div>
               <div className="text-center">
-                <img src="https://images.unsplash.com/photo-1635426437250-f73b5107a6fb" alt="Güç Girişi" className="w-full h-32 object-cover rounded-lg shadow-md" />
+                <img src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/4bye9ldu_image.png" alt="Güç Girişi" className="w-full h-32 object-contain rounded-lg shadow-md bg-white p-2" />
                 <p className="text-sm text-gray-600 mt-2 font-semibold">Güç Girişi</p>
               </div>
             </div>
@@ -80,12 +80,12 @@ const PCSetup = () => {
             </div>
             <div className="grid grid-cols-2 gap-4 mt-4">
               <div className="text-center">
-                <img src="https://images.pexels.com/photos/7596181/pexels-photo-7596181.jpeg" alt="VGA Kablo" className="w-full h-32 object-cover rounded-lg shadow-md" />
+                <img src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/xyhuazy5_image.png" alt="VGA Kablo" className="w-full h-32 object-contain rounded-lg shadow-md bg-white p-2" />
                 <p className="text-sm text-gray-600 mt-2 font-semibold">VGA Kablo</p>
               </div>
               <div className="text-center">
-                <img src="https://images.pexels.com/photos/2881228/pexels-photo-2881228.jpeg" alt="VGA Port" className="w-full h-32 object-cover rounded-lg shadow-md" />
-                <p className="text-sm text-gray-600 mt-2 font-semibold">VGA Port</p>
+                <img src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/oz6wiwdy_image.png" alt="VGA Girişi" className="w-full h-32 object-contain rounded-lg shadow-md bg-white p-2" />
+                <p className="text-sm text-gray-600 mt-2 font-semibold">VGA Girişi</p>
               </div>
             </div>
           </div>
@@ -101,12 +101,29 @@ const PCSetup = () => {
             </div>
             <div className="grid grid-cols-2 gap-4 mt-4">
               <div className="text-center">
-                <img src="https://images.unsplash.com/photo-1756043827134-dcc8ac7462f6" alt="HDMI Kablo" className="w-full h-32 object-cover rounded-lg shadow-md" />
+                <img src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/mv4phmml_image.png" alt="HDMI Kablo" className="w-full h-32 object-contain rounded-lg shadow-md bg-white p-2" />
                 <p className="text-sm text-gray-600 mt-2 font-semibold">HDMI Kablo</p>
               </div>
               <div className="text-center">
-                <img src="https://images.unsplash.com/photo-1583259034006-5ea8361109e7" alt="HDMI Port" className="w-full h-32 object-cover rounded-lg shadow-md" />
-                <p className="text-sm text-gray-600 mt-2 font-semibold">HDMI Port</p>
+                <img src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/4iongkwu_image.png" alt="HDMI Girişi" className="w-full h-32 object-contain rounded-lg shadow-md bg-white p-2" />
+                <p className="text-sm text-gray-600 mt-2 font-semibold">HDMI Girişi</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Ethernet Kablo */}
+          <div className="bg-white border-2 border-red-200 rounded-lg p-6">
+            <div className="flex items-start space-x-4 mb-3">
+              <Cable className="w-8 h-8 text-cyan-600 flex-shrink-0" />
+              <div className="flex-1">
+                <h4 className="text-xl font-bold text-gray-900">Ethernet Kablo (İnternet)</h4>
+                <p className="text-gray-700 mt-2">Bu kablo internet bağlantısı için kullanılır. Bir ucu modeme, diğer ucu PC kasasına takılır.</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 gap-4 mt-4">
+              <div className="text-center">
+                <img src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/4nnip68z_image.png" alt="Ethernet Kablo" className="w-full h-32 object-contain rounded-lg shadow-md bg-white p-2" />
+                <p className="text-sm text-gray-600 mt-2 font-semibold">Ethernet Kablo (RJ45)</p>
               </div>
             </div>
           </div>
