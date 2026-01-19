@@ -113,8 +113,8 @@ const Home = () => {
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-red-600 to-red-700 text-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-6">Ready to Get Started?</h2>
-          <p className="text-xl mb-8 opacity-90">Follow our comprehensive guide to set up your workstation</p>
+          <h2 className="text-4xl font-bold mb-6">{t('home.getStarted')}</h2>
+          <p className="text-xl mb-8 opacity-90">{t('home.description')}</p>
           <Link to="/pc-setup">
             <Button size="lg" className="bg-white text-red-600 hover:bg-gray-100 text-lg px-8 py-6">
               {t('home.getStarted')}
