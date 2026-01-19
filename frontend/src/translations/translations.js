@@ -181,67 +181,77 @@ export const translations = {
       }
     },
     pcSetup: {
-      title: 'Desktop-Computer-Einrichtung',
-      subtitle: 'Befolgen Sie diese Schritte, um Ihren Computer richtig einzurichten',
+      title: 'Computer-Installationsanleitung',
+      subtitle: 'Beschreibungen der Ihnen übermittelten Geräte und Computer-Installation',
       interactive: 'Interaktive Anleitung',
       scrollView: 'Alle Schritte',
+      important: 'Wichtige Hinweise',
+      equipmentDef: 'Gerätedefinitionen',
+      step0: {
+        title: 'Wichtige Hinweise',
+        item1: 'HDMI- und VGA-Kabel zum Anschluss des Bildschirms haben immer ein Ende am Monitor* und das andere Ende am Computergehäuse.',
+        item2: 'Wenn das Kabel nicht in die Anschlüsse passt, zwingen Sie bitte nicht den Anschluss und das Kabel.',
+        item3: 'Halten Sie Computer und Geräte von Flüssigkeiten fern.',
+        item4: 'Bewahren Sie die beim Versand verwendeten Kartons auf. Wenn Sie eines oder mehrere Geräte an uns zurücksenden, verpacken und versenden Sie sie bitte so wie geliefert.',
+        item5: 'Achten Sie auf die Sauberkeit der Geräte.',
+        item6: 'Öffnen Sie nicht das Computergehäuse.',
+        item7: 'Entfernen Sie keine Teile oder schrauben Sie nichts ab.',
+        item8: 'Blockieren Sie nicht die Lüftungsöffnungen am Gehäuse.',
+        item9: 'Stellen Sie keine brennbaren Materialien auf das Computergehäuse.',
+        item10: 'Verwenden Sie den Computer nicht für nicht arbeitsbezogene Zwecke. Bei Schäden durch Downloads oder Installationen liegt die Verantwortung nicht beim Unternehmen.'
+      },
       step1: {
-        title: 'Schritt 1: Komponenten identifizieren',
-        desc: 'Ihr Paket enthält:',
-        item1: '1x PC-Gehäuse (mit HDMI- und VGA-Ausgang)',
-        item2: '2x Monitore (mit HDMI- und VGA-Eingang)',
-        item3: '1x Tastatur',
-        item4: '1x Maus',
-        item5: '1x USB-Headset (Nur USB-Headset verwenden)',
-        warning: 'WICHTIG: Verwenden Sie KEINE Klinken- oder Bluetooth-Headsets!'
+        title: 'Gerätedefinitionen',
+        desc: 'Erforderliche Geräte und Kabeldefinitionen für die Installation',
+        powerCable: 'Stromkabel',
+        powerDesc: 'Dieses Kabel wird jeweils einmal an Bildschirm und Gehäuse angeschlossen, das andere Ende an die Steckdose.',
+        vgaCable: 'VGA-Kabel',
+        vgaDesc: 'Dieses bildübertragende Kabel wird an den Bildschirm angeschlossen, AN DEM DAS HDMI-KABEL NICHT angeschlossen ist, ein Ende am Bildschirm, das andere am Computergehäuse.',
+        hdmiCable: 'HDMI-Kabel',
+        hdmiDesc: 'Dieses bildübertragende Kabel wird an den Bildschirm angeschlossen, AN DEM DAS VGA-KABEL NICHT angeschlossen ist, ein Ende am Bildschirm, das andere am Computergehäuse.'
       },
       step2: {
-        title: 'Schritt 2: Ersten Monitor anschließen (VGA)',
-        desc: 'Verbinden Sie den ersten Monitor mit dem VGA-Kabel mit dem Gehäuse',
-        instruction1: 'Stecken Sie ein Ende des VGA-Kabels in den VGA-Anschluss auf der RÜCKSEITE des PC-Gehäuses',
-        instruction2: 'Stecken Sie das andere Ende des VGA-Kabels in den VGA-Eingang des MONITORS',
-        instruction3: 'Ziehen Sie die Schraubverbindungen fest',
-        tip: 'Tipp: Der VGA-Anschluss ist ein blauer 15-poliger D-Sub-Stecker'
+        title: 'Port-Definitionen',
+        desc: 'Portanschlüsse an der Rückseite des Computergehäuses',
+        port1: 'Stromkabelanschluss',
+        port2: 'HDMI-Kabelanschluss',
+        port3: 'VGA-Kabelanschluss',
+        port4: 'DVI-Kabelanschluss',
+        port5: 'Ethernet*-Kabelanschluss',
+        port6: 'USB-Kabelanschluss',
+        port6desc: 'Tastatur, Maus, Headset, Webcam werden hier angeschlossen.',
+        note: '* Internetkabel'
       },
       step3: {
-        title: 'Schritt 3: Zweiten Monitor anschließen (HDMI)',
-        desc: 'Verbinden Sie den zweiten Monitor mit dem HDMI-Kabel mit dem Gehäuse',
-        instruction1: 'Stecken Sie ein Ende des HDMI-Kabels in den HDMI-Anschluss auf der RÜCKSEITE des PC-Gehäuses',
-        instruction2: 'Stecken Sie das andere Ende des HDMI-Kabels in den HDMI-Eingang des ZWEITEN MONITORS',
-        tip: 'Tipp: Der HDMI-Anschluss ist ein rechteckiger 19-poliger Stecker'
+        title: 'Computergehäuse-Anschlüsse',
+        desc: 'Kabelanschlüsse an der Rückseite des PC-Gehäuses',
+        connection1: 'Das Stromkabel wird hier angeschlossen.',
+        connection2: 'Das HDMI-Kabel wird hier angeschlossen.',
+        connection3: 'Das VGA-Kabel wird hier angeschlossen.',
+        connection4: 'Headset, Maus, Tastatur, Webcam werden hier angeschlossen.',
+        connection5: 'Das andere Ende des ETHERNET-Kabels, das an das Modem angeschlossen ist, wird hier angeschlossen.'
       },
       step4: {
-        title: 'Schritt 4: Tastatur und Maus',
-        desc: 'Schließen Sie Tastatur und Maus an USB-Anschlüsse an',
-        instruction1: 'Stecken Sie die Tastatur in einen beliebigen USB-Anschluss auf der RÜCKSEITE des Gehäuses',
-        instruction2: 'Stecken Sie die Maus in einen anderen USB-Anschluss auf der RÜCKSEITE des Gehäuses',
-        tip: 'Lassen Sie die USB-Anschlüsse an der Vorderseite für das Headset frei'
+        title: 'Monitor-Anschlüsse',
+        desc: 'Wie VGA- und HDMI-Kabelanschlüsse zum Monitor hergestellt werden',
+        instruction1: 'Schließen Sie ein Ende des VGA-Kabels an den VGA-Eingang des ERSTEN Monitors an',
+        instruction2: 'Schließen Sie das andere Ende des VGA-Kabels an den VGA-Port an der Rückseite des PC-Gehäuses an',
+        instruction3: 'Schließen Sie ein Ende des HDMI-Kabels an den HDMI-Eingang des ZWEITEN Monitors an',
+        instruction4: 'Schließen Sie das andere Ende des HDMI-Kabels an den HDMI-Port an der Rückseite des PC-Gehäuses an',
+        tip: 'Wichtig: Ein Monitor wird mit VGA, der andere mit HDMI verbunden'
       },
       step5: {
-        title: 'Schritt 5: USB-Headset',
-        desc: 'Schließen Sie das USB-Headset an die Rückseite an',
-        instruction1: 'Stecken Sie das USB-Headset in einen USB-Anschluss auf der RÜCKSEITE des PC-Gehäuses',
-        instruction2: 'Verwenden Sie NICHT die USB-Anschlüsse an der Vorderseite',
-        warning: 'Nur USB-Headsets verwenden! KEINE Klinken- oder Bluetooth-Headsets!'
-      },
-      step6: {
-        title: 'Schritt 6: Stromversorgung',
-        desc: 'Schließen Sie alle Geräte an die Steckdose an',
-        instruction1: 'Stecken Sie das Stromkabel des PC-Gehäuses in die Steckdose',
-        instruction2: 'Stecken Sie die Stromkabel beider Monitore in die Steckdose',
-        instruction3: 'Schalten Sie den Computer und die Monitore ein'
-      },
-      step7: {
-        title: 'Schritt 7: Display-Einstellungen',
-        desc: 'Konfigurieren Sie die Anzeigeeinstellungen für Dual-Monitor',
-        instruction1: 'Drücken Sie die WINDOWS-Taste + P auf Ihrer Tastatur',
-        instruction2: 'Wählen Sie "Erweitern" aus dem angezeigten Menü',
-        instruction3: 'Sie sollten auf beiden Monitoren ein Bild sehen',
-        tip: 'Der Erweitern-Modus erstreckt Ihren Desktop über zwei Bildschirme'
+        title: 'Dual-Monitor-Einrichtung',
+        desc: 'Dual-Monitor-Einrichtung mit Windows-Einstellungen',
+        instruction1: 'Schalten Sie beide Monitore und den Computer ein',
+        instruction2: 'Drücken Sie die WINDOWS-Taste + P auf Ihrer Tastatur',
+        instruction3: 'Wählen Sie "Erweitern" aus dem angezeigten Menü',
+        instruction4: 'Sie sollten auf beiden Monitoren ein Bild sehen',
+        tip: 'Der Erweitern-Modus verteilt Ihren Desktop auf zwei Bildschirme'
       },
       next: 'Nächster Schritt',
       previous: 'Vorheriger Schritt',
-      complete: 'Einrichtung abgeschlossen!'
+      complete: 'Installation abgeschlossen!'
     },
     headsetTest: {
       title: 'USB-Headset-Audiotest',
