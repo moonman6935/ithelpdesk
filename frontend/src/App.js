@@ -8,6 +8,9 @@ import Home from "./pages/Home";
 import PCSetup from "./pages/PCSetup";
 import HeadsetTest from "./pages/HeadsetTest";
 import Troubleshooting from "./pages/Troubleshooting";
+import AssetConfirmation from "./pages/AssetConfirmation";
+import AdminDashboard from "./pages/AdminDashboard";
+import LoginPage from "./pages/LoginPage";
 
 function App() {
   return (
@@ -21,6 +24,9 @@ function App() {
               <Route path="/pc-setup" element={<PCSetup />} />
               <Route path="/headset-test" element={<HeadsetTest />} />
               <Route path="/troubleshooting" element={<Troubleshooting />} />
+              <Route path="/asset-confirmation" element={<AssetConfirmation />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/login" element={<LoginPage />} />
             </Routes>
           </main>
           <Footer />

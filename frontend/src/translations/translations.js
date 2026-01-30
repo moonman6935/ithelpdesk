@@ -152,6 +152,51 @@ export const translations = {
       rights: '© 2025 DCS Communication Center. Tüm hakları saklıdır.',
       support: 'IT Destek',
       contact: 'İletişim'
+    },
+    assetConfirmation: {
+      title: 'Zimmet Onaylama',
+      personnelNo: 'Personel Numarası',
+      enterPersonnelNo: '6 haneli personel numaranızı giriniz',
+      checkAssets: 'Eşyalarımı Getir',
+      itemsTitle: 'Üzerinize Zimmetli Ürünler',
+      itemName: 'Ürün Adı',
+      serialNo: 'Seri Numarası',
+      confirmCheckbox: 'Üzerime zimmetli ürünleri ve seri numaralarını okudum, onaylıyorum.',
+      confirmButton: 'Dijital Onay Gönder',
+      success: 'Zimmet onayınız başarıyla gönderildi.',
+      noAssets: 'Bu personel numarasına ait zimmet kaydı bulunamadı.',
+      alreadyConfirmed: 'Bu zimmetler için daha önce onay verilmiştir. Yeni bir zimmet işlemi için IT departmanıyla iletişime geçiniz.',
+      personnelName: 'Personel Adı Soyadı'
+    },
+    admin: {
+      title: 'Admin Paneli',
+      addAsset: 'Yeni Zimmet Ekle',
+      confirmations: 'Gelen Onaylar',
+      personnelId: 'Personel ID (6 Hane)',
+      personnelName: 'Personel Adı Soyadı',
+      itemName: 'Ürün Adı',
+      serialNo: 'Seri Numarası',
+      submit: 'Zimmetle',
+      tablePerson: 'Personel',
+      tableDate: 'Tarih',
+      tableStatus: 'Durum',
+      loginTitle: 'Yönetici Girişi',
+      username: 'Kullanıcı Adı',
+      password: 'Şifre',
+      loginButton: 'Giriş Yap',
+      dashboard: 'Dashboard',
+      adminManagement: 'Yönetici Ayarları',
+      stats: {
+        totalPersonnel: 'Zimmetli Personel',
+        totalItems: 'Aktif Zimmet',
+        returnedItems: 'İade Edilen',
+        pending: 'Onay Bekleyen'
+      },
+      inventory: 'Tüm Zimmetler',
+      returnButton: 'İade Al',
+      returnNote: 'İade Notu (Opsiyonel)',
+      status: 'Durum',
+      actions: 'İşlemler'
     }
   },
   de: {
