@@ -63,6 +63,14 @@ const Header = () => {
                 {t('header.troubleshooting')}
               </Button>
             </Link>
+            <Link to="/faq">
+              <Button
+                variant={isActive('/faq') ? 'secondary' : 'ghost'}
+                className={isActive('/faq') ? 'bg-white text-red-600 hover:bg-gray-100' : 'text-white hover:bg-red-700'}
+              >
+                {t('header.faq')}
+              </Button>
+            </Link>
             <Link to="/asset-confirmation">
               <Button
                 variant={isActive('/asset-confirmation') ? 'secondary' : 'ghost'}
@@ -118,6 +126,15 @@ const Header = () => {
               className={isActive('/headset-test') ? 'bg-white text-red-600' : 'text-white hover:bg-red-700'}
             >
               {t('header.headsetTest')}
+            </Button>
+          </Link>
+          <Link to="/faq">
+            <Button
+              size="sm"
+              variant={isActive('/faq') ? 'secondary' : 'ghost'}
+              className={isActive('/faq') ? 'bg-white text-red-600' : 'text-white hover:bg-red-700'}
+            >
+              {t('header.faq')}
             </Button>
           </Link>
         </nav>

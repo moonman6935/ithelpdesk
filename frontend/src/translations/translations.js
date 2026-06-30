@@ -5,7 +5,8 @@ export const translations = {
       home: 'Ana Sayfa',
       pcSetup: 'PC Kurulumu',
       headsetTest: 'Kulaklık Testi',
-      troubleshooting: 'Sorun Giderme'
+      troubleshooting: 'Sorun Giderme',
+      faq: 'SSS'
     },
     home: {
       welcome: 'DCS Communication Center IT Departmanı',
@@ -148,6 +149,58 @@ export const translations = {
         step4: 'Test sesi çalın ve kontrol edin'
       }
     },
+    faq: {
+      title: 'Sıkça Sorulan Sorular',
+      subtitle: 'Ajan iş birliği ve eğitim konularında sık sorulan sorular',
+      introTitle: 'Önemli: Önce kendiniz kontrol edin!',
+      introText: 'Mikrofon sorunları çoğu zaman IT desteği gerektirmez. Birini aramadan veya yazmadan önce aşağıdaki kontrolleri mutlaka yapın. Basit bir kulaklık bağlantısı sorunu bile herkesin saatlerce beklemesine neden olabilir.',
+      q1: {
+        question: 'Citrix\'i ilk kez açtığımda mikrofon izni istenirse ne yapmalıyım?',
+        answer1: 'Citrix\'i ilk kez açtığınızda mikrofon erişim izni sorulduğunda MUTLAKA "Otomatik bağlan" (Automatisch verbinden) seçeneğine tıklamalısınız.',
+        answer2: 'Geçen hafta birçok vakada müşteriler ajanları duyamadı — çünkü ajan Citrix\'e mikrofon izni vermemiş veya kulaklık takılı değildi.',
+        answer3: 'İzni daha sonra da Citrix özelliklerinden "Bağlantılar" (Verbindungen) bölümünden verebilirsiniz. (Ekranın üst kısmındaki küçük siyah çubuk.) İzin verdikten sonra Citrix\'ten çıkış yapıp tekrar giriş yapmanız gerekir.'
+      },
+      q2: {
+        question: 'Mikrofon sorunu yaşadığımda ilk ne yapmalıyım?',
+        answer1: 'Bu tam olarak bir IT konusu değil, bir eğitim konusudur. Mikrofon sorunu yaşadığınızda birini aramadan veya yazmadan ÖNCE aşağıdaki üç kontrolü yapmalısınız.',
+        answer2: 'Bunlar, bizim için çalışmasanız bile kendi başınıza yapmanız gereken şeylerdir. Kulaklık takılı olmadığında herkesin saatlerce beklemesi gerekmez — görev çubuğuna bakmak yeterlidir.'
+      },
+      q3: {
+        question: 'Kulaklığımın takılı olup olmadığını nasıl anlarım?',
+        answer1: 'Kulaklığın takılı olup olmadığını görev çubuğundaki simgeden kontrol edebilirsiniz. Kulaklık takılı değilse kırmızı arka plan üzerinde çarpı işaretli bir hoparlör simgesi görünür.',
+        win10: 'Windows 10',
+        win11: 'Windows 11'
+      },
+      q4: {
+        question: 'Citrix bağlantı ayarlarında mikrofon nasıl yapılandırılır?',
+        answer1: 'Citrix ayarlarında "Bağlantılar" (Verbindungen) bölümüne gidin ve "Otomatik bağlan" (Automatisch verbinden) seçeneğinin işaretli olduğundan emin olun.',
+        answer2: 'Değilse tıklayın, Tamam (OK) ile onaylayın ve Citrix\'ten çıkış yapıp tekrar giriş yapın.',
+        answer3: '"Bağlantı kurma" (Keine Verbindung herstellen) veya "Sor" (Fragen) seçiliyse yerel mikrofon BAĞLANMAZ — müşteri sizi duyamaz ve ttCall girişi çalışmaz.'
+      },
+      q5: {
+        question: 'Web tarayıcısında mikrofon izni nasıl verilir?',
+        answer1: 'Bu kural Web-RTC sayfamız (kurbağa sayfası) ve BP AT, DGN vb. için Genesys telefon sayfaları için de geçerlidir.',
+        answer2: 'Sayfayı ilk kez açtığınızda "Mikrofonu kullan veya engelle" sorusu çıkar. Ekranda yazanı okuyun ve MUTLAKA "İzin ver" (Zulassen) butonuna tıklayın. Bu kadar — roket bilimi değil.',
+        answer3: 'Kontrol için tarayıcının adres çubuğunun solundaki simgeye tıklayabilirsiniz (Chrome veya Edge fark etmez).'
+      },
+      q6: {
+        question: 'Edge tarayıcısında mikrofon iznini nasıl kontrol ederim?',
+        answer1: 'Edge\'de adres çubuğunun solundaki simgeye tıklayın. Küçük bir pencere açılır ve mikrofon izninin verildiğini görmelisiniz. (Kısa yol)',
+        answer2: 'Chrome\'da benzer şekilde adresin solundaki simgeye tıklayarak kontrol edebilirsiniz.'
+      },
+      q7: {
+        question: 'Chrome tarayıcısında mikrofon iznini nasıl kontrol ederim?',
+        answer1: 'Chrome\'da mikrofon iznini kontrol etmek biraz daha uzun bir yoldur. Aşağıdaki adımları izleyin:',
+        step1: 'Adres çubuğunun solundaki simgeye tıklayın.',
+        step2: 'Açılan menüden site ayarlarına gidin.',
+        step3: 'Ayarlar şu şekilde görünmelidir — mikrofon "İzin verildi" olmalıdır.'
+      },
+      q8: {
+        question: 'Müşteri sisteminde çıkan uyarı mesajlarında ne yapmalıyım?',
+        answer1: 'Müşteri sistemlerinde aşağıdaki gibi mesajlar göründüğünde ekranda istenen butona tam olarak gösterildiği gibi tıklayın.',
+        answer2: 'Hâlâ çalışmıyorsa yukarıdaki 1–3 numaralı maddeleri (kulaklık kontrolü, Citrix ayarları, tarayıcı izni) tekrar kontrol edin.'
+      }
+    },
     footer: {
       rights: '© 2025 DCS Communication Center. Tüm hakları saklıdır.',
       support: 'IT Destek',
@@ -205,7 +258,8 @@ export const translations = {
       home: 'Startseite',
       pcSetup: 'PC-Einrichtung',
       headsetTest: 'Headset-Test',
-      troubleshooting: 'Fehlerbehebung'
+      troubleshooting: 'Fehlerbehebung',
+      faq: 'FAQ'
     },
     home: {
       welcome: 'DCS Communication Center IT-Abteilung',
@@ -348,6 +402,58 @@ export const translations = {
         step4: 'Spielen Sie einen Testton ab und überprüfen Sie'
       }
     },
+    faq: {
+      title: 'Häufig gestellte Fragen',
+      subtitle: 'Agentenmitarbeit und Schulung – häufige Fragen und Antworten',
+      introTitle: 'Wichtig: Zuerst selbst prüfen!',
+      introText: 'Mikrofonprobleme erfordern oft keinen IT-Support. Bitte führen Sie die folgenden Prüfungen durch, bevor Sie jemanden kontaktieren. Allein weil ein Headset nicht angeschlossen ist, kann es locker eine Stunde oder mehr dauern, bis alle wieder weiterarbeiten können.',
+      q1: {
+        question: 'Was muss ich tun, wenn Citrix beim ersten Öffnen nach Mikrofonzugriff fragt?',
+        answer1: 'Wenn Citrix beim ersten Öffnen fragt, ob Citrix die Erlaubnis für den Zugriff aufs Mikrofon bekommen soll, MÜSSEN die Agenten dort UNBEDINGT auf „Automatisch verbinden" klicken.',
+        answer2: 'Wir hatten seit letzter Woche so viele Fälle, in denen die Kunden die Agenten nicht hören konnten — weil der Agent Citrix die Mikrofon-Erlaubnis nicht gegeben oder das Headset nicht angeschlossen hatte.',
+        answer3: 'Die Erlaubnis kann der Agent auch später noch selbst geben, in den Eigenschaften von Citrix unter „Verbindungen" (die kleine schwarze Leiste im oberen Bildschirmrand). Danach muss Citrix neu verbunden werden — also ab- und wieder anmelden.'
+      },
+      q2: {
+        question: 'Was ist die Prüfreihenfolge bei Mikrofonproblemen?',
+        answer1: 'Dies ist nicht wirklich ein IT-Thema, sondern ein Schulungsthema. Wenn der Agent Probleme mit dem Mikro hat, hat er dies wirklich als Erstes zu überprüfen — und zwar bevor er jemanden kontaktiert.',
+        answer2: 'Folgend drei Punkte, welche der Agent beachten MUSS — Dinge, die er auch selbst machen müsste, wenn er nicht für uns arbeiten würde. Ein Blick in die Taskleiste würde oft genügen.'
+      },
+      q3: {
+        question: 'Wie erkenne ich, ob das Headset angeschlossen ist?',
+        answer1: 'Prüfen Sie, ob das Headset überhaupt angeschlossen ist. Dies ist auch an einem Symbol in der Taskleiste zu sehen — als Lautsprecher mit Kreuz auf rotem Hintergrund.',
+        win10: 'Windows 10',
+        win11: 'Windows 11'
+      },
+      q4: {
+        question: 'Wie konfiguriere ich die Mikrofonverbindung in den Citrix-Einstellungen?',
+        answer1: 'Schauen Sie in den Einstellungen von Citrix, ob dort unter Verbindungen „Automatisch verbinden" eingestellt ist.',
+        answer2: 'Wenn nicht, dann anklicken, mit OK bestätigen und Citrix ab- und dann wieder anmelden.',
+        answer3: 'Wenn „Keine Verbindung herstellen" oder „Fragen" eingestellt ist, wird das lokale Mikrofon NICHT verbunden — der Kunde kann nichts hören und die ttCall-Anmeldung funktioniert dann nicht.'
+      },
+      q5: {
+        question: 'Wie erteile ich die Mikrofonberechtigung im Webbrowser?',
+        answer1: 'Dasselbe betrifft Webseiten wie die Web-RTC von uns (die Seite mit dem Frosch) oder auch die Seite für die Telefonie mit Genesys bei BP AT, DGN usw.',
+        answer2: 'Beim erstmaligen Aufruf wird man gefragt: Mikrofon verwenden oder blockieren. Der Agent MUSS einfach nur auf ZULASSEN klicken. Es ist KEINE Raketenwissenschaft — man muss nur lesen, was auf dem Bildschirm steht.',
+        answer3: 'Zum Überprüfen kann der Agent in der Adressleiste des Browsers (ob Chrome oder Edge) links von der Adresse auf das markierte Symbol klicken.'
+      },
+      q6: {
+        question: 'Wie überprüfe ich die Mikrofonberechtigung im Edge-Browser?',
+        answer1: 'Rechteüberprüfung im Edge (ein sehr kurzer Weg): Klicken Sie links von der Adresse auf das Symbol. Es öffnet sich ein kleines Fenster — dort sollte die Mikrofonberechtigung erteilt sein.',
+        answer2: 'Im Chrome sieht es ähnlich aus — links von der Adresse auf das Symbol klicken.'
+      },
+      q7: {
+        question: 'Wie überprüfe ich die Mikrofonberechtigung im Chrome-Browser?',
+        answer1: 'Rechteüberprüfung im Chrome (ein etwas längerer Weg). Folgen Sie diesen Schritten:',
+        step1: 'Links von der Adresse auf das Symbol klicken.',
+        step2: 'Im angezeigten Menü die Website-Einstellungen öffnen.',
+        step3: 'In den Einstellungen muss es so aussehen — Mikrofon auf „Zulassen" gesetzt.'
+      },
+      q8: {
+        question: 'Was tun bei Meldungen auf Kundensystemen?',
+        answer1: 'Wenn auf Kundensystemen Meldungen wie im Beispiel zu sehen sind: Den Button so wie auf dem Bildschirm gefordert anklicken.',
+        answer2: 'Falls es danach immer noch nicht funktioniert, siehe oben Punkt eins bis drei (Headset prüfen, Citrix-Einstellungen, Browser-Berechtigung).'
+      }
+    },
     footer: {
       rights: '© 2025 DCS Communication Center. Alle Rechte vorbehalten.',
       support: 'IT-Support',
@@ -360,7 +466,8 @@ export const translations = {
       home: 'Home',
       pcSetup: 'PC Setup',
       headsetTest: 'Headset Test',
-      troubleshooting: 'Troubleshooting'
+      troubleshooting: 'Troubleshooting',
+      faq: 'FAQ'
     },
     home: {
       welcome: 'DCS Communication Center IT Department',
@@ -501,6 +608,58 @@ export const translations = {
         step2: 'Select "Sound settings"',
         step3: 'Select your USB headset from the "Output" section',
         step4: 'Play a test sound and verify'
+      }
+    },
+    faq: {
+      title: 'Frequently Asked Questions',
+      subtitle: 'Agent cooperation and training – common questions and answers',
+      introTitle: 'Important: Check yourself first!',
+      introText: 'Microphone issues often do not require IT support. Please complete the checks below before contacting anyone. A simple unplugged headset can easily cause everyone to wait an hour or more.',
+      q1: {
+        question: 'What should I do when Citrix asks for microphone access on first launch?',
+        answer1: 'When Citrix asks for permission to access the microphone the first time you open it, you MUST click "Connect automatically" (Automatisch verbinden).',
+        answer2: 'We had many cases last week where customers could not hear agents — because the agent had not granted Citrix microphone permission or the headset was not connected.',
+        answer3: 'Permission can also be granted later in Citrix properties under "Connections" (Verbindungen) — the small black bar at the top of the screen. After changing this, you must reconnect Citrix (log out and log back in).'
+      },
+      q2: {
+        question: 'What should I check first when I have microphone problems?',
+        answer1: 'This is not really an IT issue but a training topic. When you have microphone problems, you must check the following three points FIRST — before contacting anyone.',
+        answer2: 'These are things you would need to do yourself even if you did not work for us. A quick look at the taskbar is often enough.'
+      },
+      q3: {
+        question: 'How do I know if my headset is connected?',
+        answer1: 'Check whether the headset is connected at all. This is visible in the taskbar as a speaker icon with a cross on a red background.',
+        win10: 'Windows 10',
+        win11: 'Windows 11'
+      },
+      q4: {
+        question: 'How do I configure the microphone in Citrix connection settings?',
+        answer1: 'In Citrix settings, go to "Connections" (Verbindungen) and make sure "Connect automatically" (Automatisch verbinden) is selected.',
+        answer2: 'If not, click it, confirm with OK, and log out and back into Citrix.',
+        answer3: 'If "Do not connect" (Keine Verbindung herstellen) or "Ask" (Fragen) is set, the local microphone will NOT be connected — the customer cannot hear you and ttCall login will not work.'
+      },
+      q5: {
+        question: 'How do I grant microphone permission in the web browser?',
+        answer1: 'The same applies to our Web-RTC page (the frog page) and Genesys telephony pages for BP AT, DGN, etc.',
+        answer2: 'On first visit you will be asked: use microphone or block. You MUST simply click ALLOW (Zulassen). It is not rocket science — just read what is on the screen.',
+        answer3: 'To verify, click the icon to the left of the address bar in your browser (Chrome or Edge).'
+      },
+      q6: {
+        question: 'How do I check microphone permission in Edge?',
+        answer1: 'Permission check in Edge (a very short way): Click the icon to the left of the address. A small window opens — microphone access should be allowed.',
+        answer2: 'In Chrome it looks similar — click the icon to the left of the address.'
+      },
+      q7: {
+        question: 'How do I check microphone permission in Chrome?',
+        answer1: 'Permission check in Chrome (a somewhat longer way). Follow these steps:',
+        step1: 'Click the icon to the left of the address bar.',
+        step2: 'Open site settings from the menu that appears.',
+        step3: 'Settings should look like this — microphone set to "Allow".'
+      },
+      q8: {
+        question: 'What should I do when messages appear on customer systems?',
+        answer1: 'When messages like the example below appear on customer systems, click the button exactly as shown on the screen.',
+        answer2: 'If it still does not work afterwards, review points 1–3 above (headset check, Citrix settings, browser permission).'
       }
     },
     footer: {
