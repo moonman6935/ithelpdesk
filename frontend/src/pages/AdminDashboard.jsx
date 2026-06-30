@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 import { Input } from "../components/ui/input";
@@ -26,6 +26,28 @@ const AdminDashboard = () => {
     const [isSystemAdmin, setIsSystemAdmin] = useState(false);
     const [newAdmin, setNewAdmin] = useState({ username: '', password: '', role: 'admin' });
 
+    const fetchAdminData = useCallback(async () => {
+        try {
+            const [confRes, invRes, statRes] = await Promise.all([
+                api.get('/api/admin/confirmations'),
+                api.get('/api/admin/inventory'),
+                api.get('/api/admin/stats')
+            ]);
+            setConfirmations(confRes.data);
+            setInventory(invRes.data);
+            setStats(statRes.data);
+
+            const role = localStorage.getItem('admin_role');
+            if (role === 'system_admin') {
+                const userRes = await api.get('/api/admin/users');
+                setAdmins(userRes.data);
+            }
+        } catch (err) {
+            console.error('Veri çekilemedi');
+            if (err.response?.status === 401) navigate('/login');
+        }
+    }, [navigate]);
+
     useEffect(() => {
         const token = localStorage.getItem('admin_token');
         const role = localStorage.getItem('admin_role');
@@ -35,7 +57,7 @@ const AdminDashboard = () => {
         }
         setIsSystemAdmin(role === 'system_admin');
         fetchAdminData();
-    }, [navigate]);
+    }, [navigate, fetchAdminData]);
 
     // Intelligent ID fetcher
     useEffect(() => {
@@ -73,28 +95,6 @@ const AdminDashboard = () => {
             setPersonnelId(res.data.random_id);
         } catch (err) {
             console.error('Rastgele ID üretilemedi');
-        }
-    };
-
-    const fetchAdminData = async () => {
-        try {
-            const [confRes, invRes, statRes] = await Promise.all([
-                api.get('/api/admin/confirmations'),
-                api.get('/api/admin/inventory'),
-                api.get('/api/admin/stats')
-            ]);
-            setConfirmations(confRes.data);
-            setInventory(invRes.data);
-            setStats(statRes.data);
-
-            const role = localStorage.getItem('admin_role');
-            if (role === 'system_admin') {
-                const userRes = await api.get('/api/admin/users');
-                setAdmins(userRes.data);
-            }
-        } catch (err) {
-            console.error('Veri çekilemedi');
-            if (err.response?.status === 401) navigate('/login');
         }
     };
 
