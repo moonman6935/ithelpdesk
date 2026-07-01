@@ -20,9 +20,6 @@ const AnnouncementPopup = () => {
         const data = res.data;
         if (!data?.id || !data?.active) return;
 
-        const dismissed = localStorage.getItem(`announcement_dismissed_${data.id}`);
-        if (dismissed) return;
-
         setAnnouncement(data);
         setOpen(true);
       } catch {
@@ -32,12 +29,7 @@ const AnnouncementPopup = () => {
     load();
   }, []);
 
-  const handleClose = () => {
-    if (announcement?.id) {
-      localStorage.setItem(`announcement_dismissed_${announcement.id}`, '1');
-    }
-    setOpen(false);
-  };
+  const handleClose = () => setOpen(false);
 
   if (!announcement) return null;
 
