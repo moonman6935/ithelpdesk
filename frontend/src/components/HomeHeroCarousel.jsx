@@ -3,13 +3,17 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { translations } from '../translations/translations';
 import { Button } from './ui/button';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ChevronLeft, ChevronRight, Sparkles, Monitor, RefreshCw, MessageSquare } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, Sparkles, Monitor, RefreshCw, MessageSquare, Package, ShieldCheck, Laptop, Cable } from 'lucide-react';
 
 const SLIDE_META = [
   { Icon: Sparkles, gradient: 'from-red-500 via-red-600 to-orange-500', blob: 'bg-yellow-300/30' },
   { Icon: Monitor, gradient: 'from-blue-600 via-blue-700 to-indigo-700', blob: 'bg-sky-300/30' },
   { Icon: RefreshCw, gradient: 'from-emerald-500 via-teal-600 to-cyan-600', blob: 'bg-lime-300/30' },
   { Icon: MessageSquare, gradient: 'from-violet-600 via-purple-600 to-fuchsia-600', blob: 'bg-pink-300/30' },
+  { Icon: Package, gradient: 'from-amber-500 via-orange-600 to-red-600', blob: 'bg-amber-300/30' },
+  { Icon: ShieldCheck, gradient: 'from-slate-600 via-slate-700 to-zinc-800', blob: 'bg-slate-300/30' },
+  { Icon: Laptop, gradient: 'from-cyan-600 via-blue-600 to-indigo-700', blob: 'bg-cyan-300/30' },
+  { Icon: Cable, gradient: 'from-teal-600 via-green-600 to-emerald-700', blob: 'bg-teal-300/30' },
 ];
 
 const HomeHeroCarousel = () => {
@@ -48,7 +52,7 @@ const HomeHeroCarousel = () => {
 
                 return (
                   <div
-                    key={slide.title}
+                    key={`${slide.title}-${index}`}
                     className={`min-w-full bg-gradient-to-br ${gradient} text-white relative`}
                   >
                     <div className="absolute inset-0 opacity-20 pointer-events-none">
@@ -136,7 +140,7 @@ const HomeHeroCarousel = () => {
           <div className="flex justify-center gap-2 mt-4">
             {slides.map((slide, index) => (
               <button
-                key={slide.title}
+                key={`dot-${slide.title}-${index}`}
                 type="button"
                 onClick={() => goTo(index)}
                 className={`h-2.5 rounded-full transition-all duration-300 ${

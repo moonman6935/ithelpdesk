@@ -31,6 +31,22 @@ export const translations = {
           title: 'Rocket.Chat Destek Talebi',
           message: 'Rocket.Chat üzerinden destek talebi ederken personel adı, AnyDesk ID ve sorunu detaylı açıklamasını yazınız.',
         },
+        {
+          title: 'Ekipman Değişim Talebi',
+          message: 'Ekipman değişimi için e-posta gönderirken ekipman talep tablosunu mutlaka ekleyin. Talep öncesinde Rocket.Chat üzerinden sorununuzu yazıp IT onayı alın.',
+        },
+        {
+          title: 'MFA ve OTP Aktarımı',
+          message: 'MFA Authenticator kurulu telefonunuzu değiştirmeden önce OTP aktarımını tamamlayın. Aksi halde hesaplarınıza erişimde sorun yaşayabilirsiniz.',
+        },
+        {
+          title: 'Desteklenen İşletim Sistemleri',
+          message: 'Desteklenen sürümler: Windows 10 Pro, Windows 11 Pro, macOS Ventura ve üzeri, Ubuntu 24.04 ve üzeri.',
+        },
+        {
+          title: 'İnternet Bağlantısı',
+          message: 'Stabil ve hızlı bağlantı için mümkün olduğunca kablolu (Ethernet) internet bağlantısı tercih edin.',
+        },
       ],
       features: {
         title: 'Hizmetlerimiz',
@@ -376,6 +392,22 @@ export const translations = {
           title: 'Rocket.Chat Supportanfrage',
           message: 'Bei Supportanfragen über Rocket.Chat geben Sie Personalname, AnyDesk-ID und eine detaillierte Problembeschreibung an.',
         },
+        {
+          title: 'Geräteaustausch-Anfrage',
+          message: 'Senden Sie bei Geräteaustausch per E-Mail unbedingt das Geräteanforderungsformular mit. Holen Sie vorab über Rocket.Chat die IT-Freigabe ein.',
+        },
+        {
+          title: 'MFA und OTP-Übertragung',
+          message: 'Übertragen Sie OTP, bevor Sie das Telefon mit dem MFA Authenticator wechseln — sonst kann der Kontozugang blockiert werden.',
+        },
+        {
+          title: 'Unterstützte Betriebssysteme',
+          message: 'Unterstützt: Windows 10 Pro, Windows 11 Pro, macOS Ventura und neuer, Ubuntu 24.04 und neuer.',
+        },
+        {
+          title: 'Internetverbindung',
+          message: 'Bevorzugen Sie nach Möglichkeit eine kabelgebundene (Ethernet-) Internetverbindung für Stabilität und Geschwindigkeit.',
+        },
       ],
       features: {
         title: 'Unsere Dienstleistungen',
@@ -720,6 +752,22 @@ export const translations = {
         {
           title: 'Rocket.Chat Support Request',
           message: 'When requesting support via Rocket.Chat, include your name, AnyDesk ID, and a detailed description of the issue.',
+        },
+        {
+          title: 'Equipment Replacement Request',
+          message: 'When emailing an equipment change request, always attach the equipment request form. Get IT approval on Rocket.Chat before submitting.',
+        },
+        {
+          title: 'MFA and OTP Transfer',
+          message: 'Complete OTP transfer before replacing the phone with your MFA Authenticator — otherwise you may lose account access.',
+        },
+        {
+          title: 'Supported Operating Systems',
+          message: 'Supported: Windows 10 Pro, Windows 11 Pro, macOS Ventura and later, Ubuntu 24.04 and later.',
+        },
+        {
+          title: 'Internet Connection',
+          message: 'Prefer a wired (Ethernet) internet connection whenever possible for stability and speed.',
         },
       ],
       features: {
