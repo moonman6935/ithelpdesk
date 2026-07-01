@@ -123,6 +123,8 @@ code {
     }
 }
 
+@layer base {
+    [data-debug-wrapper="true"] {
         display: contents !important;
     }
 
