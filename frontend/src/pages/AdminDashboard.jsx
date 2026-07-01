@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 import { Input } from "../components/ui/input";
@@ -8,7 +8,7 @@ import { Badge } from "../components/ui/badge";
 import { Alert, AlertDescription } from "../components/ui/alert";
 import {
     User, PlusCircle, CheckCircle2, LayoutDashboard, Package,
-    RefreshCcw, Users, Trash2, ArrowLeftRight, LogOut, Dices, KeyRound
+    RefreshCcw, Users, Trash2, ArrowLeftRight, LogOut, Dices, KeyRound, Search, X
 } from "lucide-react";
 import api from '../lib/api';
 import { useNavigate } from 'react-router-dom';
@@ -21,6 +21,7 @@ const AdminDashboard = () => {
     const [items, setItems] = useState([{ itemName: '', serialNo: '' }]);
     const [confirmations, setConfirmations] = useState([]);
     const [inventory, setInventory] = useState([]);
+    const [inventoryNameSearch, setInventoryNameSearch] = useState('');
     const [stats, setStats] = useState(null);
     const [admins, setAdmins] = useState([]);
     const [isSystemAdmin, setIsSystemAdmin] = useState(false);
@@ -63,6 +64,14 @@ const AdminDashboard = () => {
         setIsSystemAdmin(role === 'system_admin');
         fetchAdminData();
     }, [navigate, fetchAdminData]);
+
+    const filteredInventory = useMemo(() => {
+        const query = inventoryNameSearch.trim().toLowerCase();
+        if (!query) return inventory;
+        return inventory.filter((item) =>
+            (item.personnel_name || '').toLowerCase().includes(query)
+        );
+    }, [inventory, inventoryNameSearch]);
 
     // Intelligent ID fetcher
     useEffect(() => {
@@ -380,8 +389,31 @@ const AdminDashboard = () => {
                     <TabsContent value="inventory">
                         <Card className="border-2">
                             <CardHeader>
-                                <CardTitle>{t('admin.inventory')}</CardTitle>
-                                <CardDescription>Tüm zimmetli ve iade edilmiş ürünlerin listesi</CardDescription>
+                                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                                    <div>
+                                        <CardTitle>{t('admin.inventory')}</CardTitle>
+                                        <CardDescription>Tüm zimmetli ve iade edilmiş ürünlerin listesi</CardDescription>
+                                    </div>
+                                    <div className="relative w-full sm:w-72 shrink-0">
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                                        <Input
+                                            value={inventoryNameSearch}
+                                            onChange={(e) => setInventoryNameSearch(e.target.value)}
+                                            placeholder={t('admin.searchByName')}
+                                            className="pl-9 pr-9 rounded-xl border-gray-200"
+                                        />
+                                        {inventoryNameSearch && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setInventoryNameSearch('')}
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                                aria-label="Aramayı temizle"
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
                             </CardHeader>
                             <CardContent>
                                 <div className="overflow-x-auto">
@@ -398,7 +430,16 @@ const AdminDashboard = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {inventory.map((item) => (
+                                            {filteredInventory.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan={7} className="p-8 text-center text-gray-500">
+                                                        {inventoryNameSearch.trim()
+                                                            ? t('admin.noSearchResults')
+                                                            : 'Kayıt bulunamadı'}
+                                                    </td>
+                                                </tr>
+                                            ) : (
+                                                filteredInventory.map((item) => (
                                                 <tr key={item.id} className="border-b hover:bg-gray-50">
                                                     <td className="p-4 font-mono">{item.personnel_id}</td>
                                                     <td className="p-4 font-medium">{item.personnel_name}</td>
@@ -420,7 +461,7 @@ const AdminDashboard = () => {
                                                         )}
                                                     </td>
                                                 </tr>
-                                            ))}
+                                            )))}
                                         </tbody>
                                     </table>
                                 </div>

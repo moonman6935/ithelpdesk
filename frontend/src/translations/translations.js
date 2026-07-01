@@ -277,6 +277,8 @@ export const translations = {
         pending: 'Onay Bekleyen'
       },
       inventory: 'Tüm Zimmetler',
+      searchByName: 'İsim soyisim ile ara...',
+      noSearchResults: 'Arama kriterine uygun kayıt bulunamadı.',
       returnButton: 'İade Al',
       returnNote: 'İade Notu (Opsiyonel)',
       status: 'Durum',
