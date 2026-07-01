@@ -25,7 +25,11 @@ const LoginPage = () => {
             localStorage.setItem('admin_role', response.data.role);
             navigate('/admin');
         } catch (err) {
-            setError(err.response?.data?.detail || 'Giriş başarısız');
+            if (!err.response) {
+                setError('API sunucusuna bağlanılamıyor. Vercel ortam değişkenlerinde MONGO_URL tanımlı olduğundan emin olun.');
+            } else {
+                setError(err.response?.data?.detail || 'Giriş başarısız');
+            }
         }
     };
 

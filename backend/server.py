@@ -22,7 +22,15 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 # 24 hours
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
+use_mock_db = os.environ.get('USE_MOCK_DB', 'false').lower() == 'true'
+
+if use_mock_db:
+    from mongomock_motor import AsyncMongoMockClient
+    client = AsyncMongoMockClient()
+    logging.getLogger(__name__).warning('USE_MOCK_DB=true: using in-memory database (dev only)')
+else:
+    client = AsyncIOMotorClient(mongo_url)
+
 db = client[os.environ['DB_NAME']]
 
 # pwd_context initialization removed due to bcrypt bug in passlib on Python 3.14
@@ -322,4 +330,5 @@ logger = logging.getLogger(__name__)
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
-    client.close()
+    if not use_mock_db:
+        client.close()

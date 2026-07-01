@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: ithelpdesk-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+      - key: DB_NAME
+        value: it_helpdesk
+      - key: USE_MOCK_DB
+        value: "false"
+      - key: MONGO_URL
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: CORS_ORIGINS
+        sync: false
