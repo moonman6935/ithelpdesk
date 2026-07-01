@@ -6,7 +6,8 @@ export const translations = {
       pcSetup: 'PC Kurulumu',
       headsetTest: 'Kulaklık Testi',
       troubleshooting: 'Sorun Giderme',
-      faq: 'SSS'
+      faq: 'SSS',
+      videoTutorials: 'Sorun Giderme Videolu Anlatım'
     },
     home: {
       welcome: 'DCS Communication Center IT Departmanı',
@@ -387,6 +388,26 @@ export const translations = {
           slate: 'Koyu',
         },
       },
+      videoTutorials: {
+        tab: 'Videolar',
+        title: 'Sorun Giderme Videoları',
+        desc: 'Başlık ve video bağlantısı ekleyin. YouTube, Vimeo veya doğrudan video linki kullanabilirsiniz.',
+        heading: 'Video Başlığı',
+        headingPlaceholder: 'Örn: Citrix Bağlantı Sorunu',
+        videoUrl: 'Video Bağlantısı',
+        videoUrlPlaceholder: 'https://www.youtube.com/watch?v=...',
+        add: 'Video Ekle',
+        added: 'Video eklendi.',
+        empty: 'Henüz video eklenmemiş.',
+        deleteConfirm: 'Bu videoyu silmek istediğinize emin misiniz?',
+        required: 'Başlık ve video bağlantısı zorunludur.',
+        error: 'Video kaydedilemedi.',
+      },
+    },
+    videoTutorials: {
+      title: 'Sorun Giderme Videolu Anlatım',
+      subtitle: 'Sık karşılaşılan sorunlar için adım adım video rehberleri.',
+      empty: 'Henüz yayınlanmış video bulunmuyor.',
     },
     announcement: {
       priority: {
@@ -404,7 +425,8 @@ export const translations = {
       pcSetup: 'PC-Einrichtung',
       headsetTest: 'Headset-Test',
       troubleshooting: 'Fehlerbehebung',
-      faq: 'FAQ'
+      faq: 'FAQ',
+      videoTutorials: 'Video-Fehlerbehebung'
     },
     home: {
       welcome: 'DCS Communication Center IT-Abteilung',
@@ -778,6 +800,26 @@ export const translations = {
         error: 'Ankündigung konnte nicht gespeichert werden.',
         bg: { red: 'Rot', blue: 'Blau', green: 'Grün', orange: 'Orange', violet: 'Violett', slate: 'Dunkel' },
       },
+      videoTutorials: {
+        tab: 'Videos',
+        title: 'Fehlerbehebungs-Videos',
+        desc: 'Titel und Video-Link hinzufügen. YouTube, Vimeo oder direkte Video-URLs werden unterstützt.',
+        heading: 'Videotitel',
+        headingPlaceholder: 'z. B. Citrix-Verbindungsproblem',
+        videoUrl: 'Video-Link',
+        videoUrlPlaceholder: 'https://www.youtube.com/watch?v=...',
+        add: 'Video hinzufügen',
+        added: 'Video hinzugefügt.',
+        empty: 'Noch keine Videos vorhanden.',
+        deleteConfirm: 'Dieses Video wirklich löschen?',
+        required: 'Titel und Video-Link sind erforderlich.',
+        error: 'Video konnte nicht gespeichert werden.',
+      },
+    },
+    videoTutorials: {
+      title: 'Video-Fehlerbehebung',
+      subtitle: 'Schritt-für-Schritt-Videoanleitungen für häufige Probleme.',
+      empty: 'Noch keine Videos veröffentlicht.',
     },
     announcement: {
       priority: { high: 'Hohe Priorität', medium: 'Mittlere Priorität', low: 'Niedrige Priorität' },
@@ -791,7 +833,8 @@ export const translations = {
       pcSetup: 'PC Setup',
       headsetTest: 'Headset Test',
       troubleshooting: 'Troubleshooting',
-      faq: 'FAQ'
+      faq: 'FAQ',
+      videoTutorials: 'Video Troubleshooting'
     },
     home: {
       welcome: 'DCS Communication Center IT Department',
@@ -1165,6 +1208,26 @@ export const translations = {
         error: 'Could not save announcement.',
         bg: { red: 'Red', blue: 'Blue', green: 'Green', orange: 'Orange', violet: 'Purple', slate: 'Dark' },
       },
+      videoTutorials: {
+        tab: 'Videos',
+        title: 'Troubleshooting Videos',
+        desc: 'Add a title and video link. YouTube, Vimeo, or direct video URLs are supported.',
+        heading: 'Video Title',
+        headingPlaceholder: 'e.g. Citrix Connection Issue',
+        videoUrl: 'Video Link',
+        videoUrlPlaceholder: 'https://www.youtube.com/watch?v=...',
+        add: 'Add Video',
+        added: 'Video added.',
+        empty: 'No videos added yet.',
+        deleteConfirm: 'Delete this video?',
+        required: 'Title and video link are required.',
+        error: 'Could not save video.',
+      },
+    },
+    videoTutorials: {
+      title: 'Video Troubleshooting',
+      subtitle: 'Step-by-step video guides for common issues.',
+      empty: 'No videos published yet.',
     },
     announcement: {
       priority: { high: 'High Priority', medium: 'Medium Priority', low: 'Low Priority' },

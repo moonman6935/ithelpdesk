@@ -633,6 +633,52 @@ module.exports = async (req, res) => {
             return sendJson(res, 200, { status: 'success', announcement });
         }
 
+        if (method === 'GET' && route === 'troubleshooting-videos') {
+            const videos = await db.collection('troubleshooting_videos')
+                .find({}, { projection: { _id: 0 } })
+                .sort({ created_at: -1 })
+                .toArray();
+            return sendJson(res, 200, videos);
+        }
+
+        if (method === 'GET' && route === 'admin/troubleshooting-videos') {
+            if (!(await requireWriteAccess(db, req, res))) return;
+            const videos = await db.collection('troubleshooting_videos')
+                .find({}, { projection: { _id: 0 } })
+                .sort({ created_at: -1 })
+                .toArray();
+            return sendJson(res, 200, videos);
+        }
+
+        if (method === 'POST' && route === 'admin/troubleshooting-videos') {
+            if (!(await requireWriteAccess(db, req, res))) return;
+            const data = req.body || {};
+            const title = String(data.title || '').trim();
+            const video_url = String(data.video_url || '').trim();
+            if (!title || !video_url) {
+                return sendError(res, 400, 'Başlık ve video bağlantısı gerekli');
+            }
+            const video = {
+                id: randomUUID(),
+                title,
+                video_url,
+                created_at: new Date().toISOString(),
+                created_by: getAuthUsername(req) || 'admin',
+            };
+            await db.collection('troubleshooting_videos').insertOne(video);
+            return sendJson(res, 200, { status: 'success', video });
+        }
+
+        if (method === 'DELETE' && segments[0] === 'admin' && segments[1] === 'troubleshooting-videos' && segments.length === 3) {
+            if (!(await requireWriteAccess(db, req, res))) return;
+            const videoId = segments[2];
+            const result = await db.collection('troubleshooting_videos').deleteOne({ id: videoId });
+            if (result.deletedCount === 0) {
+                return sendError(res, 404, 'Video bulunamadı');
+            }
+            return sendJson(res, 200, { status: 'success' });
+        }
+
         if (method === 'DELETE' && segments[0] === 'admin' && segments[1] === 'users' && segments.length === 3) {
             if (!(await requireSystemAdmin(db, req, res))) return;
             const username = segments[2];

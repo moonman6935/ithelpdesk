@@ -117,6 +117,9 @@ code {
     .nav-hover-rose {
         @apply hover:bg-gradient-to-r hover:from-rose-500 hover:to-pink-600 hover:text-white hover:shadow-md;
     }
+    .nav-hover-cyan {
+        @apply hover:bg-gradient-to-r hover:from-cyan-500 hover:to-sky-600 hover:text-white hover:shadow-md;
+    }
 
     .accordion-color-hover {
         @apply transition-all duration-300 hover:shadow-md hover:border-violet-200 hover:bg-white/90;

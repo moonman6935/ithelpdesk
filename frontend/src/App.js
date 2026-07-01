@@ -11,6 +11,7 @@ import Troubleshooting from "./pages/Troubleshooting";
 import AssetConfirmation from "./pages/AssetConfirmation";
 import AdminDashboard from "./pages/AdminDashboard";
 import FAQ from "./pages/FAQ";
+import VideoTutorials from "./pages/VideoTutorials";
 import LoginPage from "./pages/LoginPage";
 import SiteBackground from "./components/SiteBackground";
 import AnnouncementPopup from "./components/AnnouncementPopup";
@@ -30,6 +31,7 @@ function App() {
               <Route path="/headset-test" element={<HeadsetTest />} />
               <Route path="/troubleshooting" element={<Troubleshooting />} />
               <Route path="/faq" element={<FAQ />} />
+              <Route path="/video-tutorials" element={<VideoTutorials />} />
               <Route path="/asset-confirmation" element={<AssetConfirmation />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/login" element={<LoginPage />} />

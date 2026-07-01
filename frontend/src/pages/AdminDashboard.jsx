@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from "../components/ui/alert";
 import {
     User, PlusCircle, CheckCircle2, LayoutDashboard, Package,
     RefreshCcw, Users, Trash2, ArrowLeftRight, LogOut, Dices, KeyRound, Search, X, Upload,
-    Truck, PackageCheck, Megaphone
+    Truck, PackageCheck, Megaphone, Video
 } from "lucide-react";
 import {
     Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
@@ -19,6 +19,7 @@ import { batchImport, getImportErrorMessage } from '../lib/batchImport';
 import api from '../lib/api';
 import CargoPanel from '../components/CargoPanel';
 import AnnouncementAdmin from '../components/AnnouncementAdmin';
+import VideoTutorialsAdmin from '../components/VideoTutorialsAdmin';
 import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
@@ -338,9 +339,14 @@ const AdminDashboard = () => {
                             </TabsTrigger>
                         )}
                         {canWrite && (
+                            <>
                             <TabsTrigger value="announcement" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                                 <Megaphone className="w-4 h-4 mr-2" /> {t('admin.announcement.tab')}
                             </TabsTrigger>
+                            <TabsTrigger value="video-tutorials" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
+                                <Video className="w-4 h-4 mr-2" /> {t('admin.videoTutorials.tab')}
+                            </TabsTrigger>
+                            </>
                         )}
                         <TabsTrigger value="account" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                             <KeyRound className="w-4 h-4 mr-2" /> {t('admin.passwordTab')}
@@ -724,6 +730,12 @@ const AdminDashboard = () => {
                     {canWrite && (
                     <TabsContent value="announcement">
                         <AnnouncementAdmin />
+                    </TabsContent>
+                    )}
+
+                    {canWrite && (
+                    <TabsContent value="video-tutorials">
+                        <VideoTutorialsAdmin />
                     </TabsContent>
                     )}
 
