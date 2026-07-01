@@ -8,7 +8,7 @@ import { Badge } from "../components/ui/badge";
 import { Alert, AlertDescription } from "../components/ui/alert";
 import {
     User, PlusCircle, CheckCircle2, LayoutDashboard, Package,
-    RefreshCcw, Users, Trash2, ArrowLeftRight, LogOut, Dices
+    RefreshCcw, Users, Trash2, ArrowLeftRight, LogOut, Dices, KeyRound
 } from "lucide-react";
 import api from '../lib/api';
 import { useNavigate } from 'react-router-dom';
@@ -25,6 +25,11 @@ const AdminDashboard = () => {
     const [admins, setAdmins] = useState([]);
     const [isSystemAdmin, setIsSystemAdmin] = useState(false);
     const [newAdmin, setNewAdmin] = useState({ username: '', password: '', role: 'admin' });
+    const [passwordForm, setPasswordForm] = useState({
+        current_password: '',
+        new_password: '',
+        confirm_password: '',
+    });
 
     const fetchAdminData = useCallback(async () => {
         try {
@@ -101,6 +106,7 @@ const AdminDashboard = () => {
     const handleLogout = () => {
         localStorage.removeItem('admin_token');
         localStorage.removeItem('admin_role');
+        localStorage.removeItem('admin_username');
         navigate('/login');
     };
 
@@ -187,6 +193,26 @@ const AdminDashboard = () => {
         }
     };
 
+    const handleChangePassword = async (e) => {
+        e.preventDefault();
+        const username = localStorage.getItem('admin_username') || 'admin';
+        if (passwordForm.new_password !== passwordForm.confirm_password) {
+            alert('Yeni şifreler eşleşmiyor');
+            return;
+        }
+        try {
+            await api.post('/api/admin/change-password', {
+                username,
+                current_password: passwordForm.current_password,
+                new_password: passwordForm.new_password,
+            });
+            alert('Şifre başarıyla değiştirildi. Lütfen tekrar giriş yapın.');
+            handleLogout();
+        } catch (err) {
+            alert(err.response?.data?.detail || 'Şifre değiştirilemedi');
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 py-12">
             <div className="container mx-auto px-4">
@@ -219,6 +245,9 @@ const AdminDashboard = () => {
                                 <Users className="w-4 h-4 mr-2" /> {t('admin.adminManagement')}
                             </TabsTrigger>
                         )}
+                        <TabsTrigger value="account" className="data-[state=active]:bg-red-600 data-[state=active]:text-white px-6">
+                            <KeyRound className="w-4 h-4 mr-2" /> Şifre
+                        </TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="dashboard">
@@ -522,6 +551,53 @@ const AdminDashboard = () => {
                             </div>
                         </TabsContent>
                     )}
+
+                    <TabsContent value="account">
+                        <Card className="max-w-md border-2">
+                            <CardHeader>
+                                <CardTitle>Şifre Değiştir</CardTitle>
+                                <CardDescription>
+                                    Kullanıcı: <strong>{localStorage.getItem('admin_username') || 'admin'}</strong>
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <form onSubmit={handleChangePassword} className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Mevcut Şifre</label>
+                                        <Input
+                                            type="password"
+                                            value={passwordForm.current_password}
+                                            onChange={(e) => setPasswordForm({ ...passwordForm, current_password: e.target.value })}
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Yeni Şifre</label>
+                                        <Input
+                                            type="password"
+                                            value={passwordForm.new_password}
+                                            onChange={(e) => setPasswordForm({ ...passwordForm, new_password: e.target.value })}
+                                            required
+                                            minLength={6}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Yeni Şifre (Tekrar)</label>
+                                        <Input
+                                            type="password"
+                                            value={passwordForm.confirm_password}
+                                            onChange={(e) => setPasswordForm({ ...passwordForm, confirm_password: e.target.value })}
+                                            required
+                                            minLength={6}
+                                        />
+                                    </div>
+                                    <Button type="submit" className="w-full bg-red-600 hover:bg-red-700">
+                                        Şifreyi Güncelle
+                                    </Button>
+                                </form>
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
                 </Tabs>
             </div>
         </div>

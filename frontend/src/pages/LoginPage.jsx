@@ -23,6 +23,7 @@ const LoginPage = () => {
             });
             localStorage.setItem('admin_token', response.data.access_token);
             localStorage.setItem('admin_role', response.data.role);
+            localStorage.setItem('admin_username', username);
             navigate('/admin');
         } catch (err) {
             if (!err.response) {

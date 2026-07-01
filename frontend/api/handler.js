@@ -211,6 +211,25 @@ module.exports = async (req, res) => {
             return sendJson(res, 200, { status: 'success' });
         }
 
+        if (method === 'POST' && route === 'admin/change-password') {
+            const { username, current_password, new_password } = req.body || {};
+            if (!username || !current_password || !new_password) {
+                return sendError(res, 400, 'Kullanıcı adı, mevcut şifre ve yeni şifre gerekli');
+            }
+            if (new_password.length < 6) {
+                return sendError(res, 400, 'Yeni şifre en az 6 karakter olmalı');
+            }
+            const user = await db.collection('users').findOne({ username });
+            if (!user || !verifyPassword(current_password, user.password_hash)) {
+                return sendError(res, 401, 'Mevcut şifre hatalı');
+            }
+            await db.collection('users').updateOne(
+                { username },
+                { $set: { password_hash: hashPassword(new_password) } }
+            );
+            return sendJson(res, 200, { status: 'success' });
+        }
+
         if (method === 'DELETE' && segments[0] === 'admin' && segments[1] === 'users' && segments.length === 3) {
             const username = segments[2];
             if (username === 'admin') {
@@ -224,7 +243,7 @@ module.exports = async (req, res) => {
     } catch (err) {
         console.error('API error:', err);
         const status = err.statusCode || 500;
-        const detail = err.statusCode ? err.message : 'Sunucu hatası';
+        const detail = err.message || 'Sunucu hatası';
         return sendError(res, status, detail);
     }
 };
