@@ -9,6 +9,7 @@ import {
 } from './ui/dialog';
 import { Search, X, Upload, Eye, Truck, PackageCheck } from 'lucide-react';
 import { readExcelFile } from '../lib/excelImport';
+import { batchImport, getImportErrorMessage } from '../lib/batchImport';
 import api from '../lib/api';
 
 const CargoPanel = ({ direction, canWrite }) => {
@@ -72,16 +73,16 @@ const CargoPanel = ({ direction, canWrite }) => {
         if (!importPreview?.items?.length) return;
         setImporting(true);
         try {
-            const res = await api.post('/api/admin/cargo/import', {
-                direction: importPreview.direction,
-                items: importPreview.items,
-            });
-            const { imported, skipped } = res.data;
+            const { imported, skipped } = await batchImport(
+                '/api/admin/cargo/import',
+                { direction: importPreview.direction },
+                importPreview.items
+            );
             alert(`${imported} ${t('admin.importSuccess')}${skipped ? `, ${skipped} ${t('admin.importSkipped')}` : ''}`);
             setImportPreview(null);
             fetchCargo();
         } catch (err) {
-            alert(err.response?.data?.detail || t('admin.importError'));
+            alert(getImportErrorMessage(err, t('admin.importError')));
         } finally {
             setImporting(false);
         }

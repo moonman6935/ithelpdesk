@@ -242,12 +242,27 @@ module.exports = async (req, res) => {
                 return sendError(res, 400, 'İçe aktarılacak kayıt bulunamadı');
             }
 
-            const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            const existingIds = await db.collection('inventory').distinct('personnel_id');
-            const numericIds = existingIds.map((pid) => parseInt(pid, 10)).filter((n) => !Number.isNaN(n));
+            const existingItems = await db.collection('inventory')
+                .find({}, { projection: { serial_number: 1, personnel_name: 1, personnel_id: 1, _id: 0 } })
+                .toArray();
+
+            const existingSerials = new Set(
+                existingItems.map((i) => i.serial_number).filter(Boolean)
+            );
+            const nameToId = {};
+            for (const item of existingItems) {
+                if (item.personnel_name && item.personnel_id) {
+                    const key = normalizeCargoKey(item.personnel_name);
+                    if (!nameToId[key]) nameToId[key] = item.personnel_id;
+                }
+            }
+
+            const numericIds = existingItems
+                .map((i) => parseInt(i.personnel_id, 10))
+                .filter((n) => !Number.isNaN(n));
             let nextId = numericIds.length ? Math.max(...numericIds) + 1 : 100001;
 
-            const nameToId = {};
+            const batchSerials = new Set();
             const itemsToInsert = [];
             let skipped = 0;
 
@@ -259,36 +274,34 @@ module.exports = async (req, res) => {
                 }
 
                 const serial = String(row.serial_number || '').trim();
-                if (serial) {
-                    const duplicate = await db.collection('inventory').findOne({ serial_number: serial });
-                    if (duplicate) {
-                        skipped += 1;
-                        continue;
-                    }
+                if (serial && (existingSerials.has(serial) || batchSerials.has(serial))) {
+                    skipped += 1;
+                    continue;
                 }
 
                 let personnelId = String(row.personnel_id || '').trim();
                 if (!personnelId) {
-                    if (!nameToId[name]) {
-                        const existing = await db.collection('inventory').findOne({
-                            personnel_name: { $regex: `^${escapeRegex(name)}$`, $options: 'i' },
-                        });
-                        nameToId[name] = existing?.personnel_id || String(nextId++);
+                    const nameKey = normalizeCargoKey(name);
+                    if (!nameToId[nameKey]) {
+                        nameToId[nameKey] = String(nextId++);
                     }
-                    personnelId = nameToId[name];
+                    personnelId = nameToId[nameKey];
                 } else {
-                    nameToId[name] = personnelId;
+                    nameToId[normalizeCargoKey(name)] = personnelId;
                 }
 
                 const createdAt = row.created_at || new Date().toISOString();
                 const status = row.status === 'returned' ? 'returned' : 'assigned';
+                const finalSerial = serial || `IMP-${randomUUID().slice(0, 8)}`;
+
+                if (serial) batchSerials.add(serial);
 
                 itemsToInsert.push({
                     id: randomUUID(),
                     personnel_id: personnelId,
                     personnel_name: name,
                     item_name: String(row.item_name || 'Ürün').trim(),
-                    serial_number: serial || `IMP-${randomUUID().slice(0, 8)}`,
+                    serial_number: finalSerial,
                     created_at: createdAt,
                     status,
                     return_note: null,
@@ -297,7 +310,10 @@ module.exports = async (req, res) => {
             }
 
             if (itemsToInsert.length) {
-                await db.collection('inventory').insertMany(itemsToInsert);
+                const CHUNK = 100;
+                for (let i = 0; i < itemsToInsert.length; i += CHUNK) {
+                    await db.collection('inventory').insertMany(itemsToInsert.slice(i, i + CHUNK));
+                }
             }
 
             return sendJson(res, 200, {
@@ -412,6 +428,14 @@ module.exports = async (req, res) => {
                 return sendError(res, 400, 'İçe aktarılacak kayıt bulunamadı');
             }
 
+            const existingCargo = await db.collection('cargo')
+                .find({ direction }, { projection: { serial_number: 1, _id: 0 } })
+                .toArray();
+            const existingSerials = new Set(
+                existingCargo.map((c) => c.serial_number).filter(Boolean)
+            );
+            const batchSerials = new Set();
+
             const itemsToInsert = [];
             let skipped = 0;
             const now = new Date().toISOString();
@@ -424,23 +448,20 @@ module.exports = async (req, res) => {
                 }
 
                 const serial = String(row.serial_number || '').trim();
-                if (serial) {
-                    const duplicate = await db.collection('cargo').findOne({
-                        direction,
-                        serial_number: serial,
-                    });
-                    if (duplicate) {
-                        skipped += 1;
-                        continue;
-                    }
+                if (serial && (existingSerials.has(serial) || batchSerials.has(serial))) {
+                    skipped += 1;
+                    continue;
                 }
+
+                const finalSerial = serial || `KARGO-${randomUUID().slice(0, 8)}`;
+                if (serial) batchSerials.add(serial);
 
                 itemsToInsert.push({
                     id: randomUUID(),
                     direction,
                     personnel_name: name,
                     item_name: String(row.item_name || 'Kargo').trim(),
-                    serial_number: serial || `KARGO-${randomUUID().slice(0, 8)}`,
+                    serial_number: finalSerial,
                     created_at: row.created_at || now,
                     imported_at: now,
                     row_no: row.row_no ?? null,
@@ -463,7 +484,10 @@ module.exports = async (req, res) => {
             }
 
             if (itemsToInsert.length) {
-                await db.collection('cargo').insertMany(itemsToInsert);
+                const CHUNK = 100;
+                for (let i = 0; i < itemsToInsert.length; i += CHUNK) {
+                    await db.collection('cargo').insertMany(itemsToInsert.slice(i, i + CHUNK));
+                }
             }
 
             return sendJson(res, 200, {

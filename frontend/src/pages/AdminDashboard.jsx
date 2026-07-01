@@ -15,6 +15,7 @@ import {
     Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "../components/ui/dialog";
 import { readExcelFile } from '../lib/excelImport';
+import { batchImport, getImportErrorMessage } from '../lib/batchImport';
 import api from '../lib/api';
 import CargoPanel from '../components/CargoPanel';
 import { useNavigate } from 'react-router-dom';
@@ -258,13 +259,16 @@ const AdminDashboard = () => {
         if (!importPreview?.items?.length) return;
         setImporting(true);
         try {
-            const res = await api.post('/api/admin/inventory/import', { items: importPreview.items });
-            const { imported, skipped } = res.data;
+            const { imported, skipped } = await batchImport(
+                '/api/admin/inventory/import',
+                {},
+                importPreview.items
+            );
             alert(`${imported} ${t('admin.importSuccess')}${skipped ? `, ${skipped} ${t('admin.importSkipped')}` : ''}`);
             setImportPreview(null);
             fetchAdminData();
         } catch (err) {
-            alert(err.response?.data?.detail || t('admin.importError'));
+            alert(getImportErrorMessage(err, t('admin.importError')));
         } finally {
             setImporting(false);
         }
