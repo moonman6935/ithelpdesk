@@ -31,7 +31,7 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 px-3 sm:px-4 pt-3 pb-1">
-      <div className="container mx-auto max-w-6xl">
+      <div className="container mx-auto max-w-7xl">
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-red-500 via-red-600 to-orange-500 shadow-xl border border-white/25">
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-yellow-300/25 blur-2xl" />

@@ -34,9 +34,9 @@ const HomeHeroCarousel = () => {
   }, [next]);
 
   return (
-    <section className="relative py-12 md:py-16 overflow-hidden">
-      <div className="container mx-auto px-4">
-        <div className="max-w-5xl mx-auto relative">
+    <section className="relative pt-10 md:pt-12 pb-2 md:pb-3 overflow-hidden">
+      <div className="container mx-auto px-4 lg:px-6 max-w-7xl">
+        <div className="w-full relative">
           <div className="overflow-hidden rounded-3xl shadow-2xl border border-white/50">
             <div
               className="flex transition-transform duration-700 ease-in-out"
@@ -69,7 +69,7 @@ const HomeHeroCarousel = () => {
                           {slide.title}
                         </h2>
                         <p
-                          className={`text-lg md:text-xl text-white/95 leading-relaxed max-w-xl transition-all duration-700 delay-150 ${
+                          className={`text-lg md:text-xl text-white/95 leading-relaxed max-w-2xl lg:max-w-3xl transition-all duration-700 delay-150 ${
                             isActive ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'
                           }`}
                         >
@@ -133,7 +133,7 @@ const HomeHeroCarousel = () => {
             <ChevronRight className="w-5 h-5" />
           </button>
 
-          <div className="flex justify-center gap-2 mt-6">
+          <div className="flex justify-center gap-2 mt-4">
             {slides.map((slide, index) => (
               <button
                 key={slide.title}
