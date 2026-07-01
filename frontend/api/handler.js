@@ -1,6 +1,58 @@
 const { randomUUID } = require('crypto');
 const { getDb, ensureDefaultAdmin } = require('./_lib/db');
 const { hashPassword, verifyPassword, createAccessToken } = require('./_lib/auth');
+const jwt = require('jsonwebtoken');
+
+const SECRET_KEY = process.env.SECRET_KEY || 'b4f2c8d9e1a3c5b7a9d0e2f4a6b8c0d2';
+const ALLOWED_ROLES = ['admin', 'system_admin', 'viewer'];
+const WRITE_ROLES = ['admin', 'system_admin'];
+
+function getAuthUsername(req) {
+    const auth = req.headers.authorization;
+    if (!auth || !auth.startsWith('Bearer ')) return null;
+    try {
+        const payload = jwt.verify(auth.slice(7), SECRET_KEY);
+        return payload.sub || null;
+    } catch {
+        return null;
+    }
+}
+
+async function getUserRole(db, username) {
+    if (!username) return null;
+    const user = await db.collection('users').findOne({ username });
+    return user?.role || null;
+}
+
+async function requireAdminAccess(db, req, res) {
+    const username = getAuthUsername(req);
+    const role = await getUserRole(db, username);
+    if (!role || !ALLOWED_ROLES.includes(role)) {
+        sendError(res, 401, 'Yetkisiz erişim');
+        return null;
+    }
+    return role;
+}
+
+async function requireWriteAccess(db, req, res) {
+    const role = await requireAdminAccess(db, req, res);
+    if (!role) return null;
+    if (!WRITE_ROLES.includes(role)) {
+        sendError(res, 403, 'Bu işlem için yetkiniz yok');
+        return null;
+    }
+    return role;
+}
+
+async function requireSystemAdmin(db, req, res) {
+    const role = await requireAdminAccess(db, req, res);
+    if (!role) return null;
+    if (role !== 'system_admin') {
+        sendError(res, 403, 'Bu işlem için sistem yöneticisi yetkisi gerekli');
+        return null;
+    }
+    return role;
+}
 
 function sendJson(res, status, data) {
     res.status(status).json(data);
@@ -71,6 +123,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'GET' && route === 'admin/stats') {
+            if (!(await requireAdminAccess(db, req, res))) return;
             const total_assigned = await db.collection('inventory').countDocuments({ status: 'assigned' });
             const total_returned = await db.collection('inventory').countDocuments({ status: 'returned' });
             const personnel_ids = await db.collection('inventory').distinct('personnel_id');
@@ -93,6 +146,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'POST' && route === 'admin/inventory/bulk') {
+            if (!(await requireWriteAccess(db, req, res))) return;
             const inputs = Array.isArray(req.body) ? req.body : [];
             const now = new Date().toISOString();
             const itemsToInsert = inputs.map((input) => ({
@@ -121,6 +175,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'POST' && route === 'admin/inventory/return') {
+            if (!(await requireWriteAccess(db, req, res))) return;
             const item_id = req.query.item_id;
             const note = req.query.note || '';
             const result = await db.collection('inventory').updateOne(
@@ -134,6 +189,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'POST' && route === 'admin/inventory/reset-confirmation') {
+            if (!(await requireWriteAccess(db, req, res))) return;
             const personnel_id = req.query.personnel_id;
             await db.collection('confirmations').updateMany(
                 { personnel_id, status: 'confirmed' },
@@ -143,6 +199,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'GET' && route === 'admin/next-personnel-id') {
+            if (!(await requireWriteAccess(db, req, res))) return;
             const pIds = await db.collection('inventory').distinct('personnel_id');
             const numericIds = pIds.map((pid) => parseInt(pid, 10)).filter((n) => !Number.isNaN(n));
             if (!numericIds.length) {
@@ -152,6 +209,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'GET' && route === 'admin/personnel/search') {
+            if (!(await requireWriteAccess(db, req, res))) return;
             const name = req.query.name || '';
             const personnel = await db.collection('inventory').findOne(
                 { personnel_name: { $regex: `^${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' } },
@@ -161,6 +219,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'GET' && route === 'admin/random-personnel-id') {
+            if (!(await requireWriteAccess(db, req, res))) return;
             for (let i = 0; i < 10; i += 1) {
                 const newId = String(Math.floor(100000 + Math.random() * 900000));
                 const existing = await db.collection('inventory').findOne({ personnel_id: newId });
@@ -175,6 +234,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'GET' && route === 'admin/confirmations') {
+            if (!(await requireAdminAccess(db, req, res))) return;
             const confirmations = await db.collection('confirmations')
                 .find({}, { projection: { _id: 0 } })
                 .toArray();
@@ -182,6 +242,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'GET' && route === 'admin/inventory') {
+            if (!(await requireAdminAccess(db, req, res))) return;
             const inventory = await db.collection('inventory')
                 .find({}, { projection: { _id: 0 } })
                 .toArray();
@@ -189,6 +250,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'GET' && route === 'admin/users') {
+            if (!(await requireSystemAdmin(db, req, res))) return;
             const users = await db.collection('users')
                 .find({}, { projection: { _id: 0, password_hash: 0 } })
                 .toArray();
@@ -196,7 +258,11 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'POST' && route === 'admin/users') {
+            if (!(await requireSystemAdmin(db, req, res))) return;
             const data = req.body || {};
+            if (!ALLOWED_ROLES.includes(data.role)) {
+                return sendError(res, 400, 'Geçersiz rol');
+            }
             const existing = await db.collection('users').findOne({ username: data.username });
             if (existing) {
                 return sendError(res, 400, 'Bu kullanıcı adı zaten mevcut');
@@ -212,6 +278,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'POST' && route === 'admin/change-password') {
+            if (!(await requireAdminAccess(db, req, res))) return;
             const { username, current_password, new_password } = req.body || {};
             if (!username || !current_password || !new_password) {
                 return sendError(res, 400, 'Kullanıcı adı, mevcut şifre ve yeni şifre gerekli');
@@ -231,6 +298,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'DELETE' && segments[0] === 'admin' && segments[1] === 'users' && segments.length === 3) {
+            if (!(await requireSystemAdmin(db, req, res))) return;
             const username = segments[2];
             if (username === 'admin') {
                 return sendError(res, 400, 'Ana sistem yöneticisi silinemez');

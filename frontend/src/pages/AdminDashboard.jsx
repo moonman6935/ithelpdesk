@@ -25,6 +25,7 @@ const AdminDashboard = () => {
     const [stats, setStats] = useState(null);
     const [admins, setAdmins] = useState([]);
     const [isSystemAdmin, setIsSystemAdmin] = useState(false);
+    const [isViewer, setIsViewer] = useState(false);
     const [newAdmin, setNewAdmin] = useState({ username: '', password: '', role: 'admin' });
     const [passwordForm, setPasswordForm] = useState({
         current_password: '',
@@ -62,6 +63,7 @@ const AdminDashboard = () => {
             return;
         }
         setIsSystemAdmin(role === 'system_admin');
+        setIsViewer(role === 'viewer');
         fetchAdminData();
     }, [navigate, fetchAdminData]);
 
@@ -72,6 +74,9 @@ const AdminDashboard = () => {
             (item.personnel_name || '').toLowerCase().includes(query)
         );
     }, [inventory, inventoryNameSearch]);
+
+    const roleLabel = (role) => t(`admin.roles.${role}`) || role;
+    const canWrite = !isViewer;
 
     // Intelligent ID fetcher
     useEffect(() => {
@@ -231,7 +236,7 @@ const AdminDashboard = () => {
                         {t('admin.title')}
                     </h1>
                     <Button variant="outline" onClick={handleLogout} className="text-red-600 border-red-200">
-                        <LogOut className="w-4 h-4 mr-2" /> Çıkış Yap
+                        <LogOut className="w-4 h-4 mr-2" /> {t('admin.logout')}
                     </Button>
                 </div>
 
@@ -240,9 +245,11 @@ const AdminDashboard = () => {
                         <TabsTrigger value="dashboard" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                             <LayoutDashboard className="w-4 h-4 mr-2" /> {t('admin.dashboard')}
                         </TabsTrigger>
+                        {canWrite && (
                         <TabsTrigger value="add" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                             <PlusCircle className="w-4 h-4 mr-2" /> {t('admin.addAsset')}
                         </TabsTrigger>
+                        )}
                         <TabsTrigger value="inventory" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                             <Package className="w-4 h-4 mr-2" /> {t('admin.inventory')}
                         </TabsTrigger>
@@ -255,7 +262,7 @@ const AdminDashboard = () => {
                             </TabsTrigger>
                         )}
                         <TabsTrigger value="account" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
-                            <KeyRound className="w-4 h-4 mr-2" /> Şifre
+                            <KeyRound className="w-4 h-4 mr-2" /> {t('admin.passwordTab')}
                         </TabsTrigger>
                     </TabsList>
 
@@ -296,6 +303,7 @@ const AdminDashboard = () => {
                         </div>
                     </TabsContent>
 
+                    {canWrite && (
                     <TabsContent value="add">
                         <Card className="max-w-3xl mx-auto border-2">
                             <CardHeader>
@@ -339,9 +347,9 @@ const AdminDashboard = () => {
 
                                     <div className="space-y-4">
                                         <div className="flex justify-between items-center">
-                                            <h3 className="font-bold text-lg">Ürün Listesi</h3>
+                                            <h3 className="font-bold text-lg">{t('admin.productList')}</h3>
                                             <Button type="button" variant="outline" size="sm" onClick={addItemRow} className="border-red-600 text-red-600">
-                                                <PlusCircle className="w-4 h-4 mr-2" /> Satır Ekle
+                                                <PlusCircle className="w-4 h-4 mr-2" /> {t('admin.addRow')}
                                             </Button>
                                         </div>
 
@@ -385,6 +393,7 @@ const AdminDashboard = () => {
                             </CardContent>
                         </Card>
                     </TabsContent>
+                    )}
 
                     <TabsContent value="inventory">
                         <Card className="border-2">
@@ -392,7 +401,7 @@ const AdminDashboard = () => {
                                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                                     <div>
                                         <CardTitle>{t('admin.inventory')}</CardTitle>
-                                        <CardDescription>Tüm zimmetli ve iade edilmiş ürünlerin listesi</CardDescription>
+                                        <CardDescription>{t('admin.inventoryDesc')}</CardDescription>
                                     </div>
                                     <div className="relative w-full sm:w-72 shrink-0">
                                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -407,7 +416,7 @@ const AdminDashboard = () => {
                                                 type="button"
                                                 onClick={() => setInventoryNameSearch('')}
                                                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                                aria-label="Aramayı temizle"
+                                                aria-label={t('admin.clearSearch')}
                                             >
                                                 <X className="w-4 h-4" />
                                             </button>
@@ -425,7 +434,7 @@ const AdminDashboard = () => {
                                                 <th className="p-4">{t('admin.itemName')}</th>
                                                 <th className="p-4 font-normal text-gray-500">S/N</th>
                                                 <th className="p-4">{t('admin.status')}</th>
-                                                <th className="p-4">Tarih</th>
+                                                <th className="p-4">{t('admin.date')}</th>
                                                 <th className="p-4">{t('admin.actions')}</th>
                                             </tr>
                                         </thead>
@@ -435,7 +444,7 @@ const AdminDashboard = () => {
                                                     <td colSpan={7} className="p-8 text-center text-gray-500">
                                                         {inventoryNameSearch.trim()
                                                             ? t('admin.noSearchResults')
-                                                            : 'Kayıt bulunamadı'}
+                                                            : t('admin.noRecords')}
                                                     </td>
                                                 </tr>
                                             ) : (
@@ -447,14 +456,14 @@ const AdminDashboard = () => {
                                                     <td className="p-4 text-gray-500">{item.serial_number}</td>
                                                     <td className="p-4">
                                                         <Badge className={item.status === 'assigned' ? "bg-red-100 text-red-700 hover:bg-red-100" : "bg-green-100 text-green-700 hover:bg-green-100"}>
-                                                            {item.status === 'assigned' ? 'ZİMMETLİ' : 'İADE EDİLDİ'}
+                                                            {item.status === 'assigned' ? t('admin.assigned') : t('admin.returned')}
                                                         </Badge>
                                                     </td>
                                                     <td className="p-4 text-xs text-gray-500">
                                                         {new Date(item.created_at).toLocaleString()}
                                                     </td>
                                                     <td className="p-4">
-                                                        {item.status === 'assigned' && (
+                                                        {canWrite && item.status === 'assigned' && (
                                                             <Button variant="ghost" size="sm" onClick={() => handleReturnAsset(item.id)} className="text-green-600">
                                                                 <ArrowLeftRight className="w-4 h-4 mr-2" /> {t('admin.returnButton')}
                                                             </Button>
@@ -478,7 +487,7 @@ const AdminDashboard = () => {
                                             <div className="p-6 flex-1">
                                                 <div className="flex items-center gap-2 mb-4">
                                                     <Badge className={conf.status === 'confirmed' ? "bg-green-600 text-white" : "bg-gray-400 text-white"}>
-                                                        {conf.status === 'confirmed' ? 'ONAYLANDI' : 'SIFIRLANDI'}
+                                                        {conf.status === 'confirmed' ? t('admin.confirmed') : t('admin.reset')}
                                                     </Badge>
                                                     <span className="text-gray-500 text-sm">{new Date(conf.confirmed_at).toLocaleString()}</span>
                                                 </div>
@@ -498,12 +507,12 @@ const AdminDashboard = () => {
                                                 </div>
                                             </div>
                                             <div className="bg-gray-50 p-6 flex items-center justify-center border-l">
-                                                {conf.status === 'confirmed' && (
+                                                {canWrite && conf.status === 'confirmed' && (
                                                     <Button
                                                         onClick={() => resetConfirmation(conf.personnel_id)}
                                                         className="bg-orange-500 hover:bg-orange-600 text-white"
                                                     >
-                                                        <RefreshCcw className="w-4 h-4 mr-2" /> Onayı Sıfırla (Reset)
+                                                        <RefreshCcw className="w-4 h-4 mr-2" /> {t('admin.resetConfirm')}
                                                     </Button>
                                                 )}
                                             </div>
@@ -519,12 +528,12 @@ const AdminDashboard = () => {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                 <Card className="md:col-span-1 border-2">
                                     <CardHeader>
-                                        <CardTitle>Yeni Yönetici Ekle</CardTitle>
+                                        <CardTitle>{t('admin.addNewAdmin')}</CardTitle>
                                     </CardHeader>
                                     <CardContent>
                                         <form onSubmit={handleAddAdmin} className="space-y-4">
                                             <div>
-                                                <label className="block text-sm font-medium mb-1">Kullanıcı Adı</label>
+                                                <label className="block text-sm font-medium mb-1">{t('admin.username')}</label>
                                                 <Input
                                                     value={newAdmin.username}
                                                     onChange={(e) => setNewAdmin({ ...newAdmin, username: e.target.value })}
@@ -532,7 +541,7 @@ const AdminDashboard = () => {
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium mb-1">Şifre</label>
+                                                <label className="block text-sm font-medium mb-1">{t('admin.password')}</label>
                                                 <Input
                                                     type="password"
                                                     value={newAdmin.password}
@@ -541,32 +550,33 @@ const AdminDashboard = () => {
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium mb-1">Rol</label>
+                                                <label className="block text-sm font-medium mb-1">{t('admin.role')}</label>
                                                 <select
                                                     className="w-full p-2 border rounded"
                                                     value={newAdmin.role}
                                                     onChange={(e) => setNewAdmin({ ...newAdmin, role: e.target.value })}
                                                 >
-                                                    <option value="admin">Admin</option>
-                                                    <option value="system_admin">Sistem Yöneticisi</option>
+                                                    <option value="viewer">{roleLabel('viewer')}</option>
+                                                    <option value="admin">{roleLabel('admin')}</option>
+                                                    <option value="system_admin">{roleLabel('system_admin')}</option>
                                                 </select>
                                             </div>
-                                            <Button type="submit" className="w-full bg-red-600">Ekle</Button>
+                                            <Button type="submit" className="w-full bg-red-600">{t('admin.addButton')}</Button>
                                         </form>
                                     </CardContent>
                                 </Card>
 
                                 <Card className="md:col-span-2 border-2">
                                     <CardHeader>
-                                        <CardTitle>Yöneticiler</CardTitle>
+                                        <CardTitle>{t('admin.adminsList')}</CardTitle>
                                     </CardHeader>
                                     <CardContent>
                                         <table className="w-full text-sm">
                                             <thead>
                                                 <tr className="border-b text-left">
-                                                    <th className="p-4">Kullanıcı Adı</th>
-                                                    <th className="p-4">Rol</th>
-                                                    <th className="p-4">İşlem</th>
+                                                    <th className="p-4">{t('admin.username')}</th>
+                                                    <th className="p-4">{t('admin.role')}</th>
+                                                    <th className="p-4">{t('admin.actions')}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -574,7 +584,7 @@ const AdminDashboard = () => {
                                                     <tr key={adm.id} className="border-b">
                                                         <td className="p-4 font-bold">{adm.username}</td>
                                                         <td className="p-4">
-                                                            <Badge variant="outline">{adm.role === 'system_admin' ? 'Sistem Yöneticisi' : 'Admin'}</Badge>
+                                                            <Badge variant="outline">{roleLabel(adm.role)}</Badge>
                                                         </td>
                                                         <td className="p-4">
                                                             {adm.username !== 'admin' && (
@@ -596,7 +606,7 @@ const AdminDashboard = () => {
                     <TabsContent value="account">
                         <Card className="max-w-md border-2">
                             <CardHeader>
-                                <CardTitle>Şifre Değiştir</CardTitle>
+                                <CardTitle>{t('admin.changePassword')}</CardTitle>
                                 <CardDescription>
                                     Kullanıcı: <strong>{localStorage.getItem('admin_username') || 'admin'}</strong>
                                 </CardDescription>
@@ -604,7 +614,7 @@ const AdminDashboard = () => {
                             <CardContent>
                                 <form onSubmit={handleChangePassword} className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">Mevcut Şifre</label>
+                                        <label className="block text-sm font-medium mb-1">{t('admin.currentPassword')}</label>
                                         <Input
                                             type="password"
                                             value={passwordForm.current_password}
@@ -613,7 +623,7 @@ const AdminDashboard = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">Yeni Şifre</label>
+                                        <label className="block text-sm font-medium mb-1">{t('admin.newPassword')}</label>
                                         <Input
                                             type="password"
                                             value={passwordForm.new_password}
@@ -623,7 +633,7 @@ const AdminDashboard = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">Yeni Şifre (Tekrar)</label>
+                                        <label className="block text-sm font-medium mb-1">{t('admin.confirmNewPassword')}</label>
                                         <Input
                                             type="password"
                                             value={passwordForm.confirm_password}
@@ -633,7 +643,7 @@ const AdminDashboard = () => {
                                         />
                                     </div>
                                     <Button type="submit" className="w-full bg-red-600 hover:bg-red-700">
-                                        Şifreyi Güncelle
+                                        {t('admin.updatePassword')}
                                     </Button>
                                 </form>
                             </CardContent>
