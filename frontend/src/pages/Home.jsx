@@ -10,6 +10,8 @@ import {
   HelpCircle,
   ClipboardCheck,
   Sparkles,
+  MessageSquare,
+  Ticket,
 } from 'lucide-react';
 import HomeHeroCarousel from '../components/HomeHeroCarousel';
 
@@ -110,6 +112,57 @@ function ColorCard({ gradient, blob, accent, Icon, title, description, cta, to, 
   );
 }
 
+const QUICK_LINKS = [
+  {
+    key: 'guide',
+    labelKey: 'home.subtitle',
+    Icon: Sparkles,
+    gradient: 'from-red-500 to-orange-500',
+    to: '/pc-setup',
+  },
+  {
+    key: 'faq',
+    labelKey: 'home.quickLinks.faq',
+    Icon: HelpCircle,
+    gradient: 'from-violet-500 to-purple-600',
+    to: '/faq',
+  },
+  {
+    key: 'rocketchat',
+    labelKey: 'home.quickLinks.rocketchat',
+    Icon: MessageSquare,
+    gradient: 'from-blue-500 to-indigo-600',
+    href: 'https://rocket.dmc-rz.com',
+  },
+  {
+    key: 'ticket',
+    labelKey: 'home.quickLinks.ticket',
+    Icon: Ticket,
+    gradient: 'from-emerald-500 to-teal-600',
+    href: 'https://support.dmc-rz.com/otobo/customer.pl?Action=CustomerDashboard',
+  },
+];
+
+function QuickLinkPill({ label, Icon, gradient, to, href }) {
+  const className = `inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r ${gradient} text-white text-sm font-semibold shadow-md hover:shadow-lg hover:scale-[1.03] transition-all duration-300`;
+
+  if (href) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
+        <Icon className="w-4 h-4 shrink-0" />
+        <span>{label}</span>
+      </a>
+    );
+  }
+
+  return (
+    <Link to={to} className={className}>
+      <Icon className="w-4 h-4 shrink-0" />
+      <span>{label}</span>
+    </Link>
+  );
+}
+
 const Home = () => {
   const { t } = useLanguage();
 
@@ -118,20 +171,32 @@ const Home = () => {
       <HomeHeroCarousel />
 
       {/* Features */}
-      <section className="py-16 md:py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12 max-w-2xl mx-auto">
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-100 text-red-700 text-sm font-semibold mb-4">
-              <Sparkles className="w-4 h-4" />
-              {t('home.subtitle')}
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-              {t('home.features.title')}
-            </h2>
-            <p className="text-gray-600 text-lg">{t('home.description')}</p>
+      <section className="py-12 md:py-16">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white/90 via-white/80 to-red-50/60 backdrop-blur-md border border-white/70 shadow-lg p-8 md:p-12 mb-10">
+            <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-violet-200/20 blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-8 -left-8 w-40 h-40 rounded-full bg-blue-200/20 blur-2xl pointer-events-none" />
+            <div className="relative text-center max-w-4xl mx-auto">
+              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-6">
+                {QUICK_LINKS.map((link) => (
+                  <QuickLinkPill
+                    key={link.key}
+                    label={t(link.labelKey)}
+                    Icon={link.Icon}
+                    gradient={link.gradient}
+                    to={link.to}
+                    href={link.href}
+                  />
+                ))}
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+                {t('home.features.title')}
+              </h2>
+              <p className="text-gray-600 text-lg">{t('home.description')}</p>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             {FEATURE_CARDS.map((card) => (
               <ColorCard
                 key={card.key}
@@ -163,9 +228,9 @@ const Home = () => {
       </section>
 
       {/* CTA */}
-      <section className="py-16 md:py-20">
-        <div className="container mx-auto px-4">
-          <div className="relative max-w-5xl mx-auto overflow-hidden rounded-3xl bg-gradient-to-br from-red-500 via-red-600 to-orange-600 text-white shadow-2xl">
+      <section className="py-12 md:py-16 px-4">
+        <div className="container mx-auto max-w-5xl">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-red-500 via-red-600 to-orange-600 text-white shadow-2xl border border-white/20">
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute -top-16 -left-16 w-72 h-72 rounded-full bg-yellow-300/20 blur-3xl" />
               <div className="absolute -bottom-20 -right-10 w-80 h-80 rounded-full bg-orange-300/20 blur-3xl" />

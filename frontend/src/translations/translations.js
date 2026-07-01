@@ -45,6 +45,11 @@ export const translations = {
         assetsDesc: 'Size zimmetlenen ekipmanları görüntüleyin ve onaylayın',
       },
       learnMore: 'İncele',
+      quickLinks: {
+        faq: 'Sıkça Sorulan Sorular',
+        rocketchat: 'Rocket.Chat Destek Masası',
+        ticket: 'Ticket Açma Sayfası',
+      },
       cta: {
         title: 'Hemen Başlayın',
         description: 'Kurulum rehberlerimiz ve test araçlarımızla dakikalar içinde hazır olun. Takıldığınız yerde SSS bölümüne göz atın.',
@@ -324,6 +329,11 @@ export const translations = {
         assetsDesc: 'Zugewiesene Geräte anzeigen und bestätigen',
       },
       learnMore: 'Mehr erfahren',
+      quickLinks: {
+        faq: 'Häufig gestellte Fragen',
+        rocketchat: 'Rocket.Chat Support',
+        ticket: 'Ticket erstellen',
+      },
       cta: {
         title: 'Jetzt starten',
         description: 'Mit unseren Anleitungen und Testtools sind Sie in wenigen Minuten bereit. Bei Fragen besuchen Sie den FAQ-Bereich.',
@@ -558,6 +568,11 @@ export const translations = {
         assetsDesc: 'View and confirm equipment assigned to you',
       },
       learnMore: 'Learn more',
+      quickLinks: {
+        faq: 'Frequently Asked Questions',
+        rocketchat: 'Rocket.Chat Support Desk',
+        ticket: 'Open a Ticket',
+      },
       cta: {
         title: 'Get Started Now',
         description: 'Use our setup guides and test tools to get ready in minutes. Check the FAQ if you get stuck.',

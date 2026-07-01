@@ -58,7 +58,7 @@ const PageShell = ({
       <div className={`container mx-auto px-4 ${maxWidth}`}>
         {!hideHero && Icon && title && (
           <div
-            className={`relative overflow-hidden rounded-3xl bg-gradient-to-br ${colors.gradient} text-white shadow-xl mb-10 p-8 md:p-12`}
+            className={`relative overflow-hidden rounded-3xl bg-gradient-to-br ${colors.gradient} text-white shadow-xl border border-white/20 mb-10 p-8 md:p-12`}
           >
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
               <div className={`absolute -top-10 -right-10 w-48 h-48 rounded-full ${colors.blob} blur-2xl`} />

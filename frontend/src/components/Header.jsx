@@ -12,83 +12,103 @@ const NAV_ITEMS = [
   { path: '/asset-confirmation', labelKey: 'assetConfirmation.title', hover: 'nav-hover-rose' },
 ];
 
+const LANGUAGES = [
+  { code: 'tr', name: 'Türkçe', flag: 'https://flagcdn.com/w80/tr.png' },
+  { code: 'de', name: 'Deutsch', flag: 'https://flagcdn.com/w80/de.png' },
+  { code: 'en', name: 'English', flag: 'https://flagcdn.com/w80/us.png' },
+];
+
 const Header = () => {
   const { language, setLanguage, t } = useLanguage();
   const location = useLocation();
-
-  const languages = [
-    { code: 'tr', flag: '🇹🇷', name: 'Türkçe' },
-    { code: 'de', flag: '🇩🇪', name: 'Deutsch' },
-    { code: 'en', flag: '🇬🇧', name: 'English' },
-  ];
 
   const isActive = (path) => location.pathname === path;
 
   const navButtonClass = (path, hover) =>
     isActive(path)
-      ? 'bg-white text-red-600 hover:bg-white shadow-md font-semibold'
-      : `text-white ${hover}`;
+      ? 'bg-white text-red-600 shadow-md font-semibold rounded-xl'
+      : `text-white rounded-xl ${hover}`;
 
   return (
-    <header className="bg-gradient-to-r from-red-600 via-red-600 to-red-700 border-b border-red-800/30 sticky top-0 z-50 shadow-lg">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center space-x-3 hover:opacity-90 transition-opacity group">
-            <img
-              src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/8rtz75f4_image.png"
-              alt="DCS Logo"
-              className="h-12 w-auto"
-            />
-            <span className="text-xl font-bold text-white group-hover:text-orange-100 transition-colors">
-              {t('header.title')}
-            </span>
-          </Link>
+    <header className="sticky top-0 z-50 px-3 sm:px-4 pt-3 pb-1">
+      <div className="container mx-auto max-w-6xl">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-red-500 via-red-600 to-orange-500 shadow-xl border border-white/25">
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-yellow-300/25 blur-2xl" />
+            <div className="absolute -bottom-10 left-1/4 w-32 h-32 rounded-full bg-orange-300/20 blur-xl" />
+            <div className="absolute top-0 right-1/3 w-24 h-24 rounded-full bg-violet-400/15 blur-xl" />
+          </div>
 
-          <nav className="hidden lg:flex items-center space-x-1">
-            {NAV_ITEMS.map((item) => (
-              <Link key={item.path} to={item.path}>
-                <Button
-                  variant="ghost"
-                  className={`transition-all duration-300 ${navButtonClass(item.path, item.hover)}`}
-                >
-                  {t(item.labelKey)}
-                </Button>
-              </Link>
-            ))}
-          </nav>
-
-          <div className="flex items-center space-x-2">
-            {languages.map((lang) => (
-              <button
-                key={lang.code}
-                type="button"
-                onClick={() => setLanguage(lang.code)}
-                className={`px-3 py-2 rounded-lg text-2xl transition-all duration-300 border-2 ${
-                  language === lang.code
-                    ? 'bg-white border-white scale-110 shadow-lg'
-                    : 'bg-red-700/50 border-red-500/50 hover:bg-gradient-to-br hover:from-violet-500 hover:to-blue-500 hover:border-white/50 hover:scale-105'
-                }`}
-                title={lang.name}
+          <div className="relative px-3 sm:px-5 py-3 md:py-4">
+            <div className="flex items-center justify-between gap-3">
+              <Link
+                to="/"
+                className="flex items-center gap-2 sm:gap-3 min-w-0 hover:opacity-90 transition-opacity group"
               >
-                {lang.flag}
-              </button>
-            ))}
+                <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-1.5 border border-white/20 shrink-0">
+                  <img
+                    src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/8rtz75f4_image.png"
+                    alt="DCS Logo"
+                    className="h-9 sm:h-10 w-auto"
+                  />
+                </div>
+                <span className="text-base sm:text-lg font-bold text-white truncate group-hover:text-orange-100 transition-colors">
+                  {t('header.title')}
+                </span>
+              </Link>
+
+              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                {LANGUAGES.map((lang) => (
+                  <button
+                    key={lang.code}
+                    type="button"
+                    onClick={() => setLanguage(lang.code)}
+                    title={lang.name}
+                    className={`relative rounded-xl overflow-hidden transition-all duration-300 border-2 ${
+                      language === lang.code
+                        ? 'border-white scale-110 shadow-lg ring-2 ring-white/50'
+                        : 'border-white/30 opacity-80 hover:opacity-100 hover:scale-105 hover:border-white/60'
+                    }`}
+                  >
+                    <img
+                      src={lang.flag}
+                      alt={lang.name}
+                      className="w-9 h-6 sm:w-10 sm:h-7 object-cover block"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <nav className="hidden lg:flex items-center justify-center flex-wrap gap-1 mt-3 pt-3 border-t border-white/20">
+              {NAV_ITEMS.map((item) => (
+                <Link key={item.path} to={item.path}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`transition-all duration-300 ${navButtonClass(item.path, item.hover)}`}
+                  >
+                    {t(item.labelKey)}
+                  </Button>
+                </Link>
+              ))}
+            </nav>
+
+            <nav className="lg:hidden flex flex-wrap items-center justify-center gap-1 mt-3 pt-3 border-t border-white/20">
+              {NAV_ITEMS.map((item) => (
+                <Link key={item.path} to={item.path}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className={`text-xs transition-all duration-300 ${navButtonClass(item.path, item.hover)}`}
+                  >
+                    {t(item.labelKey)}
+                  </Button>
+                </Link>
+              ))}
+            </nav>
           </div>
         </div>
-
-        <nav className="lg:hidden flex flex-wrap items-center justify-center gap-1 mt-4 pt-4 border-t border-red-500/40">
-          {NAV_ITEMS.map((item) => (
-            <Link key={item.path} to={item.path}>
-              <Button
-                size="sm"
-                variant="ghost"
-                className={`text-xs transition-all duration-300 ${navButtonClass(item.path, item.hover)}`}
-              >
-                {t(item.labelKey)}
-              </Button>
-            </Link>
-          ))}
-        </nav>
       </div>
     </header>
   );
