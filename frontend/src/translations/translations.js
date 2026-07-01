@@ -310,6 +310,17 @@ export const translations = {
       productList: 'Ürün Listesi',
       addRow: 'Satır Ekle',
       clearSearch: 'Aramayı temizle',
+      importExcel: 'Excel İçe Aktar',
+      importPreview: 'Excel Önizleme',
+      importConfirm: 'İçe Aktar',
+      importCancel: 'İptal',
+      importSuccess: 'kayıt başarıyla içe aktarıldı',
+      importSkipped: 'kayıt atlandı (tekrar veya eksik)',
+      importNoRows: 'Excel dosyasında uygun kayıt bulunamadı',
+      importError: 'Excel dosyası okunamadı',
+      importFormatCargo: 'Kargo raporu formatı algılandı',
+      importFormatDirect: 'Zimmet listesi formatı algılandı',
+      importRowsFound: 'kayıt bulundu',
     }
   },
   de: {
@@ -623,6 +634,17 @@ export const translations = {
       productList: 'Produktliste',
       addRow: 'Zeile hinzufügen',
       clearSearch: 'Suche löschen',
+      importExcel: 'Excel importieren',
+      importPreview: 'Excel-Vorschau',
+      importConfirm: 'Importieren',
+      importCancel: 'Abbrechen',
+      importSuccess: 'Datensätze erfolgreich importiert',
+      importSkipped: 'Datensätze übersprungen (Duplikat oder unvollständig)',
+      importNoRows: 'Keine passenden Datensätze in der Excel-Datei gefunden',
+      importError: 'Excel-Datei konnte nicht gelesen werden',
+      importFormatCargo: 'Versandbericht-Format erkannt',
+      importFormatDirect: 'Inventarlisten-Format erkannt',
+      importRowsFound: 'Datensätze gefunden',
     }
   },
   en: {
@@ -936,6 +958,17 @@ export const translations = {
       productList: 'Product List',
       addRow: 'Add Row',
       clearSearch: 'Clear search',
+      importExcel: 'Import Excel',
+      importPreview: 'Excel Preview',
+      importConfirm: 'Import',
+      importCancel: 'Cancel',
+      importSuccess: 'records imported successfully',
+      importSkipped: 'records skipped (duplicate or incomplete)',
+      importNoRows: 'No matching records found in the Excel file',
+      importError: 'Could not read the Excel file',
+      importFormatCargo: 'Shipping report format detected',
+      importFormatDirect: 'Inventory list format detected',
+      importRowsFound: 'records found',
     }
   }
 };

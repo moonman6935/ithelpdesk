@@ -155,16 +155,16 @@ module.exports = async (req, res) => {
                 personnel_name: input.personnel_name,
                 item_name: input.item_name,
                 serial_number: input.serial_number,
-                created_at: now,
-                status: 'assigned',
+                created_at: input.created_at || now,
+                status: input.status || 'assigned',
                 return_note: null,
-                returned_at: null,
+                returned_at: input.status === 'returned' ? (input.created_at || now) : null,
             }));
 
-            const pId = inputs[0]?.personnel_id;
+            const personnelIds = [...new Set(inputs.map((i) => i.personnel_id).filter(Boolean))];
             if (itemsToInsert.length) {
                 await db.collection('inventory').insertMany(itemsToInsert);
-                if (pId) {
+                for (const pId of personnelIds) {
                     await db.collection('confirmations').updateMany(
                         { personnel_id: pId, status: 'confirmed' },
                         { $set: { status: 'reset', reset_at: new Date().toISOString() } }
@@ -172,6 +172,78 @@ module.exports = async (req, res) => {
                 }
             }
             return sendJson(res, 200, { status: 'success', count: itemsToInsert.length });
+        }
+
+        if (method === 'POST' && route === 'admin/inventory/import') {
+            if (!(await requireWriteAccess(db, req, res))) return;
+            const rows = Array.isArray(req.body?.items) ? req.body.items : [];
+            if (!rows.length) {
+                return sendError(res, 400, 'İçe aktarılacak kayıt bulunamadı');
+            }
+
+            const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const existingIds = await db.collection('inventory').distinct('personnel_id');
+            const numericIds = existingIds.map((pid) => parseInt(pid, 10)).filter((n) => !Number.isNaN(n));
+            let nextId = numericIds.length ? Math.max(...numericIds) + 1 : 100001;
+
+            const nameToId = {};
+            const itemsToInsert = [];
+            let skipped = 0;
+
+            for (const row of rows) {
+                const name = String(row.personnel_name || '').trim();
+                if (!name) {
+                    skipped += 1;
+                    continue;
+                }
+
+                const serial = String(row.serial_number || '').trim();
+                if (serial) {
+                    const duplicate = await db.collection('inventory').findOne({ serial_number: serial });
+                    if (duplicate) {
+                        skipped += 1;
+                        continue;
+                    }
+                }
+
+                let personnelId = String(row.personnel_id || '').trim();
+                if (!personnelId) {
+                    if (!nameToId[name]) {
+                        const existing = await db.collection('inventory').findOne({
+                            personnel_name: { $regex: `^${escapeRegex(name)}$`, $options: 'i' },
+                        });
+                        nameToId[name] = existing?.personnel_id || String(nextId++);
+                    }
+                    personnelId = nameToId[name];
+                } else {
+                    nameToId[name] = personnelId;
+                }
+
+                const createdAt = row.created_at || new Date().toISOString();
+                const status = row.status === 'returned' ? 'returned' : 'assigned';
+
+                itemsToInsert.push({
+                    id: randomUUID(),
+                    personnel_id: personnelId,
+                    personnel_name: name,
+                    item_name: String(row.item_name || 'Ürün').trim(),
+                    serial_number: serial || `IMP-${randomUUID().slice(0, 8)}`,
+                    created_at: createdAt,
+                    status,
+                    return_note: null,
+                    returned_at: status === 'returned' ? createdAt : null,
+                });
+            }
+
+            if (itemsToInsert.length) {
+                await db.collection('inventory').insertMany(itemsToInsert);
+            }
+
+            return sendJson(res, 200, {
+                status: 'success',
+                imported: itemsToInsert.length,
+                skipped,
+            });
         }
 
         if (method === 'POST' && route === 'admin/inventory/return') {

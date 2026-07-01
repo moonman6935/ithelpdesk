@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 import { Input } from "../components/ui/input";
@@ -8,8 +8,12 @@ import { Badge } from "../components/ui/badge";
 import { Alert, AlertDescription } from "../components/ui/alert";
 import {
     User, PlusCircle, CheckCircle2, LayoutDashboard, Package,
-    RefreshCcw, Users, Trash2, ArrowLeftRight, LogOut, Dices, KeyRound, Search, X
+    RefreshCcw, Users, Trash2, ArrowLeftRight, LogOut, Dices, KeyRound, Search, X, Upload
 } from "lucide-react";
+import {
+    Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+} from "../components/ui/dialog";
+import { readExcelFile } from '../lib/excelImport';
 import api from '../lib/api';
 import { useNavigate } from 'react-router-dom';
 
@@ -32,6 +36,9 @@ const AdminDashboard = () => {
         new_password: '',
         confirm_password: '',
     });
+    const [importPreview, setImportPreview] = useState(null);
+    const [importing, setImporting] = useState(false);
+    const fileInputRef = useRef(null);
 
     const fetchAdminData = useCallback(async () => {
         try {
@@ -227,6 +234,40 @@ const AdminDashboard = () => {
         }
     };
 
+    const handleExcelFileSelect = async (e) => {
+        const file = e.target.files?.[0];
+        e.target.value = '';
+        if (!file) return;
+
+        try {
+            const result = await readExcelFile(file);
+            if (!result.items.length) {
+                alert(t('admin.importNoRows'));
+                return;
+            }
+            setImportPreview({ ...result, fileName: file.name });
+        } catch (err) {
+            alert(t('admin.importError'));
+            console.error(err);
+        }
+    };
+
+    const handleConfirmImport = async () => {
+        if (!importPreview?.items?.length) return;
+        setImporting(true);
+        try {
+            const res = await api.post('/api/admin/inventory/import', { items: importPreview.items });
+            const { imported, skipped } = res.data;
+            alert(`${imported} ${t('admin.importSuccess')}${skipped ? `, ${skipped} ${t('admin.importSkipped')}` : ''}`);
+            setImportPreview(null);
+            fetchAdminData();
+        } catch (err) {
+            alert(err.response?.data?.detail || t('admin.importError'));
+        } finally {
+            setImporting(false);
+        }
+    };
+
     return (
         <div className="min-h-screen py-12">
             <div className="container mx-auto px-4">
@@ -403,7 +444,28 @@ const AdminDashboard = () => {
                                         <CardTitle>{t('admin.inventory')}</CardTitle>
                                         <CardDescription>{t('admin.inventoryDesc')}</CardDescription>
                                     </div>
-                                    <div className="relative w-full sm:w-72 shrink-0">
+                                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto shrink-0">
+                                        {canWrite && (
+                                            <>
+                                                <input
+                                                    ref={fileInputRef}
+                                                    type="file"
+                                                    accept=".xlsx,.xls"
+                                                    className="hidden"
+                                                    onChange={handleExcelFileSelect}
+                                                />
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    className="border-orange-300 text-orange-700 hover:bg-orange-50 rounded-xl"
+                                                    onClick={() => fileInputRef.current?.click()}
+                                                >
+                                                    <Upload className="w-4 h-4 mr-2" />
+                                                    {t('admin.importExcel')}
+                                                </Button>
+                                            </>
+                                        )}
+                                        <div className="relative w-full sm:w-72">
                                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                                         <Input
                                             value={inventoryNameSearch}
@@ -421,6 +483,7 @@ const AdminDashboard = () => {
                                                 <X className="w-4 h-4" />
                                             </button>
                                         )}
+                                        </div>
                                     </div>
                                 </div>
                             </CardHeader>
@@ -651,6 +714,55 @@ const AdminDashboard = () => {
                     </TabsContent>
                 </Tabs>
             </div>
+
+            <Dialog open={Boolean(importPreview)} onOpenChange={(open) => !open && setImportPreview(null)}>
+                <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>{t('admin.importPreview')}</DialogTitle>
+                        <DialogDescription>
+                            {importPreview?.fileName} — {importPreview?.items?.length} {t('admin.importRowsFound')}
+                            {' · '}
+                            {importPreview?.format === 'cargo' ? t('admin.importFormatCargo') : t('admin.importFormatDirect')}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="overflow-x-auto border rounded-lg">
+                        <table className="w-full text-xs">
+                            <thead>
+                                <tr className="border-b bg-gray-50 text-left">
+                                    <th className="p-2">{t('admin.personnelName')}</th>
+                                    <th className="p-2">{t('admin.itemName')}</th>
+                                    <th className="p-2">S/N</th>
+                                    <th className="p-2">{t('admin.date')}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {importPreview?.items?.slice(0, 10).map((item, i) => (
+                                    <tr key={i} className="border-b">
+                                        <td className="p-2">{item.personnel_name}</td>
+                                        <td className="p-2">{item.item_name}</td>
+                                        <td className="p-2 font-mono">{item.serial_number}</td>
+                                        <td className="p-2">{new Date(item.created_at).toLocaleString()}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                    {(importPreview?.items?.length ?? 0) > 10 && (
+                        <p className="text-sm text-gray-500">
+                            +{(importPreview.items.length - 10)} kayıt daha...
+                        </p>
+                    )}
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setImportPreview(null)} disabled={importing}>
+                            {t('admin.importCancel')}
+                        </Button>
+                        <Button onClick={handleConfirmImport} disabled={importing} className="bg-orange-600 hover:bg-orange-700">
+                            <Upload className="w-4 h-4 mr-2" />
+                            {importing ? '...' : `${t('admin.importConfirm')} (${importPreview?.items?.length ?? 0})`}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };
