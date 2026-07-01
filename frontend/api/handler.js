@@ -10,13 +10,17 @@ function sendError(res, status, detail) {
     sendJson(res, status, { detail });
 }
 
-function pathKey(segments) {
-    return segments.join('/');
+function parseRoute(req) {
+    const routeParam = req.query.route;
+    if (typeof routeParam === 'string') {
+        return routeParam.replace(/^\/+|\/+$/g, '');
+    }
+    return '';
 }
 
 module.exports = async (req, res) => {
-    const segments = Array.isArray(req.query.path) ? req.query.path : [];
-    const route = pathKey(segments);
+    const route = parseRoute(req);
+    const segments = route ? route.split('/').filter(Boolean) : [];
     const method = req.method;
 
     try {
