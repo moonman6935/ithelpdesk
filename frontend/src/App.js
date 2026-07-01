@@ -13,6 +13,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import FAQ from "./pages/FAQ";
 import LoginPage from "./pages/LoginPage";
 import SiteBackground from "./components/SiteBackground";
+import AnnouncementPopup from "./components/AnnouncementPopup";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
       <BrowserRouter>
         <div className="App min-h-screen flex flex-col relative">
           <SiteBackground />
+          <AnnouncementPopup />
           <Header />
           <main className="flex-1">
             <Routes>

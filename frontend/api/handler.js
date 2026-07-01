@@ -579,6 +579,60 @@ module.exports = async (req, res) => {
             return sendJson(res, 200, { status: 'success' });
         }
 
+        if (method === 'GET' && route === 'announcement/active') {
+            const announcement = await db.collection('announcements')
+                .findOne({ active: true }, { projection: { _id: 0 }, sort: { published_at: -1 } });
+            return sendJson(res, 200, announcement);
+        }
+
+        if (method === 'GET' && route === 'admin/announcement') {
+            if (!(await requireWriteAccess(db, req, res))) return;
+            const announcement = await db.collection('announcements')
+                .findOne({ active: true }, { projection: { _id: 0 } });
+            return sendJson(res, 200, announcement);
+        }
+
+        if (method === 'POST' && route === 'admin/announcement/deactivate') {
+            if (!(await requireWriteAccess(db, req, res))) return;
+            await db.collection('announcements').updateMany(
+                { active: true },
+                { $set: { active: false, deactivated_at: new Date().toISOString() } }
+            );
+            return sendJson(res, 200, { status: 'success' });
+        }
+
+        if (method === 'POST' && route === 'admin/announcement') {
+            if (!(await requireWriteAccess(db, req, res))) return;
+            const data = req.body || {};
+            const title = String(data.title || '').trim();
+            const message = String(data.message || '').trim();
+            if (!title || !message) {
+                return sendError(res, 400, 'Duyuru başlığı ve mesajı gerekli');
+            }
+            const validPriority = ['high', 'medium', 'low'];
+            const validBg = ['red', 'blue', 'green', 'orange', 'violet', 'slate'];
+            const priority = validPriority.includes(data.priority) ? data.priority : 'medium';
+            const background = validBg.includes(data.background) ? data.background : 'red';
+
+            await db.collection('announcements').updateMany(
+                { active: true },
+                { $set: { active: false, deactivated_at: new Date().toISOString() } }
+            );
+
+            const announcement = {
+                id: randomUUID(),
+                title,
+                message,
+                priority,
+                background,
+                active: true,
+                published_at: new Date().toISOString(),
+                published_by: getAuthUsername(req) || 'admin',
+            };
+            await db.collection('announcements').insertOne(announcement);
+            return sendJson(res, 200, { status: 'success', announcement });
+        }
+
         if (method === 'DELETE' && segments[0] === 'admin' && segments[1] === 'users' && segments.length === 3) {
             if (!(await requireSystemAdmin(db, req, res))) return;
             const username = segments[2];
