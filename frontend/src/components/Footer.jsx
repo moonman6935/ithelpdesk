@@ -6,7 +6,7 @@ const Footer = () => {
   const { t } = useLanguage();
 
   return (
-    <footer className="bg-gray-900 text-white mt-20">
+    <footer className="relative bg-gradient-to-r from-slate-900 via-gray-900 to-slate-900 text-white mt-auto border-t border-white/10">
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           {/* Logo ve Başlık */}

@@ -214,7 +214,7 @@ const AdminDashboard = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 py-12">
+        <div className="min-h-screen py-12">
             <div className="container mx-auto px-4">
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-4xl font-bold flex items-center gap-3">
@@ -227,25 +227,25 @@ const AdminDashboard = () => {
                 </div>
 
                 <Tabs defaultValue="dashboard" className="space-y-6">
-                    <TabsList className="bg-white border-2 border-gray-100 p-1 flex-wrap h-auto">
-                        <TabsTrigger value="dashboard" className="data-[state=active]:bg-red-600 data-[state=active]:text-white px-6">
+                    <TabsList className="glass-panel p-1 flex-wrap h-auto border-0 shadow-md">
+                        <TabsTrigger value="dashboard" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                             <LayoutDashboard className="w-4 h-4 mr-2" /> {t('admin.dashboard')}
                         </TabsTrigger>
-                        <TabsTrigger value="add" className="data-[state=active]:bg-red-600 data-[state=active]:text-white px-6">
+                        <TabsTrigger value="add" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                             <PlusCircle className="w-4 h-4 mr-2" /> {t('admin.addAsset')}
                         </TabsTrigger>
-                        <TabsTrigger value="inventory" className="data-[state=active]:bg-red-600 data-[state=active]:text-white px-6">
+                        <TabsTrigger value="inventory" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                             <Package className="w-4 h-4 mr-2" /> {t('admin.inventory')}
                         </TabsTrigger>
-                        <TabsTrigger value="confirmations" className="data-[state=active]:bg-red-600 data-[state=active]:text-white px-6">
+                        <TabsTrigger value="confirmations" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                             <CheckCircle2 className="w-4 h-4 mr-2" /> {t('admin.confirmations')}
                         </TabsTrigger>
                         {isSystemAdmin && (
-                            <TabsTrigger value="users" className="data-[state=active]:bg-red-600 data-[state=active]:text-white px-6">
+                            <TabsTrigger value="users" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                                 <Users className="w-4 h-4 mr-2" /> {t('admin.adminManagement')}
                             </TabsTrigger>
                         )}
-                        <TabsTrigger value="account" className="data-[state=active]:bg-red-600 data-[state=active]:text-white px-6">
+                        <TabsTrigger value="account" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                             <KeyRound className="w-4 h-4 mr-2" /> Şifre
                         </TabsTrigger>
                     </TabsList>

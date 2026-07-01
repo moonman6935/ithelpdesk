@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import PageShell from '../components/PageShell';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Alert, AlertDescription } from '../components/ui/alert';
@@ -180,24 +181,9 @@ const HeadsetTest = () => {
   const MicIcon = micStatus.icon;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="inline-block p-4 bg-red-100 rounded-full mb-4">
-              <Headphones className="w-16 h-16 text-red-600" />
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              {t('headsetTest.title')}
-            </h1>
-            <p className="text-xl text-gray-600">
-              {t('headsetTest.subtitle')}
-            </p>
-          </div>
-
-          {/* Microphone Permission */}
+    <PageShell theme="emerald" icon={Headphones} title={t('headsetTest.title')} subtitle={t('headsetTest.subtitle')}>
           {micPermission === false && (
-            <Alert className="mb-8 border-2 border-red-500 bg-red-50">
+            <Alert className="mb-8 border-2 border-red-300/80 bg-red-50/90 glass-panel">
               <AlertCircle className="w-5 h-5 text-red-600" />
               <AlertDescription className="ml-2">
                 <div className="flex items-center justify-between">
@@ -205,7 +191,7 @@ const HeadsetTest = () => {
                     <p className="font-semibold text-red-800">{t('headsetTest.permission')}</p>
                     <p className="text-red-700">{t('headsetTest.permissionDesc')}</p>
                   </div>
-                  <Button onClick={requestMicPermission} className="bg-red-600 hover:bg-red-700 ml-4">
+                  <Button onClick={requestMicPermission} variant="brand" className="ml-4">
                     {t('headsetTest.requestPermission')}
                   </Button>
                 </div>
@@ -214,10 +200,10 @@ const HeadsetTest = () => {
           )}
 
           {/* Speaker Test */}
-          <Card className="mb-8 border-2 border-gray-200 hover:border-red-500 transition-colors">
-            <CardHeader className="bg-gradient-to-r from-red-50 to-white">
+          <Card className="mb-8 glass-panel border-0 hover:shadow-xl transition-shadow">
+            <CardHeader className="bg-gradient-to-r from-emerald-50/80 to-white/50 rounded-t-2xl">
               <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 bg-red-600 rounded-lg flex items-center justify-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-md">
                   <Volume2 className="w-8 h-8 text-white" />
                 </div>
                 <div>
@@ -231,7 +217,8 @@ const HeadsetTest = () => {
                 {!isPlayingSound ? (
                   <Button 
                     onClick={playTestSound}
-                    className="bg-red-600 hover:bg-red-700 flex-1"
+                    variant="brand"
+                    className="flex-1"
                     size="lg"
                   >
                     <Volume2 className="mr-2 w-5 h-5" />
@@ -240,8 +227,8 @@ const HeadsetTest = () => {
                 ) : (
                   <Button 
                     onClick={stopTestSound}
-                    variant="outline"
-                    className="border-2 border-red-600 text-red-600 hover:bg-red-50 flex-1"
+                    variant="brandOutline"
+                    className="flex-1"
                     size="lg"
                   >
                     {t('headsetTest.stopSound')}
@@ -260,10 +247,10 @@ const HeadsetTest = () => {
           </Card>
 
           {/* Microphone Test */}
-          <Card className="mb-8 border-2 border-gray-200 hover:border-red-500 transition-colors">
-            <CardHeader className="bg-gradient-to-r from-red-50 to-white">
+          <Card className="mb-8 glass-panel border-0 hover:shadow-xl transition-shadow">
+            <CardHeader className="bg-gradient-to-r from-emerald-50/80 to-white/50 rounded-t-2xl">
               <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 bg-red-600 rounded-lg flex items-center justify-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-md">
                   <Mic className="w-8 h-8 text-white" />
                 </div>
                 <div>
@@ -278,7 +265,8 @@ const HeadsetTest = () => {
                   <Button 
                     onClick={startMicTest}
                     disabled={micPermission === false}
-                    className="bg-red-600 hover:bg-red-700 flex-1"
+                    variant="brand"
+                    className="flex-1"
                     size="lg"
                   >
                     <Mic className="mr-2 w-5 h-5" />
@@ -287,8 +275,8 @@ const HeadsetTest = () => {
                 ) : (
                   <Button 
                     onClick={stopMicTest}
-                    variant="outline"
-                    className="border-2 border-red-600 text-red-600 hover:bg-red-50 flex-1"
+                    variant="brandOutline"
+                    className="flex-1"
                     size="lg"
                   >
                     {t('headsetTest.stopTest')}
@@ -377,9 +365,7 @@ const HeadsetTest = () => {
               </CardContent>
             </Card>
           )}
-        </div>
-      </div>
-    </div>
+    </PageShell>
   );
 };
 

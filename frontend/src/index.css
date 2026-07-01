@@ -82,8 +82,47 @@ code {
     }
 }
 
-@layer base {
-    [data-debug-wrapper="true"] {
+@layer components {
+    .glass-panel {
+        @apply bg-white/85 backdrop-blur-md border border-white/70 shadow-lg rounded-2xl;
+    }
+
+    .btn-brand {
+        @apply bg-red-600 text-white shadow-md transition-all duration-300;
+        @apply hover:bg-gradient-to-r hover:from-red-500 hover:via-orange-500 hover:to-red-600;
+        @apply hover:shadow-lg hover:scale-[1.02] active:scale-[0.98];
+    }
+
+    .btn-brand-outline {
+        @apply border-2 border-red-600 text-red-600 bg-white/80 backdrop-blur-sm transition-all duration-300;
+        @apply hover:bg-gradient-to-r hover:from-blue-500 hover:via-violet-500 hover:to-red-500;
+        @apply hover:text-white hover:border-transparent hover:shadow-lg hover:scale-[1.02];
+    }
+
+    .nav-hover-red {
+        @apply hover:bg-gradient-to-r hover:from-red-500 hover:to-orange-500 hover:text-white hover:shadow-md;
+    }
+    .nav-hover-blue {
+        @apply hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 hover:text-white hover:shadow-md;
+    }
+    .nav-hover-emerald {
+        @apply hover:bg-gradient-to-r hover:from-emerald-500 hover:to-teal-600 hover:text-white hover:shadow-md;
+    }
+    .nav-hover-orange {
+        @apply hover:bg-gradient-to-r hover:from-orange-500 hover:to-amber-500 hover:text-white hover:shadow-md;
+    }
+    .nav-hover-violet {
+        @apply hover:bg-gradient-to-r hover:from-violet-500 hover:to-purple-600 hover:text-white hover:shadow-md;
+    }
+    .nav-hover-rose {
+        @apply hover:bg-gradient-to-r hover:from-rose-500 hover:to-pink-600 hover:text-white hover:shadow-md;
+    }
+
+    .accordion-color-hover {
+        @apply transition-all duration-300 hover:shadow-md hover:border-violet-200 hover:bg-white/90;
+    }
+}
+
         display: contents !important;
     }
 

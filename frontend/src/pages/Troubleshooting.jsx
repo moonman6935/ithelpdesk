@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import PageShell from '../components/PageShell';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion';
 import { Alert, AlertDescription } from '../components/ui/alert';
@@ -10,30 +11,15 @@ const Troubleshooting = () => {
   const { t } = useLanguage();
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="inline-block p-4 bg-red-100 rounded-full mb-4">
-              <AlertTriangle className="w-16 h-16 text-red-600" />
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              {t('troubleshooting.title')}
-            </h1>
-            <p className="text-xl text-gray-600">
-              {t('troubleshooting.subtitle')}
-            </p>
-          </div>
-
-          {/* Common Issues Accordion */}
-          <Card className="mb-8 border-2 border-gray-200">
-            <CardHeader className="bg-gradient-to-r from-red-50 to-white">
+    <PageShell theme="orange" icon={AlertTriangle} title={t('troubleshooting.title')} subtitle={t('troubleshooting.subtitle')}>
+          <Card className="mb-8 glass-panel border-0">
+            <CardHeader className="bg-gradient-to-r from-orange-50/80 to-white/50 rounded-t-2xl">
               <CardTitle className="text-2xl">Common Issues</CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
               <Accordion type="single" collapsible className="w-full">
                 {/* No Sound Issue */}
-                <AccordionItem value="item-1" className="border-2 border-gray-200 rounded-lg mb-4 px-4">
+                <AccordionItem value="item-1" className="accordion-color-hover border-2 border-gray-200/80 rounded-xl mb-4 px-4 bg-white/60">
                   <AccordionTrigger className="hover:no-underline">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
@@ -67,7 +53,7 @@ const Troubleshooting = () => {
                 </AccordionItem>
 
                 {/* Microphone Issue */}
-                <AccordionItem value="item-2" className="border-2 border-gray-200 rounded-lg mb-4 px-4">
+                <AccordionItem value="item-2" className="accordion-color-hover border-2 border-gray-200/80 rounded-xl mb-4 px-4 bg-white/60">
                   <AccordionTrigger className="hover:no-underline">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
@@ -101,7 +87,7 @@ const Troubleshooting = () => {
                 </AccordionItem>
 
                 {/* Display Issue */}
-                <AccordionItem value="item-3" className="border-2 border-gray-200 rounded-lg mb-4 px-4">
+                <AccordionItem value="item-3" className="accordion-color-hover border-2 border-gray-200/80 rounded-xl mb-4 px-4 bg-white/60">
                   <AccordionTrigger className="hover:no-underline">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
@@ -138,7 +124,7 @@ const Troubleshooting = () => {
           </Card>
 
           {/* Windows Sound Settings Guide */}
-          <Card className="border-2 border-gray-200">
+          <Card className="glass-panel border-0">
             <CardHeader className="bg-gradient-to-r from-red-50 to-white">
               <div className="flex items-center space-x-4">
                 <div className="w-16 h-16 bg-red-600 rounded-lg flex items-center justify-center">
@@ -195,9 +181,7 @@ const Troubleshooting = () => {
               </ul>
             </AlertDescription>
           </Alert>
-        </div>
-      </div>
-    </div>
+    </PageShell>
   );
 };
 

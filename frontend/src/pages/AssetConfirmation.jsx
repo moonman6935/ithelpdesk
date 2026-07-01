@@ -7,6 +7,7 @@ import { Checkbox } from '../components/ui/checkbox';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { CheckCircle, AlertCircle, Package } from 'lucide-react';
 import api from '../lib/api';
+import PageShell from '../components/PageShell';
 
 const AssetConfirmation = () => {
     const { t } = useLanguage();
@@ -68,10 +69,9 @@ const AssetConfirmation = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-12">
-            <div className="container mx-auto px-4 max-w-4xl">
-                <Card className="border-2 border-gray-200">
-                    <CardHeader className="bg-gradient-to-r from-red-50 to-white">
+        <PageShell theme="rose" icon={Package} title={t('assetConfirmation.title')} subtitle={t('assetConfirmation.enterPersonnelNo')}>
+                <Card className="glass-panel border-0 shadow-xl">
+                    <CardHeader className="bg-gradient-to-r from-rose-50/80 to-white/50 rounded-t-2xl">
                         <CardTitle className="text-3xl">{t('assetConfirmation.title')}</CardTitle>
                         <CardDescription>{t('assetConfirmation.enterPersonnelNo')}</CardDescription>
                     </CardHeader>
@@ -84,7 +84,7 @@ const AssetConfirmation = () => {
                                 maxLength={6}
                                 className="text-lg py-6"
                             />
-                            <Button onClick={fetchAssets} loading={loading} className="bg-red-600 px-8 py-6 h-auto">
+                            <Button onClick={fetchAssets} loading={loading} variant="brand" className="px-8 py-6 h-auto">
                                 {t('assetConfirmation.checkAssets')}
                             </Button>
                         </div>
@@ -154,8 +154,7 @@ const AssetConfirmation = () => {
                         )}
                     </CardContent>
                 </Card>
-            </div>
-        </div>
+        </PageShell>
     );
 };
 

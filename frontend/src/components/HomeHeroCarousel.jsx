@@ -34,7 +34,7 @@ const HomeHeroCarousel = () => {
   }, [next]);
 
   return (
-    <section className="relative py-12 md:py-16 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
+    <section className="relative py-12 md:py-16 overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto relative">
           <div className="overflow-hidden rounded-3xl shadow-2xl border border-white/50">
@@ -82,7 +82,7 @@ const HomeHeroCarousel = () => {
                             }`}
                           >
                             <Link to="/pc-setup">
-                              <Button size="lg" className="bg-white text-red-600 hover:bg-gray-100 shadow-lg">
+                              <Button size="lg" variant="brand" className="shadow-lg">
                                 {t('home.getStarted')}
                                 <ArrowRight className="ml-2 w-4 h-4" />
                               </Button>

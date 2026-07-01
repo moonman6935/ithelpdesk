@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
+import PageShell from '../components/PageShell';
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
@@ -35,11 +36,12 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-            <Card className="max-w-md w-full border-2">
-                <CardHeader className="text-center">
-                    <div className="mx-auto bg-red-100 w-12 h-12 rounded-full flex items-center justify-center mb-4">
-                        <Lock className="text-red-600" />
+        <PageShell centered maxWidth="max-w-md" hideHero>
+            <Card className="glass-panel border-0 shadow-2xl overflow-hidden">
+                <div className="h-2 bg-gradient-to-r from-red-500 via-violet-500 to-blue-500" />
+                <CardHeader className="text-center pt-8">
+                    <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center mb-4 shadow-lg">
+                        <Lock className="text-white w-7 h-7" />
                     </div>
                     <CardTitle className="text-2xl font-bold">{t('admin.loginTitle')}</CardTitle>
                 </CardHeader>
@@ -65,13 +67,13 @@ const LoginPage = () => {
                             />
                         </div>
                         {error && <p className="text-red-600 text-sm text-center font-medium">{error}</p>}
-                        <Button type="submit" className="w-full bg-red-600 hover:bg-red-700 py-6 text-lg">
+                        <Button type="submit" variant="brand" className="w-full py-6 text-lg">
                             {t('admin.loginButton')}
                         </Button>
                     </form>
                 </CardContent>
             </Card>
-        </div>
+        </PageShell>
     );
 };
 

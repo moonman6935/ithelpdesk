@@ -39,8 +39,16 @@ export const translations = {
         test: 'Kulaklık Testi',
         testDesc: 'USB kulaklık ses ve mikrofon testi',
         support: 'Sorun Giderme',
-        supportDesc: 'Yaygın sorunlar için çözümler'
-      }
+        supportDesc: 'Yaygın sorunlar için çözümler',
+        faqDesc: 'Sık sorulan sorular ve adım adım yanıtlar',
+        assets: 'Zimmet Onaylama',
+        assetsDesc: 'Size zimmetlenen ekipmanları görüntüleyin ve onaylayın',
+      },
+      learnMore: 'İncele',
+      cta: {
+        title: 'Hemen Başlayın',
+        description: 'Kurulum rehberlerimiz ve test araçlarımızla dakikalar içinde hazır olun. Takıldığınız yerde SSS bölümüne göz atın.',
+      },
     },
     pcSetup: {
       title: 'Bilgisayar Kurulum Kılavuzu',
@@ -310,8 +318,16 @@ export const translations = {
         test: 'Headset-Test',
         testDesc: 'USB-Headset Audio- und Mikrofontest',
         support: 'Fehlerbehebung',
-        supportDesc: 'Lösungen für häufige Probleme'
-      }
+        supportDesc: 'Lösungen für häufige Probleme',
+        faqDesc: 'Häufig gestellte Fragen mit Schritt-für-Schritt-Antworten',
+        assets: 'Inventarbestätigung',
+        assetsDesc: 'Zugewiesene Geräte anzeigen und bestätigen',
+      },
+      learnMore: 'Mehr erfahren',
+      cta: {
+        title: 'Jetzt starten',
+        description: 'Mit unseren Anleitungen und Testtools sind Sie in wenigen Minuten bereit. Bei Fragen besuchen Sie den FAQ-Bereich.',
+      },
     },
     pcSetup: {
       title: 'Computer-Installationsanleitung',
@@ -536,8 +552,16 @@ export const translations = {
         test: 'Headset Test',
         testDesc: 'USB headset audio and microphone testing',
         support: 'Troubleshooting',
-        supportDesc: 'Solutions for common issues'
-      }
+        supportDesc: 'Solutions for common issues',
+        faqDesc: 'Frequently asked questions with step-by-step answers',
+        assets: 'Asset Confirmation',
+        assetsDesc: 'View and confirm equipment assigned to you',
+      },
+      learnMore: 'Learn more',
+      cta: {
+        title: 'Get Started Now',
+        description: 'Use our setup guides and test tools to get ready in minutes. Check the FAQ if you get stuck.',
+      },
     },
     pcSetup: {
       title: 'Computer Installation Guide',

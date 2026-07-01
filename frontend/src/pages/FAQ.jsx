@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import PageShell from '../components/PageShell';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion';
 import { Alert, AlertDescription } from '../components/ui/alert';
@@ -78,22 +79,8 @@ const FAQ = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="inline-block p-4 bg-red-100 rounded-full mb-4">
-              <HelpCircle className="w-16 h-16 text-red-600" />
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              {t('faq.title')}
-            </h1>
-            <p className="text-xl text-gray-600">
-              {t('faq.subtitle')}
-            </p>
-          </div>
-
-          <Alert className="mb-8 border-2 border-amber-400 bg-amber-50">
+    <PageShell theme="violet" icon={HelpCircle} title={t('faq.title')} subtitle={t('faq.subtitle')}>
+          <Alert className="mb-8 border-2 border-amber-300/80 bg-amber-50/90 backdrop-blur-sm glass-panel">
             <AlertTriangle className="w-5 h-5 text-amber-600" />
             <AlertDescription className="ml-2 text-amber-900">
               <p className="font-semibold mb-1">{t('faq.introTitle')}</p>
@@ -101,8 +88,8 @@ const FAQ = () => {
             </AlertDescription>
           </Alert>
 
-          <Card className="border-2 border-gray-200">
-            <CardHeader className="bg-gradient-to-r from-red-50 to-white">
+          <Card className="glass-panel border-0">
+            <CardHeader className="bg-gradient-to-r from-violet-50/80 to-white/50 rounded-t-2xl">
               <CardTitle className="text-2xl">{t('faq.title')}</CardTitle>
               <CardDescription className="text-base">{t('faq.subtitle')}</CardDescription>
             </CardHeader>
@@ -114,12 +101,12 @@ const FAQ = () => {
                     <AccordionItem
                       key={item.id}
                       value={item.id}
-                      className="border-2 border-gray-200 rounded-lg mb-4 px-4"
+                      className="accordion-color-hover border-2 border-gray-200/80 rounded-xl mb-4 px-4 bg-white/60"
                     >
                       <AccordionTrigger className="hover:no-underline">
                         <div className="flex items-center space-x-3 text-left">
-                          <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center shrink-0">
-                            <Icon className="w-5 h-5 text-red-600" />
+                          <div className="w-10 h-10 bg-gradient-to-br from-violet-100 to-purple-100 rounded-lg flex items-center justify-center shrink-0">
+                            <Icon className="w-5 h-5 text-violet-600" />
                           </div>
                           <span className="text-lg font-semibold">{t(`faq.${item.id}.question`)}</span>
                         </div>
@@ -133,9 +120,7 @@ const FAQ = () => {
               </Accordion>
             </CardContent>
           </Card>
-        </div>
-      </div>
-    </div>
+    </PageShell>
   );
 };
 

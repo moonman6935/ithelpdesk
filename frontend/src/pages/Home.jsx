@@ -2,9 +2,113 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Button } from '../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Monitor, Headphones, AlertCircle, ArrowRight } from 'lucide-react';
+import {
+  Monitor,
+  Headphones,
+  AlertCircle,
+  ArrowRight,
+  HelpCircle,
+  ClipboardCheck,
+  Sparkles,
+} from 'lucide-react';
 import HomeHeroCarousel from '../components/HomeHeroCarousel';
+
+const FEATURE_CARDS = [
+  {
+    key: 'setup',
+    to: '/pc-setup',
+    Icon: Monitor,
+    gradient: 'from-blue-600 via-blue-700 to-indigo-800',
+    blob: 'bg-sky-300/25',
+    accent: 'bg-sky-400/20',
+    titleKey: 'home.features.setup',
+    descKey: 'home.features.setupDesc',
+    ctaKey: 'home.getStarted',
+  },
+  {
+    key: 'test',
+    to: '/headset-test',
+    Icon: Headphones,
+    gradient: 'from-emerald-500 via-teal-600 to-cyan-700',
+    blob: 'bg-lime-300/25',
+    accent: 'bg-emerald-400/20',
+    titleKey: 'home.features.test',
+    descKey: 'home.features.testDesc',
+    ctaKey: 'home.testHeadset',
+  },
+  {
+    key: 'support',
+    to: '/troubleshooting',
+    Icon: AlertCircle,
+    gradient: 'from-orange-500 via-amber-500 to-red-600',
+    blob: 'bg-yellow-300/25',
+    accent: 'bg-orange-400/20',
+    titleKey: 'home.features.support',
+    descKey: 'home.features.supportDesc',
+    ctaKey: 'header.troubleshooting',
+  },
+];
+
+const EXTRA_CARDS = [
+  {
+    key: 'faq',
+    to: '/faq',
+    Icon: HelpCircle,
+    gradient: 'from-violet-600 via-purple-600 to-fuchsia-700',
+    blob: 'bg-pink-300/25',
+    titleKey: 'header.faq',
+    descKey: 'home.features.faqDesc',
+  },
+  {
+    key: 'assets',
+    to: '/asset-confirmation',
+    Icon: ClipboardCheck,
+    gradient: 'from-rose-500 via-pink-600 to-red-700',
+    blob: 'bg-rose-300/25',
+    titleKey: 'home.features.assets',
+    descKey: 'home.features.assetsDesc',
+  },
+];
+
+function ColorCard({ gradient, blob, accent, Icon, title, description, cta, to, compact }) {
+  return (
+    <Link to={to} className="block group h-full">
+      <div
+        className={`relative overflow-hidden rounded-3xl bg-gradient-to-br ${gradient} text-white shadow-xl border border-white/10 h-full transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl`}
+      >
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className={`absolute -top-8 -right-8 w-40 h-40 rounded-full ${blob} blur-2xl`} />
+          <div className={`absolute bottom-4 left-4 w-24 h-24 rounded-full ${accent} blur-xl`} />
+        </div>
+
+        <div className={`relative ${compact ? 'p-6' : 'p-8'} flex flex-col h-full`}>
+          <div className="flex items-start justify-between gap-4 mb-5">
+            <div className="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur-sm border border-white/25 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
+              <Icon className="w-8 h-8 text-white" strokeWidth={1.5} />
+            </div>
+            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <ArrowRight className="w-5 h-5" />
+            </div>
+          </div>
+
+          <h3 className={`font-bold mb-2 ${compact ? 'text-xl' : 'text-2xl'}`}>{title}</h3>
+          <p className={`text-white/90 leading-relaxed flex-1 ${compact ? 'text-sm' : 'text-base'}`}>
+            {description}
+          </p>
+
+          {cta && (
+            <div className="mt-6 pt-4 border-t border-white/15">
+              <span className="inline-flex items-center text-sm font-semibold bg-white/15 hover:bg-white/25 px-4 py-2 rounded-full transition-colors">
+                {cta}
+                <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+    </Link>
+  );
+}
 
 const Home = () => {
   const { t } = useLanguage();
@@ -13,86 +117,94 @@ const Home = () => {
     <div className="min-h-screen">
       <HomeHeroCarousel />
 
-      {/* Features Section */}
-      <section className="py-20 bg-white">
+      {/* Features */}
+      <section className="py-16 md:py-20">
         <div className="container mx-auto px-4">
-          <h2 className="text-4xl font-bold text-center text-gray-900 mb-12">
-            {t('home.features.title')}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {/* PC Setup Card */}
-            <Card className="border-2 border-gray-200 hover:border-red-500 hover:shadow-xl transition-all duration-300 group">
-              <CardHeader>
-                <div className="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-red-600 transition-colors duration-300">
-                  <Monitor className="w-8 h-8 text-red-600 group-hover:text-white transition-colors duration-300" />
-                </div>
-                <CardTitle className="text-2xl">{t('home.features.setup')}</CardTitle>
-                <CardDescription className="text-base">
-                  {t('home.features.setupDesc')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Link to="/pc-setup">
-                  <Button variant="ghost" className="text-red-600 hover:text-red-700 hover:bg-red-50 w-full">
-                    {t('home.getStarted')} <ArrowRight className="ml-2 w-4 h-4" />
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+          <div className="text-center mb-12 max-w-2xl mx-auto">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-100 text-red-700 text-sm font-semibold mb-4">
+              <Sparkles className="w-4 h-4" />
+              {t('home.subtitle')}
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+              {t('home.features.title')}
+            </h2>
+            <p className="text-gray-600 text-lg">{t('home.description')}</p>
+          </div>
 
-            {/* Headset Test Card */}
-            <Card className="border-2 border-gray-200 hover:border-red-500 hover:shadow-xl transition-all duration-300 group">
-              <CardHeader>
-                <div className="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-red-600 transition-colors duration-300">
-                  <Headphones className="w-8 h-8 text-red-600 group-hover:text-white transition-colors duration-300" />
-                </div>
-                <CardTitle className="text-2xl">{t('home.features.test')}</CardTitle>
-                <CardDescription className="text-base">
-                  {t('home.features.testDesc')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Link to="/headset-test">
-                  <Button variant="ghost" className="text-red-600 hover:text-red-700 hover:bg-red-50 w-full">
-                    {t('home.testHeadset')} <ArrowRight className="ml-2 w-4 h-4" />
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-6">
+            {FEATURE_CARDS.map((card) => (
+              <ColorCard
+                key={card.key}
+                {...card}
+                title={t(card.titleKey)}
+                description={t(card.descKey)}
+                cta={t(card.ctaKey)}
+                to={card.to}
+                Icon={card.Icon}
+              />
+            ))}
+          </div>
 
-            {/* Troubleshooting Card */}
-            <Card className="border-2 border-gray-200 hover:border-red-500 hover:shadow-xl transition-all duration-300 group">
-              <CardHeader>
-                <div className="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-red-600 transition-colors duration-300">
-                  <AlertCircle className="w-8 h-8 text-red-600 group-hover:text-white transition-colors duration-300" />
-                </div>
-                <CardTitle className="text-2xl">{t('home.features.support')}</CardTitle>
-                <CardDescription className="text-base">
-                  {t('home.features.supportDesc')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Link to="/troubleshooting">
-                  <Button variant="ghost" className="text-red-600 hover:text-red-700 hover:bg-red-50 w-full">
-                    {t('header.troubleshooting')} <ArrowRight className="ml-2 w-4 h-4" />
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {EXTRA_CARDS.map((card) => (
+              <ColorCard
+                key={card.key}
+                compact
+                {...card}
+                title={t(card.titleKey)}
+                description={t(card.descKey)}
+                cta={t('home.learnMore')}
+                to={card.to}
+                Icon={card.Icon}
+              />
+            ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-red-600 to-red-700 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-6">{t('home.getStarted')}</h2>
-          <p className="text-xl mb-8 opacity-90">{t('home.description')}</p>
-          <Link to="/pc-setup">
-            <Button size="lg" className="bg-white text-red-600 hover:bg-gray-100 text-lg px-8 py-6">
-              {t('home.getStarted')}
-            </Button>
-          </Link>
+      {/* CTA */}
+      <section className="py-16 md:py-20">
+        <div className="container mx-auto px-4">
+          <div className="relative max-w-5xl mx-auto overflow-hidden rounded-3xl bg-gradient-to-br from-red-500 via-red-600 to-orange-600 text-white shadow-2xl">
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute -top-16 -left-16 w-72 h-72 rounded-full bg-yellow-300/20 blur-3xl" />
+              <div className="absolute -bottom-20 -right-10 w-80 h-80 rounded-full bg-orange-300/20 blur-3xl" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-white/5" />
+            </div>
+
+            <div className="relative px-8 py-14 md:py-16 text-center">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">{t('home.cta.title')}</h2>
+              <p className="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+                {t('home.cta.description')}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link to="/pc-setup">
+                <Button size="lg" className="bg-white text-red-600 hover:bg-gray-100 text-lg px-8 py-6 shadow-lg w-full sm:w-auto">
+                    {t('home.getStarted')}
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Button>
+                </Link>
+                <Link to="/headset-test">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-2 border-white text-white hover:bg-white/10 text-lg px-8 py-6 w-full sm:w-auto"
+                  >
+                    {t('home.testHeadset')}
+                  </Button>
+                </Link>
+                <Link to="/faq">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-2 border-white/60 text-white hover:bg-white/10 text-lg px-8 py-6 w-full sm:w-auto"
+                  >
+                    {t('header.faq')}
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </div>

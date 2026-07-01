@@ -7,6 +7,7 @@ import { Badge } from '../components/ui/badge';
 import { AlertCircle, CheckCircle, ArrowRight, ArrowLeft, AlertTriangle, Cable, Monitor, Plug, Usb } from 'lucide-react';
 import ConnectionDiagram from '../components/ConnectionDiagram';
 import CompletionScreen from '../components/CompletionScreen';
+import PageShell from '../components/PageShell';
 
 const PCSetup = () => {
   const { t } = useLanguage();
@@ -330,38 +331,28 @@ const PCSetup = () => {
   const StepIcon = steps[currentStep].icon;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <PageShell theme="blue" icon={Monitor} title={t('pcSetup.title')} subtitle={t('pcSetup.subtitle')} maxWidth="max-w-5xl">
       {showCompletion && <CompletionScreen />}
-      
-      <div className="container mx-auto px-4">
-        <div className="max-w-5xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 text-center">
-            {t('pcSetup.title')}
-          </h1>
-          <p className="text-xl text-gray-600 mb-12 text-center">
-            {t('pcSetup.subtitle')}
-          </p>
-
           <Tabs defaultValue="interactive" className="w-full">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
-              <TabsTrigger value="interactive" className="data-[state=active]:bg-red-600 data-[state=active]:text-white">
+            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8 glass-panel p-1">
+              <TabsTrigger value="interactive" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white transition-all">
                 {t('pcSetup.interactive')}
               </TabsTrigger>
-              <TabsTrigger value="scroll" className="data-[state=active]:bg-red-600 data-[state=active]:text-white">
+              <TabsTrigger value="scroll" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white transition-all">
                 {t('pcSetup.scrollView')}
               </TabsTrigger>
             </TabsList>
 
             {/* Interactive Guide */}
             <TabsContent value="interactive">
-              <Card className="border-2 border-gray-200">
-                <CardHeader className="bg-gradient-to-r from-red-50 to-white">
+              <Card className="glass-panel border-0 shadow-xl">
+                <CardHeader className="bg-gradient-to-r from-blue-50/80 to-white/50 rounded-t-2xl">
                   <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 bg-red-600 rounded-lg flex items-center justify-center">
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-md">
                       <StepIcon className="w-8 h-8 text-white" />
                     </div>
                     <div className="flex-1">
-                      <Badge className="bg-red-600 text-white mb-2">Adım {currentStep + 1} / {steps.length}</Badge>
+                      <Badge className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white mb-2">Adım {currentStep + 1} / {steps.length}</Badge>
                       <CardTitle className="text-2xl">{steps[currentStep].title}</CardTitle>
                     </div>
                   </div>
@@ -374,8 +365,8 @@ const PCSetup = () => {
                     <Button
                       onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
                       disabled={currentStep === 0}
-                      variant="outline"
-                      className="border-2 border-red-600 text-red-600 hover:bg-red-50 disabled:opacity-50"
+                      variant="brandOutline"
+                      className="disabled:opacity-50"
                     >
                       <ArrowLeft className="mr-2 w-4 h-4" />
                       {t('pcSetup.previous')}
@@ -383,7 +374,7 @@ const PCSetup = () => {
                     {currentStep < steps.length - 1 ? (
                       <Button
                         onClick={() => setCurrentStep(currentStep + 1)}
-                        className="bg-red-600 hover:bg-red-700"
+                        variant="brand"
                       >
                         {t('pcSetup.next')}
                         <ArrowRight className="ml-2 w-4 h-4" />
@@ -391,7 +382,7 @@ const PCSetup = () => {
                     ) : (
                       <Button 
                         onClick={() => setShowCompletion(true)}
-                        className="bg-green-600 hover:bg-green-700"
+                    className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-md hover:shadow-lg transition-all"
                       >
                         <CheckCircle className="mr-2 w-4 h-4" />
                         {t('pcSetup.complete')}
@@ -409,7 +400,7 @@ const PCSetup = () => {
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
                   <div 
-                    className="bg-red-600 h-3 rounded-full transition-all duration-300"
+                    className="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full transition-all duration-300"
                     style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
                   />
                 </div>
@@ -422,14 +413,14 @@ const PCSetup = () => {
                 {steps.map((step, index) => {
                   const Icon = step.icon;
                   return (
-                    <Card key={index} className="border-2 border-gray-200 hover:border-red-500 transition-colors">
-                      <CardHeader className="bg-gradient-to-r from-red-50 to-white">
+                    <Card key={index} className="glass-panel border-0 hover:shadow-xl transition-shadow">
+                      <CardHeader className="bg-gradient-to-r from-blue-50/60 to-white/50 rounded-t-2xl">
                         <div className="flex items-center space-x-4">
-                          <div className="w-16 h-16 bg-red-600 rounded-lg flex items-center justify-center">
+                          <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-md">
                             <Icon className="w-8 h-8 text-white" />
                           </div>
                           <div>
-                            <Badge className="bg-red-600 text-white mb-2">Adım {index + 1}</Badge>
+                            <Badge className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white mb-2">Adım {index + 1}</Badge>
                             <CardTitle className="text-2xl">{step.title}</CardTitle>
                           </div>
                         </div>
@@ -443,9 +434,7 @@ const PCSetup = () => {
               </div>
             </TabsContent>
           </Tabs>
-        </div>
-      </div>
-    </div>
+    </PageShell>
   );
 };
 
