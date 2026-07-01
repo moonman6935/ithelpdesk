@@ -5,9 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Video, Loader2 } from 'lucide-react';
 import api from '../lib/api';
 import VideoEmbed from '../components/VideoEmbed';
+import { getVideoTitle } from '../lib/videoTitles';
 
 const VideoTutorials = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -45,16 +46,19 @@ const VideoTutorials = () => {
         </Card>
       ) : (
         <div className="space-y-8">
-          {videos.map((video) => (
+          {videos.map((video) => {
+            const title = getVideoTitle(video, language);
+            return (
             <Card key={video.id} className="glass-panel border-0 overflow-hidden">
               <CardHeader className="bg-gradient-to-r from-cyan-50/80 to-white/50">
-                <CardTitle className="text-xl">{video.title}</CardTitle>
+                <CardTitle className="text-xl">{title}</CardTitle>
               </CardHeader>
               <CardContent className="pt-6">
-                <VideoEmbed url={video.video_url} title={video.title} />
+                <VideoEmbed url={video.video_url} title={title} />
               </CardContent>
             </Card>
-          ))}
+            );
+          })}
         </div>
       )}
     </PageShell>

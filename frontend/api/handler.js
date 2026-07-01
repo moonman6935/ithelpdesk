@@ -130,6 +130,29 @@ function attachCargoMatches(items, direction, allCargo) {
     });
 }
 
+function parseVideoTitles(data) {
+    const titles = {
+        tr: String(data.titles?.tr ?? data.title_tr ?? data.title ?? '').trim(),
+        de: String(data.titles?.de ?? data.title_de ?? '').trim(),
+        en: String(data.titles?.en ?? data.title_en ?? '').trim(),
+    };
+    if (!titles.tr && !titles.de && !titles.en) return null;
+    if (!titles.tr) titles.tr = titles.de || titles.en;
+    if (!titles.de) titles.de = titles.tr;
+    if (!titles.en) titles.en = titles.tr;
+    return titles;
+}
+
+function normalizeVideoDoc(video) {
+    if (!video) return video;
+    if (video.titles) return { ...video, title: video.titles.tr || video.title };
+    const legacy = String(video.title || '').trim();
+    return {
+        ...video,
+        titles: { tr: legacy, de: legacy, en: legacy },
+    };
+}
+
 function sendJson(res, status, data) {
     res.status(status).json(data);
 }
@@ -638,7 +661,7 @@ module.exports = async (req, res) => {
                 .find({}, { projection: { _id: 0 } })
                 .sort({ created_at: -1 })
                 .toArray();
-            return sendJson(res, 200, videos);
+            return sendJson(res, 200, videos.map(normalizeVideoDoc));
         }
 
         if (method === 'GET' && route === 'admin/troubleshooting-videos') {
@@ -647,26 +670,59 @@ module.exports = async (req, res) => {
                 .find({}, { projection: { _id: 0 } })
                 .sort({ created_at: -1 })
                 .toArray();
-            return sendJson(res, 200, videos);
+            return sendJson(res, 200, videos.map(normalizeVideoDoc));
         }
 
         if (method === 'POST' && route === 'admin/troubleshooting-videos') {
             if (!(await requireWriteAccess(db, req, res))) return;
             const data = req.body || {};
-            const title = String(data.title || '').trim();
+            const titles = parseVideoTitles(data);
             const video_url = String(data.video_url || '').trim();
-            if (!title || !video_url) {
-                return sendError(res, 400, 'Başlık ve video bağlantısı gerekli');
+            if (!titles || !video_url) {
+                return sendError(res, 400, 'En az bir dilde başlık ve video bağlantısı gerekli');
             }
             const video = {
                 id: randomUUID(),
-                title,
+                titles,
+                title: titles.tr,
                 video_url,
                 created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
                 created_by: getAuthUsername(req) || 'admin',
             };
             await db.collection('troubleshooting_videos').insertOne(video);
-            return sendJson(res, 200, { status: 'success', video });
+            return sendJson(res, 200, { status: 'success', video: normalizeVideoDoc(video) });
+        }
+
+        if (method === 'PUT' && segments[0] === 'admin' && segments[1] === 'troubleshooting-videos' && segments.length === 3) {
+            if (!(await requireWriteAccess(db, req, res))) return;
+            const videoId = segments[2];
+            const data = req.body || {};
+            const titles = parseVideoTitles(data);
+            const video_url = String(data.video_url || '').trim();
+            if (!titles || !video_url) {
+                return sendError(res, 400, 'En az bir dilde başlık ve video bağlantısı gerekli');
+            }
+            const result = await db.collection('troubleshooting_videos').updateOne(
+                { id: videoId },
+                {
+                    $set: {
+                        titles,
+                        title: titles.tr,
+                        video_url,
+                        updated_at: new Date().toISOString(),
+                        updated_by: getAuthUsername(req) || 'admin',
+                    },
+                }
+            );
+            if (result.matchedCount === 0) {
+                return sendError(res, 404, 'Video bulunamadı');
+            }
+            const updated = await db.collection('troubleshooting_videos').findOne(
+                { id: videoId },
+                { projection: { _id: 0 } }
+            );
+            return sendJson(res, 200, { status: 'success', video: normalizeVideoDoc(updated) });
         }
 
         if (method === 'DELETE' && segments[0] === 'admin' && segments[1] === 'troubleshooting-videos' && segments.length === 3) {
