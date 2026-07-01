@@ -2,7 +2,23 @@ const { MongoClient } = require('mongodb');
 const { randomUUID } = require('crypto');
 const { hashPassword } = require('./auth');
 
+let cachedClient = null;
 let cachedDb = null;
+
+function mongoErrorMessage(err) {
+    const msg = err?.message || '';
+    if (err?.code === 8000 || msg.includes('bad auth') || msg.includes('Authentication failed')) {
+        const e = new Error('MongoDB sifre veya kullanici adi hatali. Vercel MONGO_URL icindeki sifreyi kontrol edin.');
+        e.statusCode = 503;
+        return e;
+    }
+    if (err?.name === 'MongoServerSelectionError' || msg.includes('timed out') || msg.includes('ECONNREFUSED')) {
+        const e = new Error('MongoDB baglantisi kurulamadi. Atlas → Network Access → 0.0.0.0/0 ekleyin.');
+        e.statusCode = 503;
+        return e;
+    }
+    return err;
+}
 
 async function getDb() {
     if (!process.env.MONGO_URL) {
@@ -15,10 +31,21 @@ async function getDb() {
         return cachedDb;
     }
 
-    const client = new MongoClient(process.env.MONGO_URL);
-    await client.connect();
-    cachedDb = client.db(process.env.DB_NAME || 'it_helpdesk');
-    return cachedDb;
+    try {
+        if (!cachedClient) {
+            cachedClient = new MongoClient(process.env.MONGO_URL, {
+                serverSelectionTimeoutMS: 8000,
+                connectTimeoutMS: 8000,
+            });
+            await cachedClient.connect();
+        }
+        cachedDb = cachedClient.db(process.env.DB_NAME || 'it_helpdesk');
+        return cachedDb;
+    } catch (err) {
+        cachedClient = null;
+        cachedDb = null;
+        throw mongoErrorMessage(err);
+    }
 }
 
 async function ensureDefaultAdmin(db) {

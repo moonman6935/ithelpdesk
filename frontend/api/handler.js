@@ -224,9 +224,7 @@ module.exports = async (req, res) => {
     } catch (err) {
         console.error('API error:', err);
         const status = err.statusCode || 500;
-        const detail = status === 503
-            ? err.message
-            : 'Sunucu hatası';
+        const detail = err.statusCode ? err.message : 'Sunucu hatası';
         return sendError(res, status, detail);
     }
 };
