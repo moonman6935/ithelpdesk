@@ -8,13 +8,15 @@ import { Badge } from "../components/ui/badge";
 import { Alert, AlertDescription } from "../components/ui/alert";
 import {
     User, PlusCircle, CheckCircle2, LayoutDashboard, Package,
-    RefreshCcw, Users, Trash2, ArrowLeftRight, LogOut, Dices, KeyRound, Search, X, Upload
+    RefreshCcw, Users, Trash2, ArrowLeftRight, LogOut, Dices, KeyRound, Search, X, Upload,
+    Truck, PackageCheck
 } from "lucide-react";
 import {
     Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "../components/ui/dialog";
 import { readExcelFile } from '../lib/excelImport';
 import api from '../lib/api';
+import CargoPanel from '../components/CargoPanel';
 import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
@@ -294,6 +296,12 @@ const AdminDashboard = () => {
                         <TabsTrigger value="inventory" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                             <Package className="w-4 h-4 mr-2" /> {t('admin.inventory')}
                         </TabsTrigger>
+                        <TabsTrigger value="outgoing-cargo" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
+                            <Truck className="w-4 h-4 mr-2" /> {t('admin.outgoingCargo')}
+                        </TabsTrigger>
+                        <TabsTrigger value="incoming-cargo" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
+                            <PackageCheck className="w-4 h-4 mr-2" /> {t('admin.incomingCargo')}
+                        </TabsTrigger>
                         <TabsTrigger value="confirmations" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                             <CheckCircle2 className="w-4 h-4 mr-2" /> {t('admin.confirmations')}
                         </TabsTrigger>
@@ -539,6 +547,14 @@ const AdminDashboard = () => {
                                 </div>
                             </CardContent>
                         </Card>
+                    </TabsContent>
+
+                    <TabsContent value="outgoing-cargo">
+                        <CargoPanel direction="outgoing" canWrite={canWrite} />
+                    </TabsContent>
+
+                    <TabsContent value="incoming-cargo">
+                        <CargoPanel direction="incoming" canWrite={canWrite} />
                     </TabsContent>
 
                     <TabsContent value="confirmations">

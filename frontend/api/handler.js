@@ -54,6 +54,67 @@ async function requireSystemAdmin(db, req, res) {
     return role;
 }
 
+function normalizeCargoKey(value) {
+    return String(value ?? '')
+        .toLowerCase()
+        .trim()
+        .replace(/ı/g, 'i')
+        .replace(/ğ/g, 'g')
+        .replace(/ü/g, 'u')
+        .replace(/ş/g, 's')
+        .replace(/ö/g, 'o')
+        .replace(/ç/g, 'c');
+}
+
+function findCargoMatch(outgoing, incomingList) {
+    const serialKey = normalizeCargoKey(outgoing.serial_number);
+    if (serialKey) {
+        const bySerial = incomingList.find(
+            (inc) => normalizeCargoKey(inc.serial_number) === serialKey
+        );
+        if (bySerial) return bySerial;
+    }
+
+    const nameKey = normalizeCargoKey(outgoing.personnel_name);
+    const nameMatches = incomingList.filter(
+        (inc) => normalizeCargoKey(inc.personnel_name) === nameKey
+    );
+    if (!nameMatches.length) return null;
+
+    const byItem = nameMatches.find(
+        (inc) => normalizeCargoKey(inc.item_name) === normalizeCargoKey(outgoing.item_name)
+    );
+    return byItem || nameMatches[0];
+}
+
+function attachCargoMatches(items, direction, allCargo) {
+    const incoming = allCargo.filter((c) => c.direction === 'incoming');
+    const outgoing = allCargo.filter((c) => c.direction === 'outgoing');
+
+    return items.map((item) => {
+        if (direction === 'outgoing') {
+            const match = findCargoMatch(item, incoming);
+            return {
+                ...item,
+                is_returned: Boolean(match),
+                match_id: match?.id || null,
+                match: match || null,
+            };
+        }
+
+        const match = findCargoMatch(
+            { personnel_name: item.personnel_name, item_name: item.item_name, serial_number: item.serial_number },
+            outgoing
+        );
+        return {
+            ...item,
+            is_returned: Boolean(match),
+            match_id: match?.id || null,
+            match: match || null,
+        };
+    });
+}
+
 function sendJson(res, status, data) {
     res.status(status).json(data);
 }
@@ -319,6 +380,97 @@ module.exports = async (req, res) => {
                 .find({}, { projection: { _id: 0 } })
                 .toArray();
             return sendJson(res, 200, inventory);
+        }
+
+        if (method === 'GET' && route === 'admin/cargo') {
+            if (!(await requireAdminAccess(db, req, res))) return;
+            const direction = req.query.direction;
+            if (!['outgoing', 'incoming'].includes(direction)) {
+                return sendError(res, 400, 'Geçersiz kargo yönü');
+            }
+
+            const allCargo = await db.collection('cargo')
+                .find({}, { projection: { _id: 0 } })
+                .toArray();
+
+            const items = allCargo
+                .filter((c) => c.direction === direction)
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            return sendJson(res, 200, attachCargoMatches(items, direction, allCargo));
+        }
+
+        if (method === 'POST' && route === 'admin/cargo/import') {
+            if (!(await requireWriteAccess(db, req, res))) return;
+            const direction = req.body?.direction;
+            const rows = Array.isArray(req.body?.items) ? req.body.items : [];
+
+            if (!['outgoing', 'incoming'].includes(direction)) {
+                return sendError(res, 400, 'Geçersiz kargo yönü');
+            }
+            if (!rows.length) {
+                return sendError(res, 400, 'İçe aktarılacak kayıt bulunamadı');
+            }
+
+            const itemsToInsert = [];
+            let skipped = 0;
+            const now = new Date().toISOString();
+
+            for (const row of rows) {
+                const name = String(row.personnel_name || '').trim();
+                if (!name) {
+                    skipped += 1;
+                    continue;
+                }
+
+                const serial = String(row.serial_number || '').trim();
+                if (serial) {
+                    const duplicate = await db.collection('cargo').findOne({
+                        direction,
+                        serial_number: serial,
+                    });
+                    if (duplicate) {
+                        skipped += 1;
+                        continue;
+                    }
+                }
+
+                itemsToInsert.push({
+                    id: randomUUID(),
+                    direction,
+                    personnel_name: name,
+                    item_name: String(row.item_name || 'Kargo').trim(),
+                    serial_number: serial || `KARGO-${randomUUID().slice(0, 8)}`,
+                    created_at: row.created_at || now,
+                    imported_at: now,
+                    row_no: row.row_no ?? null,
+                    address: row.address || '',
+                    phone: row.phone || '',
+                    ship_date: row.ship_date || '',
+                    sender: row.sender || '',
+                    arrival_date: row.arrival_date || '',
+                    arrival_city: row.arrival_city || '',
+                    delivery_type: row.delivery_type || '',
+                    delivery_date: row.delivery_date || '',
+                    delivery_time: row.delivery_time || '',
+                    recipient: row.recipient || '',
+                    recipient_unit: row.recipient_unit || '',
+                    recipient_city: row.recipient_city || '',
+                    package_count: row.package_count ?? null,
+                    return_flag: row.return_flag || '',
+                    return_reason: row.return_reason || '',
+                });
+            }
+
+            if (itemsToInsert.length) {
+                await db.collection('cargo').insertMany(itemsToInsert);
+            }
+
+            return sendJson(res, 200, {
+                status: 'success',
+                imported: itemsToInsert.length,
+                skipped,
+            });
         }
 
         if (method === 'GET' && route === 'admin/users') {

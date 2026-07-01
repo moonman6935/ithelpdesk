@@ -46,6 +46,40 @@ function parseSpecialField(text) {
     return { itemName, serial };
 }
 
+function rowToCargoRecord(row, format) {
+    if (format !== 'cargo') {
+        const base = rowToRecord(row, format);
+        return base ? { ...base, direction_meta: {} } : null;
+    }
+
+    const name = String(row['Alıcı Müşteri'] ?? row['Alici Musteri'] ?? '').trim();
+    const { itemName, serial } = parseSpecialField(row['Özel Alan 2'] ?? row['Ozel Alan 2']);
+    if (!name) return null;
+
+    return {
+        personnel_name: name,
+        item_name: itemName,
+        serial_number: serial || `KARGO-${row.No ?? Date.now()}`,
+        created_at: parseDeliveryDate(row['Teslim Tarihi'], row['Teslim Saati']),
+        row_no: row.No ?? null,
+        address: String(row['Alıcı Adresi'] ?? '').trim(),
+        phone: String(row['Alıcı Telefonu'] ?? '').trim(),
+        ship_date: String(row['Çıkış Tarihi'] ?? '').trim(),
+        sender: String(row['Gönderen Müşteri'] ?? '').trim(),
+        arrival_date: String(row['Varış Tarihi'] ?? '').trim(),
+        arrival_city: String(row['Varış İli'] ?? '').trim(),
+        delivery_type: String(row['Teslim Tipi'] ?? '').trim(),
+        delivery_date: String(row['Teslim Tarihi'] ?? '').trim(),
+        delivery_time: String(row['Teslim Saati'] ?? '').trim(),
+        recipient: String(row['Teslim Alan'] ?? '').trim(),
+        recipient_unit: String(row['Teslim Birimi'] ?? '').trim(),
+        recipient_city: String(row['Teslim İli'] ?? '').trim(),
+        package_count: row['Kargo Adedi'] ?? null,
+        return_flag: String(row['İade'] ?? row['Iade'] ?? '').trim(),
+        return_reason: String(row['İade Sebebi'] ?? row['Iade Sebebi'] ?? '').trim(),
+    };
+}
+
 function rowToRecord(row, format) {
     if (format === 'cargo') {
         const name = String(row['Alıcı Müşteri'] ?? row['Alici Musteri'] ?? '').trim();
@@ -125,7 +159,7 @@ export function parseInventoryExcel(fileBuffer) {
 
     rows.forEach((row, index) => {
         try {
-            const record = rowToRecord(row, format);
+            const record = rowToCargoRecord(row, format);
             if (record) items.push(record);
         } catch (err) {
             errors.push({ row: headerRowIndex + index + 2, message: err.message });
@@ -145,3 +179,5 @@ export async function readExcelFile(file) {
     const buffer = await file.arrayBuffer();
     return parseInventoryExcel(buffer);
 }
+
+export { normalize as normalizeCargoKey };
