@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 
 const SECRET_KEY = process.env.SECRET_KEY || 'b4f2c8d9e1a3c5b7a9d0e2f4a6b8c0d2';
 const ALLOWED_ROLES = ['admin', 'system_admin', 'viewer'];
-const WRITE_ROLES = ['admin', 'system_admin'];
+const WRITE_ROLES = ['system_admin'];
 
 function getAuthUsername(req) {
     const auth = req.headers.authorization;
@@ -85,6 +85,21 @@ function findCargoMatch(outgoing, incomingList) {
         (inc) => normalizeCargoKey(inc.item_name) === normalizeCargoKey(outgoing.item_name)
     );
     return byItem || nameMatches[0];
+}
+
+async function saveProductNames(db, names) {
+    const unique = [...new Set(names.map((n) => String(n).trim()).filter(Boolean))];
+    if (!unique.length) return;
+    const now = new Date().toISOString();
+    await db.collection('product_names').bulkWrite(
+        unique.map((name) => ({
+            updateOne: {
+                filter: { name },
+                update: { $set: { name, updated_at: now } },
+                upsert: true,
+            },
+        }))
+    );
 }
 
 function attachCargoMatches(items, direction, allCargo) {
@@ -225,6 +240,7 @@ module.exports = async (req, res) => {
             const personnelIds = [...new Set(inputs.map((i) => i.personnel_id).filter(Boolean))];
             if (itemsToInsert.length) {
                 await db.collection('inventory').insertMany(itemsToInsert);
+                await saveProductNames(db, itemsToInsert.map((i) => i.item_name));
                 for (const pId of personnelIds) {
                     await db.collection('confirmations').updateMany(
                         { personnel_id: pId, status: 'confirmed' },
@@ -314,6 +330,7 @@ module.exports = async (req, res) => {
                 for (let i = 0; i < itemsToInsert.length; i += CHUNK) {
                     await db.collection('inventory').insertMany(itemsToInsert.slice(i, i + CHUNK));
                 }
+                await saveProductNames(db, itemsToInsert.map((i) => i.item_name));
             }
 
             return sendJson(res, 200, {
@@ -396,6 +413,19 @@ module.exports = async (req, res) => {
                 .find({}, { projection: { _id: 0 } })
                 .toArray();
             return sendJson(res, 200, inventory);
+        }
+
+        if (method === 'GET' && route === 'admin/product-names') {
+            if (!(await requireAdminAccess(db, req, res))) return;
+            const [catalog, inventoryNames] = await Promise.all([
+                db.collection('product_names').find({}, { projection: { _id: 0, name: 1 } }).toArray(),
+                db.collection('inventory').distinct('item_name'),
+            ]);
+            const names = [...new Set([
+                ...catalog.map((c) => c.name),
+                ...inventoryNames,
+            ])].filter(Boolean).sort((a, b) => a.localeCompare(b, 'tr'));
+            return sendJson(res, 200, names);
         }
 
         if (method === 'GET' && route === 'admin/cargo') {
@@ -527,21 +557,25 @@ module.exports = async (req, res) => {
 
         if (method === 'POST' && route === 'admin/change-password') {
             if (!(await requireAdminAccess(db, req, res))) return;
-            const { username, current_password, new_password } = req.body || {};
-            if (!username || !current_password || !new_password) {
-                return sendError(res, 400, 'Kullanıcı adı, mevcut şifre ve yeni şifre gerekli');
+            const authUsername = getAuthUsername(req);
+            const { current_password, new_password } = req.body || {};
+            if (!authUsername || !current_password || !new_password) {
+                return sendError(res, 400, 'Mevcut şifre ve yeni şifre gerekli');
             }
             if (new_password.length < 6) {
                 return sendError(res, 400, 'Yeni şifre en az 6 karakter olmalı');
             }
-            const user = await db.collection('users').findOne({ username });
+            const user = await db.collection('users').findOne({ username: authUsername });
             if (!user || !verifyPassword(current_password, user.password_hash)) {
                 return sendError(res, 401, 'Mevcut şifre hatalı');
             }
-            await db.collection('users').updateOne(
-                { username },
+            const result = await db.collection('users').updateOne(
+                { username: authUsername },
                 { $set: { password_hash: hashPassword(new_password) } }
             );
+            if (result.matchedCount === 0) {
+                return sendError(res, 404, 'Kullanıcı bulunamadı');
+            }
             return sendJson(res, 200, { status: 'success' });
         }
 

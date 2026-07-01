@@ -33,7 +33,7 @@ const AdminDashboard = () => {
     const [admins, setAdmins] = useState([]);
     const [isSystemAdmin, setIsSystemAdmin] = useState(false);
     const [isViewer, setIsViewer] = useState(false);
-    const [newAdmin, setNewAdmin] = useState({ username: '', password: '', role: 'admin' });
+    const [newAdmin, setNewAdmin] = useState({ username: '', password: '', role: 'viewer' });
     const [passwordForm, setPasswordForm] = useState({
         current_password: '',
         new_password: '',
@@ -41,6 +41,7 @@ const AdminDashboard = () => {
     });
     const [importPreview, setImportPreview] = useState(null);
     const [importing, setImporting] = useState(false);
+    const [productNames, setProductNames] = useState([]);
     const fileInputRef = useRef(null);
 
     const fetchAdminData = useCallback(async () => {
@@ -56,8 +57,19 @@ const AdminDashboard = () => {
 
             const role = localStorage.getItem('admin_role');
             if (role === 'system_admin') {
-                const userRes = await api.get('/api/admin/users');
+                const [userRes, namesRes] = await Promise.all([
+                    api.get('/api/admin/users'),
+                    api.get('/api/admin/product-names'),
+                ]);
                 setAdmins(userRes.data);
+                setProductNames(namesRes.data);
+            } else {
+                try {
+                    const namesRes = await api.get('/api/admin/product-names');
+                    setProductNames(namesRes.data);
+                } catch {
+                    setProductNames([]);
+                }
             }
         } catch (err) {
             console.error('Veri çekilemedi');
@@ -86,10 +98,21 @@ const AdminDashboard = () => {
     }, [inventory, inventoryNameSearch]);
 
     const roleLabel = (role) => t(`admin.roles.${role}`) || role;
-    const canWrite = !isViewer;
+    const canWrite = isSystemAdmin;
+
+    const fetchProductNames = useCallback(async () => {
+        try {
+            const res = await api.get('/api/admin/product-names');
+            setProductNames(res.data);
+        } catch {
+            console.error('Ürün adları alınamadı');
+        }
+    }, []);
 
     // Intelligent ID fetcher
     useEffect(() => {
+        if (!isSystemAdmin) return undefined;
+
         const fetchNextId = async () => {
             if (!personnelName.trim()) {
                 setPersonnelId('');
@@ -116,7 +139,7 @@ const AdminDashboard = () => {
         };
 
         fetchNextId();
-    }, [personnelName]);
+    }, [personnelName, isSystemAdmin]);
 
     const handleRandomId = async () => {
         try {
@@ -165,6 +188,7 @@ const AdminDashboard = () => {
             setPersonnelName('');
             setItems([{ itemName: '', serialNo: '' }]);
             fetchAdminData();
+            fetchProductNames();
         } catch (err) {
             alert('Zimmet eklenirken hata oluştu');
         }
@@ -198,8 +222,8 @@ const AdminDashboard = () => {
         e.preventDefault();
         try {
             await api.post('/api/admin/users', newAdmin);
-            alert('Yönetici eklendi');
-            setNewAdmin({ username: '', password: '', role: 'admin' });
+            alert('Kullanıcı eklendi');
+            setNewAdmin({ username: '', password: '', role: 'viewer' });
             fetchAdminData();
         } catch (err) {
             alert(err.response?.data?.detail || 'Hata oluştu');
@@ -219,14 +243,12 @@ const AdminDashboard = () => {
 
     const handleChangePassword = async (e) => {
         e.preventDefault();
-        const username = localStorage.getItem('admin_username') || 'admin';
         if (passwordForm.new_password !== passwordForm.confirm_password) {
             alert('Yeni şifreler eşleşmiyor');
             return;
         }
         try {
             await api.post('/api/admin/change-password', {
-                username,
                 current_password: passwordForm.current_password,
                 new_password: passwordForm.new_password,
             });
@@ -406,6 +428,12 @@ const AdminDashboard = () => {
                                             </Button>
                                         </div>
 
+                                        <datalist id="product-name-suggestions">
+                                            {productNames.map((name) => (
+                                                <option key={name} value={name} />
+                                            ))}
+                                        </datalist>
+
                                         {items.map((item, index) => (
                                             <div key={index} className="flex gap-4 items-end bg-white p-4 border rounded shadow-sm relative group">
                                                 <div className="flex-[2]">
@@ -413,6 +441,7 @@ const AdminDashboard = () => {
                                                     <Input
                                                         value={item.itemName}
                                                         onChange={(e) => handleItemChange(index, 'itemName', e.target.value)}
+                                                        list="product-name-suggestions"
                                                         required
                                                         placeholder="Örn: Dell Monitör"
                                                     />
