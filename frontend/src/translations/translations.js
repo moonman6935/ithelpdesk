@@ -14,6 +14,24 @@ export const translations = {
       description: 'Yeni bilgisayarınızı kurmak ve USB kulaklığınızı test etmek için adım adım rehberlerimizi kullanın.',
       getStarted: 'Kuruluma Başla',
       testHeadset: 'Kulaklık Testi',
+      carouselSlides: [
+        {
+          title: 'DCS IT Yardım Masasına Hoş Geldiniz',
+          message: 'DCS Communication Center IT Departmanı destek portalına hoş geldiniz. Aşağıdaki ipuçlarını takip ederek sık karşılaşılan sorunları hızlıca çözebilirsiniz.',
+        },
+        {
+          title: 'Citrix Girişi',
+          message: "Citrix'e giriş yaparken mail adresinizi değil kullanıcı adı ve şifrenizi giriniz.",
+        },
+        {
+          title: 'Citrix Güncellemeleri',
+          message: 'Citrix güncellemelerini düzenli olarak kontrol ediniz. Güncel olmayan istemci bağlantı ve performans sorunlarına yol açabilir.',
+        },
+        {
+          title: 'Rocket.Chat Destek Talebi',
+          message: 'Rocket.Chat üzerinden destek talebi ederken personel adı, AnyDesk ID ve sorunu detaylı açıklamasını yazınız.',
+        },
+      ],
       features: {
         title: 'Hizmetlerimiz',
         setup: 'PC Kurulumu',
@@ -267,6 +285,24 @@ export const translations = {
       description: 'Verwenden Sie unsere Schritt-für-Schritt-Anleitungen zum Einrichten Ihres neuen Computers und zum Testen Ihres USB-Headsets.',
       getStarted: 'Installation starten',
       testHeadset: 'Headset testen',
+      carouselSlides: [
+        {
+          title: 'Willkommen am DCS IT Helpdesk',
+          message: 'Willkommen im Support-Portal der DCS Communication Center IT-Abteilung. Mit den folgenden Tipps lösen Sie häufige Probleme schnell.',
+        },
+        {
+          title: 'Citrix-Anmeldung',
+          message: 'Beim Citrix-Login geben Sie bitte Benutzername und Passwort ein – nicht Ihre E-Mail-Adresse.',
+        },
+        {
+          title: 'Citrix-Updates',
+          message: 'Überprüfen Sie regelmäßig Citrix-Updates. Veraltete Clients können Verbindungs- und Leistungsprobleme verursachen.',
+        },
+        {
+          title: 'Rocket.Chat Supportanfrage',
+          message: 'Bei Supportanfragen über Rocket.Chat geben Sie Personalname, AnyDesk-ID und eine detaillierte Problembeschreibung an.',
+        },
+      ],
       features: {
         title: 'Unsere Dienstleistungen',
         setup: 'PC-Einrichtung',
@@ -475,6 +511,24 @@ export const translations = {
       description: 'Use our step-by-step guides to set up your new computer and test your USB headset.',
       getStarted: 'Get Started',
       testHeadset: 'Test Headset',
+      carouselSlides: [
+        {
+          title: 'Welcome to DCS IT Help Desk',
+          message: 'Welcome to the DCS Communication Center IT Department support portal. Follow the tips below to quickly resolve common issues.',
+        },
+        {
+          title: 'Citrix Login',
+          message: 'When logging into Citrix, enter your username and password — not your email address.',
+        },
+        {
+          title: 'Citrix Updates',
+          message: 'Check for Citrix updates regularly. Outdated clients may cause connection and performance issues.',
+        },
+        {
+          title: 'Rocket.Chat Support Request',
+          message: 'When requesting support via Rocket.Chat, include your name, AnyDesk ID, and a detailed description of the issue.',
+        },
+      ],
       features: {
         title: 'Our Services',
         setup: 'PC Setup',

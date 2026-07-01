@@ -4,41 +4,14 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Monitor, Headphones, AlertCircle, ArrowRight } from 'lucide-react';
+import HomeHeroCarousel from '../components/HomeHeroCarousel';
 
 const Home = () => {
   const { t } = useLanguage();
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-red-50 via-white to-red-50 py-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-              {t('home.welcome')}
-            </h1>
-            <p className="text-2xl text-red-600 font-semibold mb-4">
-              {t('home.subtitle')}
-            </p>
-            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-              {t('home.description')}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/pc-setup">
-                <Button size="lg" className="bg-red-600 hover:bg-red-700 text-lg px-8 py-6 group">
-                  {t('home.getStarted')}
-                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              <Link to="/headset-test">
-                <Button size="lg" variant="outline" className="border-2 border-red-600 text-red-600 hover:bg-red-50 text-lg px-8 py-6">
-                  {t('home.testHeadset')}
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HomeHeroCarousel />
 
       {/* Features Section */}
       <section className="py-20 bg-white">
