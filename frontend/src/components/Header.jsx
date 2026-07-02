@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Button } from './ui/button';
+import BrandLogo from './BrandLogo';
 
 const NAV_ITEMS = [
   { path: '/', labelKey: 'header.home', hover: 'nav-hover-red' },
@@ -44,15 +45,9 @@ const Header = () => {
             <div className="flex items-center justify-between gap-3">
               <Link
                 to="/"
-                className="flex items-center gap-2 sm:gap-3 min-w-0 hover:opacity-90 transition-opacity group"
+                className="flex items-center gap-2.5 sm:gap-3 min-w-0 hover:opacity-95 transition-opacity group"
               >
-                <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-1.5 border border-white/20 shrink-0">
-                  <img
-                    src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/8rtz75f4_image.png"
-                    alt="DCS Logo"
-                    className="h-9 sm:h-10 w-auto"
-                  />
-                </div>
+                <BrandLogo variant="dark" className="h-9 sm:h-10 w-auto shrink-0" />
                 <span className="text-base sm:text-lg font-bold text-white truncate group-hover:text-orange-100 transition-colors">
                   {t('header.title')}
                 </span>
