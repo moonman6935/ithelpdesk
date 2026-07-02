@@ -21,8 +21,9 @@ const Footer = () => {
                 <BrandLogo
                   framed
                   frame="footer"
+                  crop="full"
                   variant="light"
-                  className="h-11 sm:h-12 w-auto min-w-[8.5rem]"
+                  className="h-12 sm:h-[3.25rem] w-auto"
                 />
                 <div>
                   <h3 className="text-xl font-bold text-red-400">DCS Communication Center</h3>
@@ -61,8 +62,9 @@ const Footer = () => {
               <BrandLogo
                 framed
                 frame="subtle"
+                crop="mark"
                 variant="muted"
-                className="h-8 sm:h-9 w-auto min-w-[6.5rem]"
+                className="h-9 w-auto"
               />
             </div>
           </div>

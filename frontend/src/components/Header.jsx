@@ -50,8 +50,9 @@ const Header = () => {
                 <BrandLogo
                   framed
                   frame="header"
+                  crop="mark"
                   variant="light"
-                  className="h-11 sm:h-12 md:h-[3.35rem] w-auto min-w-[7.5rem] sm:min-w-[8.5rem]"
+                  className="h-11 sm:h-12 w-auto"
                 />
                 <span className="text-base sm:text-lg font-bold text-white truncate group-hover:text-orange-100 transition-colors">
                   {t('header.title')}

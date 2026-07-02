@@ -1,6 +1,9 @@
 import React from 'react';
 
-const LOGO_SRC = `${process.env.PUBLIC_URL}/brand/dcs-logo-transparent.png`;
+const LOGO_SOURCES = {
+  mark: `${process.env.PUBLIC_URL}/brand/dcs-logo-mark.png`,
+  full: `${process.env.PUBLIC_URL}/brand/dcs-logo-tight.png`,
+};
 
 const VARIANTS = {
   light: 'brand-logo brand-logo--light',
@@ -18,13 +21,14 @@ const BrandLogo = ({
   variant = 'light',
   framed = false,
   frame = 'header',
+  crop = 'mark',
   className = '',
   alt = 'DCS Logo',
   ...props
 }) => {
   const image = (
     <img
-      src={LOGO_SRC}
+      src={LOGO_SOURCES[crop] || LOGO_SOURCES.mark}
       alt={alt}
       className={`${VARIANTS[variant] || VARIANTS.light} ${className}`.trim()}
       loading="lazy"
