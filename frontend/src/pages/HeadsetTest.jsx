@@ -23,16 +23,36 @@ const HeadsetTest = () => {
   const micStreamRef = useRef(null);
   const animationFrameRef = useRef(null);
   const oscillatorRef = useRef(null);
+  const isTestingRef = useRef(false);
 
   useEffect(() => {
-    // Check if microphone permission is already granted
-    if (navigator.permissions) {
-      navigator.permissions.query({ name: 'microphone' }).then((result) => {
-        setMicPermission(result.state === 'granted');
-      });
-    }
+    let permissionStatus = null;
+
+    const syncPermission = async () => {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setMicPermission(false);
+        return;
+      }
+
+      try {
+        if (navigator.permissions?.query) {
+          permissionStatus = await navigator.permissions.query({ name: 'microphone' });
+          setMicPermission(permissionStatus.state === 'granted');
+          permissionStatus.onchange = () => {
+            setMicPermission(permissionStatus.state === 'granted');
+          };
+        }
+      } catch {
+        // Permissions API desteklenmiyorsa startMicTest sırasında izin istenir
+      }
+    };
+
+    syncPermission();
 
     return () => {
+      if (permissionStatus) {
+        permissionStatus.onchange = null;
+      }
       stopMicTest();
       stopTestSound();
     };
@@ -42,32 +62,33 @@ const HeadsetTest = () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       setMicPermission(true);
-      stream.getTracks().forEach(track => track.stop());
+      stream.getTracks().forEach((track) => track.stop());
     } catch (error) {
       console.error('Microphone permission denied:', error);
       setMicPermission(false);
     }
   };
 
-  const playTestSound = () => {
+  const playTestSound = async () => {
     try {
-      // Create audio context
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      
-      // Create oscillator for test tone (440Hz - A note)
+      if (audioContext.state === 'suspended') {
+        await audioContext.resume();
+      }
+
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
-      
+
       oscillator.connect(gainNode);
       gainNode.connect(audioContext.destination);
-      
+
       oscillator.frequency.value = 440;
       oscillator.type = 'sine';
       gainNode.gain.value = 0.3;
-      
+
       oscillator.start();
       oscillatorRef.current = { oscillator, audioContext };
-      
+
       setIsPlayingSound(true);
       setSpeakerTested(true);
     } catch (error) {
@@ -89,41 +110,64 @@ const HeadsetTest = () => {
   };
 
   const startMicTest = async () => {
+    if (isTestingRef.current) return;
+
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      });
       micStreamRef.current = stream;
+      setMicPermission(true);
 
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
       audioContextRef.current = audioContext;
 
+      if (audioContext.state === 'suspended') {
+        await audioContext.resume();
+      }
+
       const analyser = audioContext.createAnalyser();
-      analyser.fftSize = 256;
+      analyser.fftSize = 2048;
+      analyser.smoothingTimeConstant = 0.4;
       analyserRef.current = analyser;
 
       const microphone = audioContext.createMediaStreamSource(stream);
       microphone.connect(analyser);
 
+      isTestingRef.current = true;
       setIsTesting(true);
       setMicTested(true);
       analyzeMicLevel();
     } catch (error) {
       console.error('Error accessing microphone:', error);
       setMicPermission(false);
+      stopMicTest();
     }
   };
 
   const analyzeMicLevel = () => {
     if (!analyserRef.current) return;
 
-    const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
-    
-    const checkLevel = () => {
-      if (!analyserRef.current || !isTesting) return;
+    const dataArray = new Uint8Array(analyserRef.current.fftSize);
 
-      analyserRef.current.getByteFrequencyData(dataArray);
-      const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
-      const normalizedLevel = Math.min(100, (average / 128) * 100);
-      
+    const checkLevel = () => {
+      if (!analyserRef.current || !isTestingRef.current) return;
+
+      analyserRef.current.getByteTimeDomainData(dataArray);
+
+      let sum = 0;
+      for (let i = 0; i < dataArray.length; i += 1) {
+        const sample = (dataArray[i] - 128) / 128;
+        sum += sample * sample;
+      }
+
+      const rms = Math.sqrt(sum / dataArray.length);
+      const normalizedLevel = Math.min(100, Math.round(rms * 500));
+
       setMicLevel(normalizedLevel);
       animationFrameRef.current = requestAnimationFrame(checkLevel);
     };
@@ -132,12 +176,15 @@ const HeadsetTest = () => {
   };
 
   const stopMicTest = () => {
+    isTestingRef.current = false;
+
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
     }
 
     if (micStreamRef.current) {
-      micStreamRef.current.getTracks().forEach(track => track.stop());
+      micStreamRef.current.getTracks().forEach((track) => track.stop());
       micStreamRef.current = null;
     }
 
@@ -146,6 +193,7 @@ const HeadsetTest = () => {
       audioContextRef.current = null;
     }
 
+    analyserRef.current = null;
     setIsTesting(false);
     setMicLevel(0);
   };
@@ -262,9 +310,8 @@ const HeadsetTest = () => {
             <CardContent className="pt-6">
               <div className="flex flex-col sm:flex-row gap-4 mb-6">
                 {!isTesting ? (
-                  <Button 
+                  <Button
                     onClick={startMicTest}
-                    disabled={micPermission === false}
                     variant="brand"
                     className="flex-1"
                     size="lg"
