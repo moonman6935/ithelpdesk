@@ -126,11 +126,11 @@ code {
     }
 
     .brand-logo {
-        @apply object-contain select-none;
+        @apply object-contain select-none block;
     }
 
     .brand-logo--light {
-        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.12));
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.06));
     }
 
     .brand-logo--dark {
@@ -138,7 +138,24 @@ code {
     }
 
     .brand-logo--muted {
-        @apply opacity-35;
+        @apply opacity-70;
+    }
+
+    .brand-logo-frame {
+        @apply inline-flex items-center justify-center shrink-0;
+    }
+
+    .brand-logo-frame--header {
+        @apply bg-white rounded-2xl px-3.5 py-2 sm:px-4 sm:py-2.5;
+        @apply shadow-lg shadow-black/20 border border-white/90 ring-1 ring-black/5;
+    }
+
+    .brand-logo-frame--footer {
+        @apply bg-white rounded-2xl px-4 py-2.5 shadow-md border border-white/80;
+    }
+
+    .brand-logo-frame--subtle {
+        @apply bg-white/95 rounded-xl px-3 py-1.5 shadow-sm border border-white/60;
     }
 }
 

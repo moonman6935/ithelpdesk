@@ -18,7 +18,12 @@ const Footer = () => {
           <div className="relative px-6 py-8 md:px-10">
             <div className="flex flex-col md:flex-row justify-between items-center gap-6">
               <div className="flex items-center gap-4">
-                <BrandLogo variant="light" className="h-10 sm:h-11 w-auto shrink-0" />
+                <BrandLogo
+                  framed
+                  frame="footer"
+                  variant="light"
+                  className="h-11 sm:h-12 w-auto min-w-[8.5rem]"
+                />
                 <div>
                   <h3 className="text-xl font-bold text-red-400">DCS Communication Center</h3>
                   <p className="text-gray-400">{t('footer.support')}</p>
@@ -53,7 +58,12 @@ const Footer = () => {
               <p className="text-gray-400 text-sm text-center md:text-left">
                 {t('footer.rights')} | Bayram Can Aslan
               </p>
-              <BrandLogo variant="muted" className="h-7 w-auto" />
+              <BrandLogo
+                framed
+                frame="subtle"
+                variant="muted"
+                className="h-8 sm:h-9 w-auto min-w-[6.5rem]"
+              />
             </div>
           </div>
         </div>

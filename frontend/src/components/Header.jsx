@@ -45,9 +45,14 @@ const Header = () => {
             <div className="flex items-center justify-between gap-3">
               <Link
                 to="/"
-                className="flex items-center gap-2.5 sm:gap-3 min-w-0 hover:opacity-95 transition-opacity group"
+                className="flex items-center gap-3 sm:gap-4 min-w-0 hover:opacity-95 transition-opacity group"
               >
-                <BrandLogo variant="dark" className="h-9 sm:h-10 w-auto shrink-0" />
+                <BrandLogo
+                  framed
+                  frame="header"
+                  variant="light"
+                  className="h-11 sm:h-12 md:h-[3.35rem] w-auto min-w-[7.5rem] sm:min-w-[8.5rem]"
+                />
                 <span className="text-base sm:text-lg font-bold text-white truncate group-hover:text-orange-100 transition-colors">
                   {t('header.title')}
                 </span>
