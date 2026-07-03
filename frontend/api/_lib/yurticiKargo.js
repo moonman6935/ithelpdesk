@@ -193,6 +193,16 @@ function parseQueryShipmentResponse(xml) {
     const deliveryDate = getFirstTagValue(detailXml, 'deliveryDate');
     const deliveryTime = getFirstTagValue(detailXml, 'deliveryTime');
     const receiverInfo = getFirstTagValue(detailXml, 'receiverInfo');
+    const receiverCustName = getFirstTagValue(detailXml, 'receiverCustName');
+    const receiverAddress = getFirstTagValue(detailXml, 'receiverAddress');
+    const documentDate = getFirstTagValue(detailXml, 'documentDate');
+    const departureDate = getFirstTagValue(detailXml, 'departureDate');
+    const arrivalUnitName = getFirstTagValue(detailXml, 'arrivalUnitName');
+    const cityName = getFirstTagValue(detailXml, 'cityName');
+    const townName = getFirstTagValue(detailXml, 'townName');
+
+    const shipDateRaw = departureDate || documentDate;
+    const ship_date = formatYurticiDateTime(shipDateRaw, '').split(' ')[0] || '';
 
     const historyBlocks = extractBlocks(detailXml, 'invDocCargoVOArray');
     const events = historyBlocks
@@ -222,7 +232,13 @@ function parseQueryShipmentResponse(xml) {
         public_status: mapOperationToPublicStatus(operationCode, returnStatus),
         delivery_date: formatYurticiDateTime(deliveryDate, deliveryTime).split(' ')[0] || '',
         delivery_time: formatYurticiDateTime(deliveryDate, deliveryTime).split(' ')[1] || '',
-        receiver_info: receiverInfo,
+        receiver_info: receiverInfo || receiverCustName,
+        receiver_cust_name: receiverCustName,
+        receiver_address: receiverAddress,
+        arrival_unit: arrivalUnitName,
+        arrival_city: cityName,
+        arrival_town: townName,
+        ship_date,
         tracking_url: trackingUrl,
         return_status: returnStatus,
         events,
@@ -271,76 +287,87 @@ async function queryYurticiShipment(key, keyType = 0) {
     return parsed;
 }
 
+function collectLookupKeys(shipment) {
+    const keys = [];
+    const add = (value) => {
+        const key = String(value ?? '').trim();
+        if (key && isTrackableKey(key) && !keys.includes(key)) keys.push(key);
+    };
+    add(shipment.gonderi_kodu);
+    add(shipment.serial_number);
+    return keys;
+}
+
+function resolvePublicGonderiKodu(tracking, shipment) {
+    const fromApi = String(tracking?.cargo_key ?? '').trim() || String(tracking?.doc_id ?? '').trim();
+    if (fromApi) return fromApi;
+    return String(shipment?.gonderi_kodu ?? '').trim();
+}
+
+async function queryYurticiBestMatch(keys) {
+    for (const key of keys) {
+        for (const keyType of [0, 1]) {
+            const result = await queryYurticiShipment(key, keyType);
+            if (result.ok) {
+                return result;
+            }
+        }
+    }
+    return { ok: false, error: 'Kargo kaydı bulunamadı' };
+}
+
 async function enrichShipmentWithYurtici(shipment) {
     const config = getYurticiConfig();
-    const gonderiKodu = String(shipment.gonderi_kodu ?? '').trim();
-    const serialKey = String(shipment.serial_number || '').trim();
-    const queryKey = gonderiKodu || serialKey;
-
-    const applyPublicLink = (record, code) => {
-        const resolved = String(code ?? '').trim();
-        if (!resolved) return record;
-        return {
-            ...record,
-            gonderi_kodu: resolved,
-            yurtici: {
-                ...(record.yurtici || {}),
-                tracking_url: buildPublicTrackingUrl(resolved),
-            },
-        };
-    };
+    const storedGonderiKodu = String(shipment.gonderi_kodu ?? '').trim();
+    const lookupKeys = collectLookupKeys(shipment);
 
     if (!config.enabled) {
-        const code = gonderiKodu || (isTrackableKey(serialKey) ? serialKey : '');
-        return applyPublicLink(
-            {
-                ...shipment,
-                yurtici: { enabled: false },
+        return {
+            ...shipment,
+            gonderi_kodu: storedGonderiKodu,
+            yurtici: {
+                enabled: false,
+                ...(storedGonderiKodu ? { tracking_url: buildPublicTrackingUrl(storedGonderiKodu) } : {}),
             },
-            code
-        );
+        };
     }
 
-    if (!isTrackableKey(queryKey)) {
-        return applyPublicLink(
-            {
-                ...shipment,
-                yurtici: {
-                    enabled: true,
-                    skipped: true,
-                },
-            },
-            gonderiKodu
-        );
+    if (!lookupKeys.length) {
+        return {
+            ...shipment,
+            gonderi_kodu: storedGonderiKodu,
+            yurtici: { enabled: true, skipped: true },
+        };
     }
 
-    let tracking = await queryYurticiShipment(queryKey, 0);
-    if (!tracking.ok && !tracking.skipped) {
-        tracking = await queryYurticiShipment(queryKey, 1);
-    }
+    const tracking = await queryYurticiBestMatch(lookupKeys);
 
     if (!tracking.ok) {
-        return applyPublicLink(
-            {
-                ...shipment,
-                yurtici: {
-                    enabled: true,
-                    found: false,
-                    error: tracking.error || 'Canlı takip bilgisi alınamadı',
-                },
+        return {
+            ...shipment,
+            gonderi_kodu: storedGonderiKodu,
+            yurtici: {
+                enabled: true,
+                found: false,
+                error: tracking.error || 'Canlı takip bilgisi alınamadı',
+                ...(storedGonderiKodu ? { tracking_url: buildPublicTrackingUrl(storedGonderiKodu) } : {}),
             },
-            gonderiKodu || queryKey
-        );
+        };
     }
 
-    const resolvedCode = tracking.cargo_key || tracking.doc_id || gonderiKodu || queryKey;
+    const publicCode = resolvePublicGonderiKodu(tracking, shipment);
+    const arrivalCity = [tracking.arrival_town, tracking.arrival_city].filter(Boolean).join(', ');
 
     const enriched = {
         ...shipment,
         status: tracking.public_status || shipment.status,
+        ship_date: tracking.ship_date || shipment.ship_date,
         delivery_date: tracking.delivery_date || shipment.delivery_date,
         delivery_time: tracking.delivery_time || shipment.delivery_time,
-        gonderi_kodu: resolvedCode,
+        recipient: tracking.receiver_info || shipment.recipient,
+        address: tracking.receiver_address || shipment.address,
+        arrival_city: arrivalCity || shipment.arrival_city,
+        gonderi_kodu: publicCode,
         yurtici: {
             enabled: true,
             found: true,
@@ -350,10 +377,11 @@ async function enrichShipmentWithYurtici(shipment) {
             status_code: tracking.status_code,
             receiver_info: tracking.receiver_info,
             events: tracking.events,
+            tracking_url: publicCode ? buildPublicTrackingUrl(publicCode) : undefined,
         },
     };
 
-    return applyPublicLink(enriched, resolvedCode);
+    return enriched;
 }
 
 function buildPublicTrackingUrl(trackingNumber) {

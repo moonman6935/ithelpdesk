@@ -1,7 +1,7 @@
 const { randomUUID } = require('crypto');
 const { getDb, ensureDefaultAdmin } = require('./_lib/db');
 const { hashPassword, verifyPassword, createAccessToken, verifyAccessToken, isStrongPassword } = require('./_lib/auth');
-const { enrichShipmentWithYurtici, getYurticiConfig, buildPublicTrackingUrl } = require('./_lib/yurticiKargo');
+const { enrichShipmentWithYurtici, getYurticiConfig } = require('./_lib/yurticiKargo');
 const {
     normalizeCargoKey,
     namesMatch,
@@ -315,7 +315,7 @@ async function buildCargoStatusResponse(db, person, queryName = '') {
 
     const shipmentMap = new Map();
     shipmentRecords.forEach((item) => {
-        const dedupeKey = normalizeCargoKey(item.serial_number) || item.id;
+        const dedupeKey = item.id || normalizeCargoKey(item.gonderi_kodu) || normalizeCargoKey(item.serial_number) || item.id;
         if (!shipmentMap.has(dedupeKey)) {
             shipmentMap.set(dedupeKey, item);
         }
@@ -374,17 +374,7 @@ async function buildCargoStatusResponse(db, person, queryName = '') {
         .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
 
     const yurticiConfig = getYurticiConfig();
-    const shipments = yurticiConfig.enabled
-        ? await Promise.all(baseShipments.map((s) => enrichShipmentWithYurtici(s)))
-        : baseShipments.map((s) => {
-            const code = String(s.gonderi_kodu || s.serial_number || '').trim();
-            if (!code || /^(KARGO|SN|IMP)-/i.test(code)) return s;
-            return {
-                ...s,
-                gonderi_kodu: s.gonderi_kodu || code,
-                yurtici: { enabled: false, tracking_url: buildPublicTrackingUrl(code) },
-            };
-        });
+    const shipments = await Promise.all(baseShipments.map((s) => enrichShipmentWithYurtici(s)));
 
     return {
         personnel_id: person.personnel_id,

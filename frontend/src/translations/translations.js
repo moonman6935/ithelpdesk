@@ -348,6 +348,9 @@ export const translations = {
       trackOnYurtici: 'Yurtiçi Kargo\'da Gönderi Sorgula',
       viewOnYurtici: 'Yurtiçi Kargo\'da görüntüle',
       movementHistory: 'Hareket geçmişi',
+      cargoStatus: 'Kargo durumu',
+      liveTracking: 'Canlı takip',
+      shipmentCodePending: 'Gönderi kodu Yurtiçi Kargo sisteminden henüz alınamadı. IT departmanıyla iletişime geçin.',
       status: {
         in_transit: 'Yolda',
         delivered: 'Teslim Edildi',
@@ -894,6 +897,9 @@ export const translations = {
       trackOnYurtici: 'Bei Yurtiçi Kargo Sendung abfragen',
       viewOnYurtici: 'Bei Yurtiçi Kargo anzeigen',
       movementHistory: 'Bewegungsverlauf',
+      cargoStatus: 'Sendungsstatus',
+      liveTracking: 'Live-Tracking',
+      shipmentCodePending: 'Sendungscode konnte noch nicht von Yurtiçi Kargo abgerufen werden. Bitte IT kontaktieren.',
       status: {
         in_transit: 'Unterwegs',
         delivered: 'Zugestellt',
@@ -1429,6 +1435,9 @@ export const translations = {
       trackOnYurtici: 'Inquire on Yurtiçi Kargo',
       viewOnYurtici: 'View on Yurtiçi Kargo',
       movementHistory: 'Movement history',
+      cargoStatus: 'Shipment status',
+      liveTracking: 'Live tracking',
+      shipmentCodePending: 'Shipment code could not be retrieved from Yurtiçi Kargo yet. Please contact IT.',
       status: {
         in_transit: 'In Transit',
         delivered: 'Delivered',

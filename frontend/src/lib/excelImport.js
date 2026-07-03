@@ -47,7 +47,7 @@ function parseSpecialField(text) {
 }
 
 function extractGonderiKodu(row) {
-    return String(
+    const fromColumn = String(
         row['Gönderi Kodu'] ??
         row['Gonderi Kodu'] ??
         row['Gönderi No'] ??
@@ -55,8 +55,19 @@ function extractGonderiKodu(row) {
         row['Referans No'] ??
         row['Referans Kodu'] ??
         row['Referans'] ??
+        row['İrsaliye No'] ??
+        row['Irsaliye No'] ??
         ''
     ).trim();
+    if (fromColumn) return fromColumn;
+
+    for (const field of ['Özel Alan 1', 'Ozel Alan 1', 'Özel Alan 2', 'Ozel Alan 2']) {
+        const raw = String(row[field] ?? '').trim();
+        const dcsMatch = raw.match(/\b(DCS\d+)\b/i);
+        if (dcsMatch) return dcsMatch[1].toUpperCase();
+    }
+
+    return '';
 }
 
 function rowToCargoRecord(row, format) {
@@ -74,7 +85,7 @@ function rowToCargoRecord(row, format) {
         personnel_name: name,
         item_name: itemName,
         gonderi_kodu: gonderiKodu,
-        serial_number: serial || gonderiKodu || `KARGO-${row.No ?? Date.now()}`,
+        serial_number: serial || `KARGO-${row.No ?? Date.now()}`,
         created_at: parseDeliveryDate(row['Teslim Tarihi'], row['Teslim Saati']),
         row_no: row.No ?? null,
         address: String(row['Alıcı Adresi'] ?? '').trim(),
