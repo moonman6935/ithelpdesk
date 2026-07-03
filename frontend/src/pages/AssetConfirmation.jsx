@@ -6,12 +6,16 @@ import { Input } from '../components/ui/input';
 import { Checkbox } from '../components/ui/checkbox';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { Badge } from '../components/ui/badge';
-import { CheckCircle, AlertCircle, Package, User, Lock } from 'lucide-react';
+import {
+    Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+} from '../components/ui/dialog';
+import { CheckCircle, AlertCircle, Package, User, Lock, FileText } from 'lucide-react';
 import api from '../lib/api';
 import PageShell from '../components/PageShell';
+import { translations } from '../translations/translations';
 
 const AssetConfirmation = () => {
-    const { t } = useLanguage();
+    const { language, t } = useLanguage();
     const [step, setStep] = useState(1);
     const [personnelName, setPersonnelName] = useState('');
     const [personnelId, setPersonnelId] = useState('');
@@ -21,6 +25,8 @@ const AssetConfirmation = () => {
     const [error, setError] = useState('');
     const [isAccepted, setIsAccepted] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [formDialogOpen, setFormDialogOpen] = useState(false);
+    const [formTermsAccepted, setFormTermsAccepted] = useState(false);
 
     const resetFlow = () => {
         setStep(1);
@@ -30,6 +36,8 @@ const AssetConfirmation = () => {
         setError('');
         setConfirmed(false);
         setIsAccepted(false);
+        setFormDialogOpen(false);
+        setFormTermsAccepted(false);
     };
 
     const checkName = async () => {
@@ -93,6 +101,27 @@ const AssetConfirmation = () => {
             setLoading(false);
         }
     };
+
+    const handleCheckboxChange = (checked) => {
+        if (checked) {
+            setFormTermsAccepted(false);
+            setFormDialogOpen(true);
+        } else {
+            setIsAccepted(false);
+            setFormTermsAccepted(false);
+        }
+    };
+
+    const handleFormAccept = () => {
+        if (!formTermsAccepted) return;
+        setIsAccepted(true);
+        setFormDialogOpen(false);
+    };
+
+    const clauses =
+        translations[language]?.assetConfirmation?.formClauses
+        || translations.tr.assetConfirmation.formClauses
+        || [];
 
     const handleConfirm = async () => {
         try {
@@ -216,16 +245,29 @@ const AssetConfirmation = () => {
 
                                 {!confirmed && (
                                     <>
-                                        <div className="flex items-center space-x-2 bg-red-50 p-4 rounded-lg border border-red-100">
+                                        <div
+                                            className="flex items-center space-x-2 bg-red-50 p-4 rounded-lg border border-red-100 cursor-pointer"
+                                            onClick={() => !isAccepted && handleCheckboxChange(true)}
+                                            onKeyDown={(e) => e.key === 'Enter' && !isAccepted && handleCheckboxChange(true)}
+                                            role="button"
+                                            tabIndex={0}
+                                        >
                                             <Checkbox
                                                 id="confirm"
                                                 checked={isAccepted}
-                                                onCheckedChange={setIsAccepted}
+                                                onCheckedChange={handleCheckboxChange}
                                             />
-                                            <label htmlFor="confirm" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-red-900">
+                                            <label htmlFor="confirm" className="text-sm font-medium leading-snug cursor-pointer text-red-900">
                                                 {t('assetConfirmation.confirmCheckbox')}
                                             </label>
                                         </div>
+
+                                        {isAccepted && (
+                                            <p className="text-xs text-green-700 flex items-center gap-1.5">
+                                                <FileText className="w-3.5 h-3.5" />
+                                                {t('assetConfirmation.formSigned')}
+                                            </p>
+                                        )}
 
                                         <Button
                                             disabled={!isAccepted}
@@ -240,6 +282,78 @@ const AssetConfirmation = () => {
                         )}
                     </CardContent>
                 </Card>
+
+                <Dialog open={formDialogOpen} onOpenChange={setFormDialogOpen}>
+                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2 text-xl">
+                                <FileText className="w-5 h-5 text-red-600" />
+                                {t('assetConfirmation.formTitle')}
+                            </DialogTitle>
+                            <DialogDescription>
+                                {t('assetConfirmation.formIntro')}
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <div className="space-y-4 text-sm text-gray-700">
+                            <div className="rounded-lg border bg-gray-50 p-4 space-y-1">
+                                <p className="font-semibold text-gray-900">{personnelName}</p>
+                                <p className="text-gray-500 font-mono text-xs">{personnelId}</p>
+                            </div>
+
+                            <div>
+                                <p className="font-semibold text-gray-900 mb-2">{t('assetConfirmation.formAssetsList')}</p>
+                                <ul className="space-y-2 border rounded-lg divide-y">
+                                    {assets.map((item, idx) => (
+                                        <li key={idx} className="flex justify-between gap-2 p-3 text-sm">
+                                            <span className="font-medium">{item.item_name}</span>
+                                            <span className="text-gray-500 font-mono shrink-0">S/N: {item.serial_number}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            <div>
+                                <p className="font-semibold text-gray-900 mb-3">{t('assetConfirmation.formTermsTitle')}</p>
+                                <ol className="list-decimal list-inside space-y-3 leading-relaxed">
+                                    {clauses.map((clause, idx) => (
+                                        <li key={idx} className="pl-1">{clause}</li>
+                                    ))}
+                                </ol>
+                            </div>
+
+                            <div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4">
+                                <Checkbox
+                                    id="form-terms"
+                                    checked={formTermsAccepted}
+                                    onCheckedChange={setFormTermsAccepted}
+                                    className="mt-0.5"
+                                />
+                                <label htmlFor="form-terms" className="text-sm font-medium text-red-900 leading-snug cursor-pointer">
+                                    {t('assetConfirmation.formTermsCheckbox')}
+                                </label>
+                            </div>
+                        </div>
+
+                        <DialogFooter className="gap-2 sm:gap-0">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => setFormDialogOpen(false)}
+                            >
+                                {t('assetConfirmation.formCancel')}
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="brand"
+                                disabled={!formTermsAccepted}
+                                onClick={handleFormAccept}
+                            >
+                                {t('assetConfirmation.formAccept')}
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
         </PageShell>
     );
 };
