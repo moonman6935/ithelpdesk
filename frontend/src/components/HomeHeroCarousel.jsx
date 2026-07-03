@@ -4,6 +4,7 @@ import { translations } from '../translations/translations';
 import { Button } from './ui/button';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronLeft, ChevronRight, Sparkles, Monitor, RefreshCw, MessageSquare, Package, ShieldCheck, Laptop, Cable } from 'lucide-react';
+import { useIsMobile } from '../hooks/useMediaQuery';
 
 const SLIDE_META = [
   { Icon: Sparkles, gradient: 'from-red-500 via-red-600 to-orange-500', blob: 'bg-yellow-300/30' },
@@ -16,114 +17,129 @@ const SLIDE_META = [
   { Icon: Cable, gradient: 'from-teal-600 via-green-600 to-emerald-700', blob: 'bg-teal-300/30' },
 ];
 
+function CarouselSlide({ slide, index, slidesLength, isActive, t }) {
+  const { Icon, gradient, blob } = SLIDE_META[index] || SLIDE_META[0];
+
+  return (
+    <div className={`min-w-full bg-gradient-to-br ${gradient} text-white relative`}>
+      <div className="absolute inset-0 opacity-20 pointer-events-none decorative-blur">
+        <div className={`absolute -top-10 -right-10 w-64 h-64 rounded-full ${blob} blur-2xl`} />
+        <div className={`absolute bottom-0 left-10 w-48 h-48 rounded-full ${blob} blur-xl`} />
+      </div>
+
+      <div className="relative grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-center p-6 sm:p-8 md:p-14 min-h-[280px] sm:min-h-[320px] md:min-h-[340px]">
+        <div className="order-2 md:order-1 space-y-3 sm:space-y-4">
+          <span className="inline-block px-3 py-1 rounded-full bg-white/20 text-sm font-medium sm:backdrop-blur-sm">
+            {index + 1} / {slidesLength}
+          </span>
+          <h2
+            className={`text-2xl sm:text-3xl md:text-4xl font-bold leading-tight transition-opacity duration-500 ${
+              isActive ? 'opacity-100' : 'opacity-0 md:opacity-100'
+            }`}
+          >
+            {slide.title}
+          </h2>
+          <p
+            className={`text-base sm:text-lg md:text-xl text-white/95 leading-relaxed max-w-2xl lg:max-w-3xl transition-opacity duration-500 ${
+              isActive ? 'opacity-100' : 'opacity-0 md:opacity-100'
+            }`}
+          >
+            {slide.message}
+          </p>
+          {index === 0 && isActive && (
+            <div className="flex flex-wrap gap-3 pt-2 sm:pt-4">
+              <Link to="/pc-setup">
+                <Button size="lg" variant="brand" className="shadow-lg">
+                  {t('home.getStarted')}
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              </Link>
+              <Link to="/faq">
+                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+                  {t('header.faq')}
+                </Button>
+              </Link>
+            </div>
+          )}
+        </div>
+
+        <div className="order-1 md:order-2 flex justify-center">
+          <div className={`relative transition-transform duration-500 ${isActive ? 'scale-100' : 'scale-95 md:scale-90'}`}>
+            <div className="w-36 h-36 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full bg-white/15 sm:backdrop-blur-sm flex items-center justify-center border-4 border-white/30 shadow-inner">
+              <Icon className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 text-white drop-shadow-lg" strokeWidth={1.25} />
+            </div>
+            <div className="hidden sm:block absolute -top-3 -right-3 w-16 h-16 rounded-2xl bg-white/20 rotate-12 sm:backdrop-blur-sm" />
+            <div className="hidden sm:block absolute -bottom-4 -left-4 w-20 h-20 rounded-full bg-white/10" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const HomeHeroCarousel = () => {
   const { language, t } = useLanguage();
+  const isMobile = useIsMobile();
   const slides = translations[language]?.home?.carouselSlides || translations.tr.home.carouselSlides;
   const [active, setActive] = useState(0);
   const [animating, setAnimating] = useState(false);
+  const slidesLength = slides.length;
 
   const goTo = useCallback((index) => {
     if (animating) return;
     setAnimating(true);
-    setActive((index + slides.length) % slides.length);
-    setTimeout(() => setAnimating(false), 600);
-  }, [animating, slides.length]);
+    setActive((index + slidesLength) % slidesLength);
+    window.setTimeout(() => setAnimating(false), 500);
+  }, [animating, slidesLength]);
 
   const next = useCallback(() => goTo(active + 1), [active, goTo]);
   const prev = useCallback(() => goTo(active - 1), [active, goTo]);
 
   useEffect(() => {
-    const timer = setInterval(next, 6000);
-    return () => clearInterval(timer);
-  }, [next]);
+    const timer = window.setInterval(() => {
+      if (document.hidden) return;
+      setActive((prev) => (prev + 1) % slidesLength);
+    }, 7000);
+
+    return () => window.clearInterval(timer);
+  }, [slidesLength]);
 
   return (
     <section className="relative pt-10 md:pt-12 pb-2 md:pb-3 overflow-hidden">
       <div className="container mx-auto px-4 lg:px-6 max-w-7xl">
         <div className="w-full relative">
           <div className="overflow-hidden rounded-3xl shadow-2xl border border-white/50">
-            <div
-              className="flex transition-transform duration-700 ease-in-out"
-              style={{ transform: `translateX(-${active * 100}%)` }}
-            >
-              {slides.map((slide, index) => {
-                const { Icon, gradient, blob } = SLIDE_META[index] || SLIDE_META[0];
-                const isActive = index === active;
-
-                return (
-                  <div
+            {isMobile ? (
+              <CarouselSlide
+                slide={slides[active]}
+                index={active}
+                slidesLength={slidesLength}
+                isActive
+                t={t}
+              />
+            ) : (
+              <div
+                className="flex transition-transform duration-700 ease-in-out"
+                style={{ transform: `translateX(-${active * 100}%)` }}
+              >
+                {slides.map((slide, index) => (
+                  <CarouselSlide
                     key={`${slide.title}-${index}`}
-                    className={`min-w-full bg-gradient-to-br ${gradient} text-white relative`}
-                  >
-                    <div className="absolute inset-0 opacity-20 pointer-events-none">
-                      <div className={`absolute -top-10 -right-10 w-64 h-64 rounded-full ${blob} blur-2xl`} />
-                      <div className={`absolute bottom-0 left-10 w-48 h-48 rounded-full ${blob} blur-xl`} />
-                    </div>
-
-                    <div className="relative grid grid-cols-1 md:grid-cols-2 gap-8 items-center p-8 md:p-14 min-h-[340px]">
-                      <div className="order-2 md:order-1 space-y-4">
-                        <span className="inline-block px-3 py-1 rounded-full bg-white/20 text-sm font-medium backdrop-blur-sm">
-                          {index + 1} / {slides.length}
-                        </span>
-                        <h2
-                          className={`text-3xl md:text-4xl font-bold leading-tight transition-all duration-700 ${
-                            isActive ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
-                          }`}
-                        >
-                          {slide.title}
-                        </h2>
-                        <p
-                          className={`text-lg md:text-xl text-white/95 leading-relaxed max-w-2xl lg:max-w-3xl transition-all duration-700 delay-150 ${
-                            isActive ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'
-                          }`}
-                        >
-                          {slide.message}
-                        </p>
-                        {index === 0 && (
-                          <div
-                            className={`flex flex-wrap gap-3 pt-4 transition-all duration-700 delay-300 ${
-                              isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-                            }`}
-                          >
-                            <Link to="/pc-setup">
-                              <Button size="lg" variant="brand" className="shadow-lg">
-                                {t('home.getStarted')}
-                                <ArrowRight className="ml-2 w-4 h-4" />
-                              </Button>
-                            </Link>
-                            <Link to="/faq">
-                              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
-                                {t('header.faq')}
-                              </Button>
-                            </Link>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="order-1 md:order-2 flex justify-center">
-                        <div
-                          className={`relative transition-all duration-700 ${
-                            isActive ? 'scale-100 opacity-100' : 'scale-90 opacity-60'
-                          }`}
-                        >
-                          <div className="w-48 h-48 md:w-56 md:h-56 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center border-4 border-white/30 shadow-inner">
-                            <Icon className="w-24 h-24 md:w-28 md:h-28 text-white drop-shadow-lg" strokeWidth={1.25} />
-                          </div>
-                          <div className="absolute -top-3 -right-3 w-16 h-16 rounded-2xl bg-white/20 rotate-12 backdrop-blur-sm" />
-                          <div className="absolute -bottom-4 -left-4 w-20 h-20 rounded-full bg-white/10" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                    slide={slide}
+                    index={index}
+                    slidesLength={slidesLength}
+                    isActive={index === active}
+                    t={t}
+                  />
+                ))}
+              </div>
+            )}
           </div>
 
           <button
             type="button"
             onClick={prev}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 md:-translate-x-5 z-10 w-10 h-10 rounded-full bg-white shadow-lg border flex items-center justify-center text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 md:-translate-x-5 z-10 w-10 h-10 rounded-full bg-white shadow-lg border flex items-center justify-center text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
             aria-label="Önceki"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -131,7 +147,7 @@ const HomeHeroCarousel = () => {
           <button
             type="button"
             onClick={next}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 md:translate-x-5 z-10 w-10 h-10 rounded-full bg-white shadow-lg border flex items-center justify-center text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 md:translate-x-5 z-10 w-10 h-10 rounded-full bg-white shadow-lg border flex items-center justify-center text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
             aria-label="Sonraki"
           >
             <ChevronRight className="w-5 h-5" />

@@ -65,7 +65,7 @@ const PageShell = ({
           <div
             className={`relative overflow-hidden rounded-3xl bg-gradient-to-br ${colors.gradient} text-white shadow-xl border border-white/20 mb-10 p-8 md:p-12`}
           >
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute inset-0 pointer-events-none overflow-hidden decorative-blur">
               <div className={`absolute -top-10 -right-10 w-48 h-48 rounded-full ${colors.blob} blur-2xl`} />
               <div className={`absolute bottom-0 left-8 w-32 h-32 rounded-full ${colors.accent} blur-xl`} />
             </div>

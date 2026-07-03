@@ -47,12 +47,20 @@ const HeadsetTest = () => {
       }
     };
 
+    const onVisibilityChange = () => {
+      if (document.hidden && isTestingRef.current) {
+        stopMicTest();
+      }
+    };
+
     syncPermission();
+    document.addEventListener('visibilitychange', onVisibilityChange);
 
     return () => {
       if (permissionStatus) {
         permissionStatus.onchange = null;
       }
+      document.removeEventListener('visibilitychange', onVisibilityChange);
       stopMicTest();
       stopTestSound();
     };

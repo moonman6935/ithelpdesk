@@ -5,7 +5,6 @@ import {
   Headphones,
   Keyboard,
   Mic,
-  RefreshCw,
   Cable,
   ScreenShare,
   Server,
@@ -107,13 +106,16 @@ function FloatingDecor({ item }) {
 const SiteBackground = () => (
   <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden="true">
     <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-red-50/50" />
-    <div className="absolute -top-40 -right-32 w-[28rem] h-[28rem] rounded-full bg-red-200/25 blur-3xl" />
-    <div className="absolute top-[20%] -left-28 w-80 h-80 rounded-full bg-blue-200/20 blur-3xl" />
-    <div className="absolute top-[55%] right-[10%] w-72 h-72 rounded-full bg-emerald-200/20 blur-3xl" />
-    <div className="absolute bottom-[5%] left-[20%] w-96 h-96 rounded-full bg-violet-200/15 blur-3xl" />
-    <div className="absolute bottom-0 right-0 w-64 h-64 rounded-full bg-orange-200/15 blur-2xl" />
 
-    {/* Kenar vektör ikonları — geniş ekranlarda */}
+    {/* Büyük blur küreleri yalnızca masaüstünde — mobilde GPU belleğini tüketir */}
+    <div className="hidden lg:block decorative-blur">
+      <div className="absolute -top-40 -right-32 w-[28rem] h-[28rem] rounded-full bg-red-200/25 blur-3xl" />
+      <div className="absolute top-[20%] -left-28 w-80 h-80 rounded-full bg-blue-200/20 blur-3xl" />
+      <div className="absolute top-[55%] right-[10%] w-72 h-72 rounded-full bg-emerald-200/20 blur-3xl" />
+      <div className="absolute bottom-[5%] left-[20%] w-96 h-96 rounded-full bg-violet-200/15 blur-3xl" />
+      <div className="absolute bottom-0 right-0 w-64 h-64 rounded-full bg-orange-200/15 blur-2xl" />
+    </div>
+
     <div className="hidden xl:block absolute inset-0">
       {LEFT_DECOR.map((item, i) => (
         <FloatingDecor key={`l-${i}`} item={item} />
@@ -123,7 +125,6 @@ const SiteBackground = () => (
       ))}
     </div>
 
-    {/* Orta alanın dışında kalan bölgeye ekstra küçük ikonlar (2xl+) */}
     <div className="hidden 2xl:block absolute inset-0">
       <div className="absolute top-[22%] left-[9%] rotate-12 text-blue-300/20">
         <WindowsMark size={20} />
@@ -138,7 +139,7 @@ const SiteBackground = () => (
       </div>
     </div>
 
-    <svg className="absolute inset-0 w-full h-full opacity-[0.03]" xmlns="http://www.w3.org/2000/svg">
+    <svg className="hidden md:block absolute inset-0 w-full h-full opacity-[0.03]" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
           <path d="M 32 0 L 0 0 0 32" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-slate-400" />

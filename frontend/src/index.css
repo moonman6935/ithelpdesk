@@ -87,6 +87,16 @@ code {
         @apply bg-white/85 backdrop-blur-md border border-white/70 shadow-lg rounded-3xl;
     }
 
+    @media (max-width: 1023px) {
+        .glass-panel {
+            @apply bg-white backdrop-blur-none border border-gray-100 shadow-md;
+        }
+
+        .decorative-blur {
+            @apply hidden;
+        }
+    }
+
     .btn-brand {
         @apply bg-red-600 text-white shadow-md transition-all duration-300;
         @apply hover:bg-gradient-to-r hover:from-red-500 hover:via-orange-500 hover:to-red-600;

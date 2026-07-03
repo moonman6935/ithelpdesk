@@ -76,16 +76,16 @@ function ColorCard({ gradient, blob, accent, Icon, title, description, cta, to, 
   return (
     <Link to={to} className="block group h-full">
       <div
-        className={`relative overflow-hidden rounded-3xl bg-gradient-to-br ${gradient} text-white shadow-xl border border-white/10 h-full transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl`}
+        className={`relative overflow-hidden rounded-3xl bg-gradient-to-br ${gradient} text-white shadow-xl border border-white/10 h-full transition-all duration-300 sm:hover:scale-[1.02] sm:hover:shadow-2xl`}
       >
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden decorative-blur">
           <div className={`absolute -top-8 -right-8 w-40 h-40 rounded-full ${blob} blur-2xl`} />
           <div className={`absolute bottom-4 left-4 w-24 h-24 rounded-full ${accent} blur-xl`} />
         </div>
 
         <div className={`relative ${compact ? 'p-6' : 'p-8'} flex flex-col h-full`}>
           <div className="flex items-start justify-between gap-4 mb-5">
-            <div className="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur-sm border border-white/25 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
+            <div className="w-16 h-16 rounded-2xl bg-white/20 sm:bg-white/15 sm:backdrop-blur-sm border border-white/25 flex items-center justify-center shrink-0 sm:group-hover:scale-110 transition-transform duration-300">
               <Icon className="w-8 h-8 text-white" strokeWidth={1.5} />
             </div>
             <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -173,9 +173,9 @@ const Home = () => {
       {/* Features */}
       <section className="pt-2 md:pt-4 pb-12 md:pb-16">
         <div className="container mx-auto px-4 lg:px-6 max-w-7xl">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white/90 via-white/80 to-red-50/60 backdrop-blur-md border border-white/70 shadow-lg p-6 md:p-10 mb-10">
-            <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-violet-200/20 blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-8 -left-8 w-40 h-40 rounded-full bg-blue-200/20 blur-2xl pointer-events-none" />
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-white to-red-50/60 sm:from-white/90 sm:via-white/80 sm:to-red-50/60 sm:backdrop-blur-md border border-white/70 shadow-lg p-6 md:p-10 mb-10">
+            <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-violet-200/20 blur-3xl pointer-events-none decorative-blur" />
+            <div className="absolute -bottom-8 -left-8 w-40 h-40 rounded-full bg-blue-200/20 blur-2xl pointer-events-none decorative-blur" />
             <div className="relative text-center w-full">
               <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-4">
                 {QUICK_LINKS.map((link) => (
@@ -231,7 +231,7 @@ const Home = () => {
       <section className="py-12 md:py-16 px-4 lg:px-6">
         <div className="container mx-auto max-w-7xl">
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-red-500 via-red-600 to-orange-600 text-white shadow-2xl border border-white/20">
-            <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute inset-0 pointer-events-none decorative-blur">
               <div className="absolute -top-16 -left-16 w-72 h-72 rounded-full bg-yellow-300/20 blur-3xl" />
               <div className="absolute -bottom-20 -right-10 w-80 h-80 rounded-full bg-orange-300/20 blur-3xl" />
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-white/5" />

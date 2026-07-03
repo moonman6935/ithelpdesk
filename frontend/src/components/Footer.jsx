@@ -10,7 +10,7 @@ const Footer = () => {
     <footer className="px-4 pb-6 pt-4 mt-auto">
       <div className="container mx-auto max-w-7xl">
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-800 via-gray-900 to-slate-900 text-white shadow-xl border border-white/10">
-          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute inset-0 pointer-events-none overflow-hidden decorative-blur">
             <div className="absolute -top-10 right-10 w-40 h-40 rounded-full bg-red-500/10 blur-2xl" />
             <div className="absolute bottom-0 left-10 w-32 h-32 rounded-full bg-violet-500/10 blur-xl" />
           </div>

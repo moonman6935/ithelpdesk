@@ -35,7 +35,7 @@ const Header = () => {
     <header className="sticky top-0 z-50 px-3 sm:px-4 pt-3 pb-1">
       <div className="container mx-auto max-w-7xl">
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-red-500 via-red-600 to-orange-500 shadow-xl border border-white/25">
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none overflow-hidden decorative-blur">
             <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-yellow-300/25 blur-2xl" />
             <div className="absolute -bottom-10 left-1/4 w-32 h-32 rounded-full bg-orange-300/20 blur-xl" />
             <div className="absolute top-0 right-1/3 w-24 h-24 rounded-full bg-violet-400/15 blur-xl" />
