@@ -32,7 +32,7 @@ const Header = () => {
       : `text-white rounded-xl ${hover}`;
 
   return (
-    <header className="sticky top-0 z-50 px-3 sm:px-4 pt-3 pb-1">
+    <header className="z-50 px-3 sm:px-4 pt-3 pb-1 lg:sticky lg:top-0">
       <div className="container mx-auto max-w-7xl">
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-red-500 via-red-600 to-orange-500 shadow-xl border border-white/25">
           <div className="absolute inset-0 pointer-events-none overflow-hidden decorative-blur">
