@@ -3,7 +3,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { translations } from '../translations/translations';
 import { Button } from './ui/button';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ChevronLeft, ChevronRight, Sparkles, Monitor, RefreshCw, MessageSquare, Package, ShieldCheck, Laptop, Cable } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, Sparkles, Monitor, RefreshCw, MessageSquare, Package, ShieldCheck, Laptop, Cable, Truck, ClipboardCheck } from 'lucide-react';
 import { useIsMobile } from '../hooks/useMediaQuery';
 
 const SLIDE_META = [
@@ -15,6 +15,8 @@ const SLIDE_META = [
   { Icon: ShieldCheck, gradient: 'from-slate-600 via-slate-700 to-zinc-800', blob: 'bg-slate-300/30' },
   { Icon: Laptop, gradient: 'from-cyan-600 via-blue-600 to-indigo-700', blob: 'bg-cyan-300/30' },
   { Icon: Cable, gradient: 'from-teal-600 via-green-600 to-emerald-700', blob: 'bg-teal-300/30' },
+  { Icon: Truck, gradient: 'from-amber-500 via-orange-600 to-red-600', blob: 'bg-amber-300/30' },
+  { Icon: ClipboardCheck, gradient: 'from-rose-500 via-pink-600 to-red-700', blob: 'bg-rose-300/30' },
 ];
 
 function CarouselSlide({ slide, index, slidesLength, isActive, t }) {
@@ -46,7 +48,17 @@ function CarouselSlide({ slide, index, slidesLength, isActive, t }) {
           >
             {slide.message}
           </p>
-          {index === 0 && isActive && (
+          {slide.ctaLink && isActive && (
+            <div className="flex flex-wrap gap-3 pt-2 sm:pt-4">
+              <Link to={slide.ctaLink}>
+                <Button size="lg" variant="brand" className="shadow-lg">
+                  {slide.ctaLabel}
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              </Link>
+            </div>
+          )}
+          {index === 0 && isActive && !slide.ctaLink && (
             <div className="flex flex-wrap gap-3 pt-2 sm:pt-4">
               <Link to="/pc-setup">
                 <Button size="lg" variant="brand" className="shadow-lg">

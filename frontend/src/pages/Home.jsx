@@ -12,6 +12,7 @@ import {
   Sparkles,
   MessageSquare,
   Ticket,
+  Truck,
 } from 'lucide-react';
 import HomeHeroCarousel from '../components/HomeHeroCarousel';
 
@@ -69,6 +70,17 @@ const EXTRA_CARDS = [
     blob: 'bg-rose-300/25',
     titleKey: 'home.features.assets',
     descKey: 'home.features.assetsDesc',
+    ctaKey: 'home.fillAssetForm',
+  },
+  {
+    key: 'cargo',
+    to: '/cargo-status',
+    Icon: Truck,
+    gradient: 'from-amber-500 via-orange-600 to-red-600',
+    blob: 'bg-amber-300/25',
+    titleKey: 'home.features.cargo',
+    descKey: 'home.features.cargoDesc',
+    ctaKey: 'home.trackCargo',
   },
 ];
 
@@ -141,6 +153,20 @@ const QUICK_LINKS = [
     gradient: 'from-emerald-500 to-teal-600',
     href: 'https://support.dmc-rz.com/otobo/customer.pl?Action=CustomerDashboard',
   },
+  {
+    key: 'cargo',
+    labelKey: 'home.quickLinks.cargo',
+    Icon: Truck,
+    gradient: 'from-amber-500 to-orange-600',
+    to: '/cargo-status',
+  },
+  {
+    key: 'assets',
+    labelKey: 'home.quickLinks.assetForm',
+    Icon: ClipboardCheck,
+    gradient: 'from-rose-500 to-pink-600',
+    to: '/asset-confirmation',
+  },
 ];
 
 function QuickLinkPill({ label, Icon, gradient, to, href }) {
@@ -210,7 +236,7 @@ const Home = () => {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {EXTRA_CARDS.map((card) => (
               <ColorCard
                 key={card.key}
@@ -218,7 +244,7 @@ const Home = () => {
                 {...card}
                 title={t(card.titleKey)}
                 description={t(card.descKey)}
-                cta={t('home.learnMore')}
+                cta={t(card.ctaKey || 'home.learnMore')}
                 to={card.to}
                 Icon={card.Icon}
               />
