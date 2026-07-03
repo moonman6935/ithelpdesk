@@ -74,16 +74,18 @@ function getShipmentPublicStatus(cargo, incomingMatch) {
 
 function findCargoMatch(outgoing, incomingList) {
     const serialKey = normalizeCargoKey(outgoing.serial_number);
-    if (serialKey) {
+    if (serialKey && !/^(kargo|imp|sn)-/.test(serialKey)) {
         const bySerial = incomingList.find(
             (inc) => normalizeCargoKey(inc.serial_number) === serialKey
         );
         if (bySerial) return bySerial;
     }
 
-    const nameKey = normalizeCargoKey(outgoing.personnel_name);
     const nameMatches = incomingList.filter(
-        (inc) => normalizeCargoKey(inc.personnel_name) === nameKey
+        (inc) =>
+            namesMatch(outgoing.personnel_name, inc.personnel_name) ||
+            namesMatch(outgoing.personnel_name, inc.recipient) ||
+            (outgoing.recipient && namesMatch(outgoing.recipient, inc.personnel_name))
     );
     if (!nameMatches.length) return null;
 
@@ -91,6 +93,91 @@ function findCargoMatch(outgoing, incomingList) {
         (inc) => normalizeCargoKey(inc.item_name) === normalizeCargoKey(outgoing.item_name)
     );
     return byItem || nameMatches[0];
+}
+
+function filterCargoByDirection(allCargo, direction) {
+    if (direction === 'outgoing') {
+        return allCargo.filter((c) => c.direction !== 'incoming');
+    }
+    return allCargo.filter((c) => c.direction === 'incoming');
+}
+
+function looksLikeMisplacedCargoImport(item) {
+    const serial = String(item.serial_number ?? '').trim();
+    if (/^(KARGO|IMP)-/i.test(serial)) return true;
+    const itemName = String(item.item_name ?? '').trim();
+    return itemName.length > 0 && itemName !== 'Ürün' && itemName !== 'Urun';
+}
+
+async function syncInventoryToCargo(db, direction = 'outgoing') {
+    if (!['outgoing', 'incoming'].includes(direction)) {
+        return { imported: 0, skipped: 0, error: 'invalid_direction' };
+    }
+
+    const [inventoryItems, existingCargo] = await Promise.all([
+        db.collection('inventory').find({}, { projection: { _id: 0 } }).toArray(),
+        db.collection('cargo').find({}, { projection: { serial_number: 1, _id: 0 } }).toArray(),
+    ]);
+
+    const existingSerials = new Set(
+        existingCargo.map((c) => String(c.serial_number ?? '').trim()).filter(Boolean)
+    );
+
+    const nameToId = {};
+    for (const item of inventoryItems) {
+        if (item.personnel_name && item.personnel_id) {
+            const key = normalizeCargoKey(item.personnel_name);
+            if (!nameToId[key]) nameToId[key] = item.personnel_id;
+        }
+    }
+
+    const now = new Date().toISOString();
+    const itemsToInsert = [];
+    let skipped = 0;
+
+    for (const item of inventoryItems) {
+        if (!looksLikeMisplacedCargoImport(item)) {
+            skipped += 1;
+            continue;
+        }
+
+        const serial = String(item.serial_number ?? '').trim();
+        if (!serial || existingSerials.has(serial)) {
+            skipped += 1;
+            continue;
+        }
+
+        existingSerials.add(serial);
+        const personnelId = String(item.personnel_id ?? '').trim()
+            || nameToId[normalizeCargoKey(item.personnel_name)]
+            || undefined;
+
+        itemsToInsert.push({
+            id: randomUUID(),
+            direction,
+            personnel_id: personnelId,
+            personnel_name: String(item.personnel_name ?? '').trim(),
+            item_name: String(item.item_name || 'Kargo').trim(),
+            serial_number: serial,
+            created_at: item.created_at || now,
+            imported_at: now,
+            synced_from_inventory: true,
+            address: '',
+            phone: '',
+            ship_date: '',
+            delivery_date: item.returned_at || '',
+            recipient: '',
+        });
+    }
+
+    if (itemsToInsert.length) {
+        const CHUNK = 100;
+        for (let i = 0; i < itemsToInsert.length; i += CHUNK) {
+            await db.collection('cargo').insertMany(itemsToInsert.slice(i, i + CHUNK));
+        }
+    }
+
+    return { imported: itemsToInsert.length, skipped };
 }
 
 async function saveProductNames(db, names) {
@@ -227,6 +314,38 @@ async function buildCargoStatusResponse(db, person, queryName = '') {
             shipmentMap.set(dedupeKey, item);
         }
     });
+
+    if (!shipmentMap.size) {
+        const invItems = await db.collection('inventory').find({}, { projection: { _id: 0 } }).toArray();
+        invItems
+            .filter((item) => looksLikeMisplacedCargoImport(item))
+            .filter((item) =>
+                personMatchesCargo(
+                    { personnel_name: item.personnel_name, recipient: '', personnel_id: item.personnel_id },
+                    person,
+                    queryName
+                )
+            )
+            .forEach((item) => {
+                const dedupeKey = normalizeCargoKey(item.serial_number) || item.id;
+                if (!shipmentMap.has(dedupeKey)) {
+                    shipmentMap.set(dedupeKey, {
+                        id: item.id,
+                        direction: 'outgoing',
+                        item_name: item.item_name,
+                        serial_number: item.serial_number,
+                        ship_date: '',
+                        delivery_date: item.returned_at ? String(item.returned_at).split('T')[0] : '',
+                        delivery_time: '',
+                        recipient: '',
+                        address: '',
+                        arrival_city: '',
+                        imported_at: item.created_at,
+                        created_at: item.created_at,
+                    });
+                }
+            });
+    }
 
     const baseShipments = [...shipmentMap.values()]
         .map((record) => {
@@ -635,6 +754,23 @@ module.exports = async (req, res) => {
             return sendJson(res, 200, names);
         }
 
+        if (method === 'GET' && segments[0] === 'admin' && segments[1] === 'cargo' && segments.length === 3 && !segments[2].includes('.')) {
+            if (!(await requireAdminAccess(db, req, res))) return;
+            const direction = segments[2];
+            if (!['outgoing', 'incoming'].includes(direction)) {
+                return sendError(res, 400, 'Geçersiz kargo yönü');
+            }
+
+            const allCargo = await db.collection('cargo')
+                .find({}, { projection: { _id: 0 } })
+                .toArray();
+
+            const items = filterCargoByDirection(allCargo, direction)
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            return sendJson(res, 200, attachCargoMatches(items, direction, allCargo));
+        }
+
         if (method === 'GET' && route === 'admin/cargo') {
             if (!(await requireAdminAccess(db, req, res))) return;
             const direction = req.query.direction;
@@ -646,11 +782,17 @@ module.exports = async (req, res) => {
                 .find({}, { projection: { _id: 0 } })
                 .toArray();
 
-            const items = allCargo
-                .filter((c) => c.direction === direction)
+            const items = filterCargoByDirection(allCargo, direction)
                 .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
             return sendJson(res, 200, attachCargoMatches(items, direction, allCargo));
+        }
+
+        if (method === 'POST' && route === 'admin/cargo/sync-from-inventory') {
+            if (!(await requireWriteAccess(db, req, res))) return;
+            const direction = req.body?.direction === 'incoming' ? 'incoming' : 'outgoing';
+            const result = await syncInventoryToCargo(db, direction);
+            return sendJson(res, 200, { status: 'success', ...result });
         }
 
         if (method === 'POST' && route === 'admin/cargo/import') {

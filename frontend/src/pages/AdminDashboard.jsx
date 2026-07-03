@@ -272,7 +272,7 @@ const AdminDashboard = () => {
                 alert(t('admin.importNoRows'));
                 return;
             }
-            setImportPreview({ ...result, fileName: file.name });
+            setImportPreview({ ...result, fileName: file.name, cargoDirection: 'outgoing' });
         } catch (err) {
             alert(t('admin.importError'));
             console.error(err);
@@ -281,14 +281,29 @@ const AdminDashboard = () => {
 
     const handleConfirmImport = async () => {
         if (!importPreview?.items?.length) return;
+
+        if (importPreview.format === 'cargo' && !importPreview.cargoDirection) {
+            alert(t('admin.cargoImportSelectDirection'));
+            return;
+        }
+
         setImporting(true);
         try {
-            const { imported, skipped } = await batchImport(
-                '/api/admin/inventory/import',
-                {},
-                importPreview.items
-            );
-            alert(`${imported} ${t('admin.importSuccess')}${skipped ? `, ${skipped} ${t('admin.importSkipped')}` : ''}`);
+            if (importPreview.format === 'cargo') {
+                const { imported, skipped } = await batchImport(
+                    '/api/admin/cargo/import',
+                    { direction: importPreview.cargoDirection },
+                    importPreview.items
+                );
+                alert(`${imported} ${t('admin.importSuccess')}${skipped ? `, ${skipped} ${t('admin.importSkipped')}` : ''}`);
+            } else {
+                const { imported, skipped } = await batchImport(
+                    '/api/admin/inventory/import',
+                    {},
+                    importPreview.items
+                );
+                alert(`${imported} ${t('admin.importSuccess')}${skipped ? `, ${skipped} ${t('admin.importSkipped')}` : ''}`);
+            }
             setImportPreview(null);
             fetchAdminData();
         } catch (err) {
@@ -824,6 +839,34 @@ const AdminDashboard = () => {
                         <p className="text-sm text-gray-500">
                             +{(importPreview.items.length - 10)} kayıt daha...
                         </p>
+                    )}
+                    {importPreview?.format === 'cargo' && (
+                        <div className="rounded-lg border border-orange-200 bg-orange-50 p-4 space-y-3">
+                            <p className="text-sm font-medium text-orange-900">{t('admin.cargoImportSelectDirection')}</p>
+                            <div className="flex flex-wrap gap-3">
+                                <label className="flex items-center gap-2 text-sm cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="cargoDirection"
+                                        value="outgoing"
+                                        checked={importPreview.cargoDirection === 'outgoing'}
+                                        onChange={() => setImportPreview((prev) => ({ ...prev, cargoDirection: 'outgoing' }))}
+                                    />
+                                    {t('admin.outgoingCargo')}
+                                </label>
+                                <label className="flex items-center gap-2 text-sm cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="cargoDirection"
+                                        value="incoming"
+                                        checked={importPreview.cargoDirection === 'incoming'}
+                                        onChange={() => setImportPreview((prev) => ({ ...prev, cargoDirection: 'incoming' }))}
+                                    />
+                                    {t('admin.incomingCargo')}
+                                </label>
+                            </div>
+                            <p className="text-xs text-orange-800">{t('admin.cargoImportHint')}</p>
+                        </div>
                     )}
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setImportPreview(null)} disabled={importing}>

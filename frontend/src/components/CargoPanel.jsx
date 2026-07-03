@@ -7,7 +7,7 @@ import { Badge } from './ui/badge';
 import {
     Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from './ui/dialog';
-import { Search, X, Upload, Eye, Truck, PackageCheck } from 'lucide-react';
+import { Search, X, Upload, Eye, Truck, PackageCheck, RefreshCcw } from 'lucide-react';
 import { readExcelFile } from '../lib/excelImport';
 import { batchImport, getImportErrorMessage } from '../lib/batchImport';
 import api from '../lib/api';
@@ -29,14 +29,29 @@ const CargoPanel = ({ direction, canWrite }) => {
     const fetchCargo = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await api.get(`/api/admin/cargo?direction=${direction}`);
+            const res = await api.get(`/api/admin/cargo/${direction}`);
             setItems(res.data);
         } catch (err) {
             console.error('Kargo verisi alınamadı', err);
+            setItems([]);
         } finally {
             setLoading(false);
         }
     }, [direction]);
+
+    const handleSyncFromInventory = async () => {
+        if (!window.confirm(t('admin.cargoSyncConfirm'))) return;
+        setLoading(true);
+        try {
+            const res = await api.post('/api/admin/cargo/sync-from-inventory', { direction });
+            alert(`${res.data.imported} ${t('admin.cargoSyncDone')}${res.data.skipped ? `, ${res.data.skipped} ${t('admin.importSkipped')}` : ''}`);
+            fetchCargo();
+        } catch (err) {
+            alert(err.response?.data?.detail || t('admin.cargoSyncError'));
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
         fetchCargo();
@@ -129,6 +144,16 @@ const CargoPanel = ({ direction, canWrite }) => {
                         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto shrink-0">
                             {canWrite && (
                                 <>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="border-blue-300 text-blue-700 hover:bg-blue-50 rounded-xl"
+                                        onClick={handleSyncFromInventory}
+                                        disabled={loading}
+                                    >
+                                        <RefreshCcw className="w-4 h-4 mr-2" />
+                                        {t('admin.cargoSyncFromInventory')}
+                                    </Button>
                                     <input
                                         ref={fileInputRef}
                                         type="file"
