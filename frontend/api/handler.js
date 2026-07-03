@@ -385,6 +385,45 @@ async function buildCargoStatusResponse(db, person, queryName = '') {
     };
 }
 
+async function buildPersonnelProfile(db, personnelId) {
+    const items = await db.collection('inventory')
+        .find({ personnel_id: personnelId }, { projection: { _id: 0 } })
+        .sort({ created_at: -1 })
+        .toArray();
+    if (!items.length) return null;
+
+    const person = {
+        personnel_id: personnelId,
+        personnel_name: items[0].personnel_name,
+    };
+
+    const allCargo = await db.collection('cargo')
+        .find({}, { projection: { _id: 0 } })
+        .toArray();
+
+    const cargo_outgoing = allCargo.filter(
+        (c) => c.direction !== 'incoming' && personMatchesCargo(c, person)
+    );
+    const cargo_incoming = allCargo.filter(
+        (c) => c.direction === 'incoming' && personMatchesCargo(c, person)
+    );
+
+    const confirmation = await db.collection('confirmations')
+        .find({ personnel_id: personnelId })
+        .sort({ confirmed_at: -1 })
+        .limit(1)
+        .next();
+
+    return {
+        ...person,
+        items,
+        cargo_outgoing,
+        cargo_incoming,
+        confirmation: confirmation || null,
+        is_confirmed: confirmation?.status === 'confirmed',
+    };
+}
+
 function parseVideoTitles(data) {
     const titles = {
         tr: String(data.titles?.tr ?? data.title_tr ?? data.title ?? '').trim(),
@@ -612,6 +651,8 @@ module.exports = async (req, res) => {
                 status: input.status || 'assigned',
                 return_note: null,
                 returned_at: input.status === 'returned' ? (input.created_at || now) : null,
+                it_notes: '',
+                condition: 'undamaged',
             }));
 
             const personnelIds = [...new Set(inputs.map((i) => i.personnel_id).filter(Boolean))];
@@ -699,6 +740,8 @@ module.exports = async (req, res) => {
                     status,
                     return_note: null,
                     returned_at: status === 'returned' ? createdAt : null,
+                    it_notes: '',
+                    condition: 'undamaged',
                 });
             }
 
@@ -790,6 +833,32 @@ module.exports = async (req, res) => {
                 .find({}, { projection: { _id: 0 } })
                 .toArray();
             return sendJson(res, 200, inventory);
+        }
+
+        if (method === 'GET' && segments[0] === 'admin' && segments[1] === 'personnel' && segments.length === 3 && segments[2] !== 'search') {
+            if (!(await requireAdminAccess(db, req, res))) return;
+            const profile = await buildPersonnelProfile(db, segments[2]);
+            if (!profile) {
+                return sendError(res, 404, 'Personel bulunamadı');
+            }
+            return sendJson(res, 200, profile);
+        }
+
+        if (method === 'PUT' && segments[0] === 'admin' && segments[1] === 'inventory' && segments.length === 3) {
+            const reserved = ['bulk', 'import', 'return', 'reset-confirmation'];
+            if (!reserved.includes(segments[2])) {
+                if (!(await requireWriteAccess(db, req, res))) return;
+                const it_notes = coerceString(req.body?.it_notes, 2000);
+                const condition = req.body?.condition === 'damaged' ? 'damaged' : 'undamaged';
+                const result = await db.collection('inventory').updateOne(
+                    { id: segments[2] },
+                    { $set: { it_notes, condition } }
+                );
+                if (result.matchedCount === 0) {
+                    return sendError(res, 404, 'Ürün bulunamadı');
+                }
+                return sendJson(res, 200, { status: 'success' });
+            }
         }
 
         if (method === 'GET' && route === 'admin/product-names') {

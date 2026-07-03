@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 import { Input } from "../components/ui/input";
@@ -8,7 +8,7 @@ import { Badge } from "../components/ui/badge";
 import { Alert, AlertDescription } from "../components/ui/alert";
 import {
     User, PlusCircle, CheckCircle2, LayoutDashboard, Package,
-    RefreshCcw, Users, Trash2, ArrowLeftRight, LogOut, Dices, KeyRound, Search, X, Upload,
+    RefreshCcw, Users, Trash2, ArrowLeftRight, LogOut, Dices, KeyRound, Upload,
     Truck, PackageCheck, Megaphone, Video
 } from "lucide-react";
 import {
@@ -20,6 +20,7 @@ import api from '../lib/api';
 import CargoPanel from '../components/CargoPanel';
 import AnnouncementAdmin from '../components/AnnouncementAdmin';
 import VideoTutorialsAdmin from '../components/VideoTutorialsAdmin';
+import PersonnelInventoryPanel from '../components/PersonnelInventoryPanel';
 import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
@@ -30,7 +31,8 @@ const AdminDashboard = () => {
     const [items, setItems] = useState([{ itemName: '', serialNo: '' }]);
     const [confirmations, setConfirmations] = useState([]);
     const [inventory, setInventory] = useState([]);
-    const [inventoryNameSearch, setInventoryNameSearch] = useState('');
+    const [activeTab, setActiveTab] = useState('dashboard');
+    const [inventoryStatusFilter, setInventoryStatusFilter] = useState('all');
     const [stats, setStats] = useState(null);
     const [admins, setAdmins] = useState([]);
     const [isSystemAdmin, setIsSystemAdmin] = useState(false);
@@ -91,13 +93,10 @@ const AdminDashboard = () => {
         fetchAdminData();
     }, [navigate, fetchAdminData]);
 
-    const filteredInventory = useMemo(() => {
-        const query = inventoryNameSearch.trim().toLowerCase();
-        if (!query) return inventory;
-        return inventory.filter((item) =>
-            (item.personnel_name || '').toLowerCase().includes(query)
-        );
-    }, [inventory, inventoryNameSearch]);
+    const goToInventory = (filter = 'all') => {
+        setInventoryStatusFilter(filter);
+        setActiveTab('inventory');
+    };
 
     const roleLabel = (role) => t(`admin.roles.${role}`) || role;
     const canWrite = isSystemAdmin;
@@ -326,7 +325,7 @@ const AdminDashboard = () => {
                     </Button>
                 </div>
 
-                <Tabs defaultValue="dashboard" className="space-y-6">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
                     <TabsList className="glass-panel p-1 flex-wrap h-auto border-0 shadow-md">
                         <TabsTrigger value="dashboard" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                             <LayoutDashboard className="w-4 h-4 mr-2" /> {t('admin.dashboard')}
@@ -370,7 +369,10 @@ const AdminDashboard = () => {
 
                     <TabsContent value="dashboard">
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                            <Card className="border-l-4 border-l-blue-500">
+                            <Card
+                                className="border-l-4 border-l-blue-500 cursor-pointer transition-shadow hover:shadow-md"
+                                onClick={() => goToInventory('all')}
+                            >
                                 <CardHeader className="pb-2">
                                     <CardTitle className="text-sm text-gray-500">{t('admin.stats.totalPersonnel')}</CardTitle>
                                 </CardHeader>
@@ -378,7 +380,10 @@ const AdminDashboard = () => {
                                     <p className="text-3xl font-bold">{stats?.total_personnel_with_assets || 0}</p>
                                 </CardContent>
                             </Card>
-                            <Card className="border-l-4 border-l-red-500">
+                            <Card
+                                className="border-l-4 border-l-red-500 cursor-pointer transition-shadow hover:shadow-md"
+                                onClick={() => goToInventory('assigned')}
+                            >
                                 <CardHeader className="pb-2">
                                     <CardTitle className="text-sm text-gray-500">{t('admin.stats.totalItems')}</CardTitle>
                                 </CardHeader>
@@ -386,7 +391,10 @@ const AdminDashboard = () => {
                                     <p className="text-3xl font-bold">{stats?.total_assigned_items || 0}</p>
                                 </CardContent>
                             </Card>
-                            <Card className="border-l-4 border-l-green-500">
+                            <Card
+                                className="border-l-4 border-l-green-500 cursor-pointer transition-shadow hover:shadow-md"
+                                onClick={() => goToInventory('returned')}
+                            >
                                 <CardHeader className="pb-2">
                                     <CardTitle className="text-sm text-gray-500">{t('admin.stats.returnedItems')}</CardTitle>
                                 </CardHeader>
@@ -394,7 +402,10 @@ const AdminDashboard = () => {
                                     <p className="text-3xl font-bold">{stats?.total_returned_items || 0}</p>
                                 </CardContent>
                             </Card>
-                            <Card className="border-l-4 border-l-orange-500">
+                            <Card
+                                className="border-l-4 border-l-orange-500 cursor-pointer transition-shadow hover:shadow-md"
+                                onClick={() => setActiveTab('confirmations')}
+                            >
                                 <CardHeader className="pb-2">
                                     <CardTitle className="text-sm text-gray-500">{t('admin.stats.pending')}</CardTitle>
                                 </CardHeader>
@@ -505,108 +516,17 @@ const AdminDashboard = () => {
                     )}
 
                     <TabsContent value="inventory">
-                        <Card className="border-2">
-                            <CardHeader>
-                                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                                    <div>
-                                        <CardTitle>{t('admin.inventory')}</CardTitle>
-                                        <CardDescription>{t('admin.inventoryDesc')}</CardDescription>
-                                    </div>
-                                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto shrink-0">
-                                        {canWrite && (
-                                            <>
-                                                <input
-                                                    ref={fileInputRef}
-                                                    type="file"
-                                                    accept=".xlsx,.xls"
-                                                    className="hidden"
-                                                    onChange={handleExcelFileSelect}
-                                                />
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    className="border-orange-300 text-orange-700 hover:bg-orange-50 rounded-xl"
-                                                    onClick={() => fileInputRef.current?.click()}
-                                                >
-                                                    <Upload className="w-4 h-4 mr-2" />
-                                                    {t('admin.importExcel')}
-                                                </Button>
-                                            </>
-                                        )}
-                                        <div className="relative w-full sm:w-72">
-                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                                        <Input
-                                            value={inventoryNameSearch}
-                                            onChange={(e) => setInventoryNameSearch(e.target.value)}
-                                            placeholder={t('admin.searchByName')}
-                                            className="pl-9 pr-9 rounded-xl border-gray-200"
-                                        />
-                                        {inventoryNameSearch && (
-                                            <button
-                                                type="button"
-                                                onClick={() => setInventoryNameSearch('')}
-                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                                aria-label={t('admin.clearSearch')}
-                                            >
-                                                <X className="w-4 h-4" />
-                                            </button>
-                                        )}
-                                        </div>
-                                    </div>
-                                </div>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-sm">
-                                        <thead>
-                                            <tr className="border-b bg-gray-50 text-left">
-                                                <th className="p-4">{t('admin.personnelId')}</th>
-                                                <th className="p-4">{t('admin.personnelName')}</th>
-                                                <th className="p-4">{t('admin.itemName')}</th>
-                                                <th className="p-4 font-normal text-gray-500">S/N</th>
-                                                <th className="p-4">{t('admin.status')}</th>
-                                                <th className="p-4">{t('admin.date')}</th>
-                                                <th className="p-4">{t('admin.actions')}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {filteredInventory.length === 0 ? (
-                                                <tr>
-                                                    <td colSpan={7} className="p-8 text-center text-gray-500">
-                                                        {inventoryNameSearch.trim()
-                                                            ? t('admin.noSearchResults')
-                                                            : t('admin.noRecords')}
-                                                    </td>
-                                                </tr>
-                                            ) : (
-                                                filteredInventory.map((item) => (
-                                                <tr key={item.id} className="border-b hover:bg-gray-50">
-                                                    <td className="p-4 font-mono">{item.personnel_id}</td>
-                                                    <td className="p-4 font-medium">{item.personnel_name}</td>
-                                                    <td className="p-4">{item.item_name}</td>
-                                                    <td className="p-4 text-gray-500">{item.serial_number}</td>
-                                                    <td className="p-4">
-                                                        <Badge className={item.status === 'assigned' ? "bg-red-100 text-red-700 hover:bg-red-100" : "bg-green-100 text-green-700 hover:bg-green-100"}>
-                                                            {item.status === 'assigned' ? t('admin.assigned') : t('admin.returned')}
-                                                        </Badge>
-                                                    </td>
-                                                    <td className="p-4 text-xs text-gray-500">
-                                                        {new Date(item.created_at).toLocaleString()}
-                                                    </td>
-                                                    <td className="p-4">
-                                                        {canWrite && item.status === 'assigned' && (
-                                                            <Button variant="ghost" size="sm" onClick={() => handleReturnAsset(item.id)} className="text-green-600">
-                                                                <ArrowLeftRight className="w-4 h-4 mr-2" /> {t('admin.returnButton')}
-                                                            </Button>
-                                                        )}
-                                                    </td>
-                                                </tr>
-                                            )))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </CardContent>
-                        </Card>
+                        <PersonnelInventoryPanel
+                            inventory={inventory}
+                            statusFilter={inventoryStatusFilter}
+                            onStatusFilterChange={setInventoryStatusFilter}
+                            canWrite={canWrite}
+                            onImportClick={() => fileInputRef.current?.click()}
+                            fileInputRef={fileInputRef}
+                            onExcelSelect={handleExcelFileSelect}
+                            onRefresh={fetchAdminData}
+                            onReturnAsset={handleReturnAsset}
+                        />
                     </TabsContent>
 
                     <TabsContent value="outgoing-cargo">
