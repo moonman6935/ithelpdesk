@@ -102,14 +102,18 @@ const AssetConfirmation = () => {
         }
     };
 
-    const handleCheckboxChange = (checked) => {
-        if (checked) {
-            setFormTermsAccepted(false);
-            setFormDialogOpen(true);
-        } else {
-            setIsAccepted(false);
-            setFormTermsAccepted(false);
-        }
+    const openFormDialog = () => {
+        setFormTermsAccepted(false);
+        setFormDialogOpen(true);
+    };
+
+    const handleDialogOpenChange = (open) => {
+        setFormDialogOpen(open);
+        if (!open) setFormTermsAccepted(false);
+    };
+
+    const handleFormTermsChange = (value) => {
+        setFormTermsAccepted(value === true);
     };
 
     const handleFormAccept = () => {
@@ -147,6 +151,7 @@ const AssetConfirmation = () => {
     }
 
     return (
+        <>
         <PageShell theme="rose" icon={Package} title={t('assetConfirmation.title')} subtitle={t('assetConfirmation.subtitle')}>
                 <Card className="glass-panel border-0 shadow-xl">
                     <CardHeader className="bg-gradient-to-r from-rose-50/80 to-white/50 rounded-t-2xl">
@@ -244,28 +249,44 @@ const AssetConfirmation = () => {
                                 </div>
 
                                 {!confirmed && (
-                                    <>
-                                        <div
-                                            className="flex items-center space-x-2 bg-red-50 p-4 rounded-lg border border-red-100 cursor-pointer"
-                                            onClick={() => !isAccepted && handleCheckboxChange(true)}
-                                            onKeyDown={(e) => e.key === 'Enter' && !isAccepted && handleCheckboxChange(true)}
-                                            role="button"
-                                            tabIndex={0}
+                                    <div className="space-y-4">
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={openFormDialog}
+                                            className="w-full border-2 border-red-300 text-red-800 hover:bg-red-50 py-6 text-base font-semibold"
                                         >
+                                            <FileText className="w-5 h-5 mr-2 shrink-0" />
+                                            {t('assetConfirmation.openFormButton')}
+                                        </Button>
+
+                                        <div className="flex items-start gap-3 bg-red-50 p-4 rounded-lg border border-red-100">
                                             <Checkbox
                                                 id="confirm"
                                                 checked={isAccepted}
-                                                onCheckedChange={handleCheckboxChange}
+                                                disabled={!isAccepted}
+                                                className="mt-0.5"
                                             />
-                                            <label htmlFor="confirm" className="text-sm font-medium leading-snug cursor-pointer text-red-900">
+                                            <label htmlFor="confirm" className="text-sm font-medium leading-snug text-red-900">
                                                 {t('assetConfirmation.confirmCheckbox')}
                                             </label>
                                         </div>
 
-                                        {isAccepted && (
+                                        {isAccepted ? (
                                             <p className="text-xs text-green-700 flex items-center gap-1.5">
-                                                <FileText className="w-3.5 h-3.5" />
+                                                <CheckCircle className="w-3.5 h-3.5" />
                                                 {t('assetConfirmation.formSigned')}
+                                                <button
+                                                    type="button"
+                                                    onClick={openFormDialog}
+                                                    className="text-red-600 underline ml-1"
+                                                >
+                                                    {t('assetConfirmation.reviewForm')}
+                                                </button>
+                                            </p>
+                                        ) : (
+                                            <p className="text-xs text-gray-500">
+                                                {t('assetConfirmation.openFormHint')}
                                             </p>
                                         )}
 
@@ -276,15 +297,16 @@ const AssetConfirmation = () => {
                                         >
                                             {t('assetConfirmation.confirmButton')}
                                         </Button>
-                                    </>
+                                    </div>
                                 )}
                             </div>
                         )}
                     </CardContent>
                 </Card>
+        </PageShell>
 
-                <Dialog open={formDialogOpen} onOpenChange={setFormDialogOpen}>
-                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <Dialog open={formDialogOpen} onOpenChange={handleDialogOpenChange}>
+                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto z-[200]">
                         <DialogHeader>
                             <DialogTitle className="flex items-center gap-2 text-xl">
                                 <FileText className="w-5 h-5 text-red-600" />
@@ -326,7 +348,7 @@ const AssetConfirmation = () => {
                                 <Checkbox
                                     id="form-terms"
                                     checked={formTermsAccepted}
-                                    onCheckedChange={setFormTermsAccepted}
+                                    onCheckedChange={handleFormTermsChange}
                                     className="mt-0.5"
                                 />
                                 <label htmlFor="form-terms" className="text-sm font-medium text-red-900 leading-snug cursor-pointer">
@@ -354,7 +376,7 @@ const AssetConfirmation = () => {
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
-        </PageShell>
+        </>
     );
 };
 
