@@ -292,7 +292,8 @@ export const translations = {
       shipDate: 'Gönderim tarihi',
       deliveryDate: 'Teslim tarihi',
       recipient: 'Teslim alan',
-      trackingNo: 'Gönderi no',
+      trackingNo: 'Kargo takip numarası',
+      trackOnYurtici: 'Yurtiçi Kargo\'da sorgula',
       viewOnYurtici: 'Yurtiçi Kargo\'da görüntüle',
       movementHistory: 'Hareket geçmişi',
       status: {
@@ -755,7 +756,8 @@ export const translations = {
       shipDate: 'Versanddatum',
       deliveryDate: 'Zustelldatum',
       recipient: 'Empfänger',
-      trackingNo: 'Sendungsnr.',
+      trackingNo: 'Sendungsverfolgungsnummer',
+      trackOnYurtici: 'Bei Yurtiçi Kargo verfolgen',
       viewOnYurtici: 'Bei Yurtiçi Kargo anzeigen',
       movementHistory: 'Bewegungsverlauf',
       status: {
@@ -1207,7 +1209,8 @@ export const translations = {
       shipDate: 'Ship date',
       deliveryDate: 'Delivery date',
       recipient: 'Recipient',
-      trackingNo: 'Tracking no.',
+      trackingNo: 'Cargo tracking number',
+      trackOnYurtici: 'Track on Yurtiçi Kargo',
       viewOnYurtici: 'View on Yurtiçi Kargo',
       movementHistory: 'Movement history',
       status: {

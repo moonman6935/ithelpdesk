@@ -3,12 +3,13 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import PageShell from '../components/PageShell';
 import { Button } from '../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { Badge } from '../components/ui/badge';
 import { Truck, AlertCircle, Package, MapPin, Calendar, User, ExternalLink, History, Lock } from 'lucide-react';
 import api from '../lib/api';
+import { buildYurticiTrackingUrl, getShipmentTrackingNumber } from '../lib/yurticiTracking';
 
 const STATUS_STYLES = {
   in_transit: 'bg-orange-100 text-orange-800 border-orange-200',
@@ -183,7 +184,11 @@ const CargoStatus = () => {
             <span className="font-mono text-sm">{result.personnel_id}</span>
           </div>
 
-          {result.shipments.map((shipment) => (
+          {result.shipments.map((shipment) => {
+            const trackingNo = getShipmentTrackingNumber(shipment);
+            const trackingUrl = buildYurticiTrackingUrl(trackingNo, shipment.yurtici?.tracking_url);
+
+            return (
             <Card key={shipment.id} className="glass-panel border-0 overflow-hidden">
               <CardHeader className="pb-3">
                 <div className="flex flex-wrap items-start justify-between gap-3">
@@ -193,11 +198,6 @@ const CargoStatus = () => {
                     </div>
                     <div>
                       <CardTitle className="text-lg">{shipment.item_name}</CardTitle>
-                      <CardDescription className="font-mono">
-                        {shipment.yurtici?.doc_id
-                          ? `${t('cargoTracking.trackingNo')}: ${shipment.yurtici.doc_id}`
-                          : `S/N: ${shipment.serial_number}`}
-                      </CardDescription>
                     </div>
                   </div>
                   <Badge className={`border ${STATUS_STYLES[shipment.status] || STATUS_STYLES.in_transit}`}>
@@ -206,6 +206,25 @@ const CargoStatus = () => {
                 </div>
               </CardHeader>
               <CardContent className="grid sm:grid-cols-2 gap-3 text-sm text-gray-600 pt-0">
+                {trackingNo && (
+                  <div className="sm:col-span-2 rounded-xl border border-orange-200 bg-orange-50/70 p-4">
+                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                      {t('cargoTracking.trackingNo')}
+                    </p>
+                    <p className="font-mono text-xl font-bold text-gray-900 mb-3">{trackingNo}</p>
+                    {trackingUrl && (
+                      <a
+                        href={trackingUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-red-600 font-semibold hover:underline"
+                      >
+                        <ExternalLink className="w-4 h-4 shrink-0" />
+                        {t('cargoTracking.trackOnYurtici')}
+                      </a>
+                    )}
+                  </div>
+                )}
                 {shipment.ship_date && (
                   <p className="flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-gray-400 shrink-0" />
@@ -230,19 +249,6 @@ const CargoStatus = () => {
                     <span>{shipment.address}{shipment.arrival_city ? `, ${shipment.arrival_city}` : ''}</span>
                   </p>
                 )}
-                {shipment.yurtici?.tracking_url && (
-                  <p className="flex items-center gap-2 sm:col-span-2">
-                    <ExternalLink className="w-4 h-4 text-gray-400 shrink-0" />
-                    <a
-                      href={shipment.yurtici.tracking_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-red-600 font-medium hover:underline"
-                    >
-                      {t('cargoTracking.viewOnYurtici')}
-                    </a>
-                  </p>
-                )}
                 {shipment.yurtici?.events?.length > 0 && (
                   <div className="sm:col-span-2 mt-2 pt-3 border-t border-gray-100">
                     <p className="flex items-center gap-2 text-gray-700 font-medium mb-2">
@@ -262,7 +268,8 @@ const CargoStatus = () => {
                 )}
               </CardContent>
             </Card>
-          ))}
+            );
+          })}
         </div>
       )}
     </PageShell>

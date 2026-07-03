@@ -273,13 +273,29 @@ async function queryYurticiShipment(key, keyType = 0) {
 
 async function enrichShipmentWithYurtici(shipment) {
     const config = getYurticiConfig();
+    const serialKey = String(shipment.serial_number || '').trim();
+    const fallbackUrl = buildPublicTrackingUrl(serialKey);
+
     if (!config.enabled) {
-        return { ...shipment, yurtici: { enabled: false } };
+        return {
+            ...shipment,
+            yurtici: {
+                enabled: false,
+                tracking_url: fallbackUrl || undefined,
+            },
+        };
     }
 
-    const key = String(shipment.serial_number || '').trim();
+    const key = serialKey;
     if (!isTrackableKey(key)) {
-        return { ...shipment, yurtici: { enabled: true, skipped: true } };
+        return {
+            ...shipment,
+            yurtici: {
+                enabled: true,
+                skipped: true,
+                tracking_url: fallbackUrl || undefined,
+            },
+        };
     }
 
     let tracking = await queryYurticiShipment(key, 0);
@@ -294,6 +310,7 @@ async function enrichShipmentWithYurtici(shipment) {
                 enabled: true,
                 found: false,
                 error: tracking.error || 'Canlı takip bilgisi alınamadı',
+                tracking_url: fallbackUrl || undefined,
             },
         };
     }
@@ -325,7 +342,21 @@ async function enrichShipmentWithYurtici(shipment) {
             `https://selfservis.yurticikargo.com/reports/SavReportsFromParamFields.aspx?ssfldvn=99&sskurkod=${encodeURIComponent(config.customerCode)}&refnumber=${encodeURIComponent(tracking.doc_id)}&date=${dd}.${mm}.${yyyy}`;
     }
 
+    if (!enriched.yurtici.tracking_url) {
+        const publicNumber = tracking.doc_id || tracking.cargo_key || key;
+        if (publicNumber) {
+            enriched.yurtici.tracking_url =
+                `https://www.yurticikargo.com/tr/online-servisler/gonderi-sorgula?code=${encodeURIComponent(publicNumber)}`;
+        }
+    }
+
     return enriched;
+}
+
+function buildPublicTrackingUrl(trackingNumber) {
+    const number = String(trackingNumber ?? '').trim();
+    if (!number || /^(KARGO|SN|IMP)-/i.test(number)) return '';
+    return `https://www.yurticikargo.com/tr/online-servisler/gonderi-sorgula?code=${encodeURIComponent(number)}`;
 }
 
 module.exports = {
@@ -333,4 +364,5 @@ module.exports = {
     queryYurticiShipment,
     enrichShipmentWithYurtici,
     isTrackableKey,
+    buildPublicTrackingUrl,
 };
