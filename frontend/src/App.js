@@ -9,6 +9,7 @@ import PCSetup from "./pages/PCSetup";
 import HeadsetTest from "./pages/HeadsetTest";
 import Troubleshooting from "./pages/Troubleshooting";
 import AssetConfirmation from "./pages/AssetConfirmation";
+import CargoStatus from "./pages/CargoStatus";
 import AdminDashboard from "./pages/AdminDashboard";
 import FAQ from "./pages/FAQ";
 import VideoTutorials from "./pages/VideoTutorials";
@@ -33,6 +34,7 @@ function App() {
               <Route path="/faq" element={<FAQ />} />
               <Route path="/video-tutorials" element={<VideoTutorials />} />
               <Route path="/asset-confirmation" element={<AssetConfirmation />} />
+              <Route path="/cargo-status" element={<CargoStatus />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/login" element={<LoginPage />} />
             </Routes>

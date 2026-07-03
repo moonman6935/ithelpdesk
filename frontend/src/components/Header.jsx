@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { path: '/troubleshooting', labelKey: 'header.troubleshooting', hover: 'nav-hover-orange' },
   { path: '/faq', labelKey: 'header.faq', hover: 'nav-hover-violet' },
   { path: '/asset-confirmation', labelKey: 'assetConfirmation.title', hover: 'nav-hover-rose' },
+  { path: '/cargo-status', labelKey: 'cargoTracking.nav', hover: 'nav-hover-orange' },
   { path: '/video-tutorials', labelKey: 'header.videoTutorials', hover: 'nav-hover-cyan' },
 ];
 

@@ -1,6 +1,7 @@
 const { randomUUID } = require('crypto');
 const { getDb, ensureDefaultAdmin } = require('./_lib/db');
 const { hashPassword, verifyPassword, createAccessToken } = require('./_lib/auth');
+const { enrichShipmentWithYurtici, getYurticiConfig } = require('./_lib/yurticiKargo');
 const jwt = require('jsonwebtoken');
 
 const SECRET_KEY = process.env.SECRET_KEY || 'b4f2c8d9e1a3c5b7a9d0e2f4a6b8c0d2';
@@ -130,6 +131,32 @@ function attachCargoMatches(items, direction, allCargo) {
     });
 }
 
+function getShipmentPublicStatus(outgoing, incomingMatch) {
+    if (incomingMatch) return 'returned';
+    if (outgoing.delivery_date || outgoing.recipient) return 'delivered';
+    return 'in_transit';
+}
+
+async function resolvePersonnelById(db, personnelId) {
+    const inv = await db.collection('inventory').findOne(
+        { personnel_id: personnelId },
+        { projection: { _id: 0, personnel_name: 1, personnel_id: 1 } }
+    );
+    if (inv?.personnel_name) {
+        return { personnel_id: personnelId, personnel_name: String(inv.personnel_name).trim() };
+    }
+
+    const cargo = await db.collection('cargo').findOne(
+        { personnel_id: personnelId },
+        { projection: { _id: 0, personnel_name: 1, personnel_id: 1 } }
+    );
+    if (cargo?.personnel_name) {
+        return { personnel_id: personnelId, personnel_name: String(cargo.personnel_name).trim() };
+    }
+
+    return null;
+}
+
 function parseVideoTitles(data) {
     const titles = {
         tr: String(data.titles?.tr ?? data.title_tr ?? data.title ?? '').trim(),
@@ -210,6 +237,63 @@ module.exports = async (req, res) => {
 
             const is_confirmed = Boolean(confirmation && confirmation.status === 'confirmed');
             return sendJson(res, 200, { items, is_confirmed });
+        }
+
+        if (method === 'GET' && segments[0] === 'cargo' && segments[1] === 'status' && segments.length === 3) {
+            const personnelId = segments[2];
+            if (!/^\d{6}$/.test(personnelId)) {
+                return sendError(res, 400, 'Geçerli 6 haneli personel numarası gerekli');
+            }
+
+            const person = await resolvePersonnelById(db, personnelId);
+            if (!person) {
+                return sendJson(res, 200, {
+                    personnel_id: personnelId,
+                    personnel_name: null,
+                    shipments: [],
+                });
+            }
+
+            const allCargo = await db.collection('cargo').find({}, { projection: { _id: 0 } }).toArray();
+            const incoming = allCargo.filter((c) => c.direction === 'incoming');
+            const nameKey = normalizeCargoKey(person.personnel_name);
+
+            const shipmentMap = new Map();
+            allCargo
+                .filter((c) => c.direction === 'outgoing')
+                .filter((c) => c.personnel_id === personnelId || normalizeCargoKey(c.personnel_name) === nameKey)
+                .forEach((item) => shipmentMap.set(item.id, item));
+
+            const baseShipments = [...shipmentMap.values()]
+                .map((out) => {
+                    const match = findCargoMatch(out, incoming);
+                    return {
+                        id: out.id,
+                        item_name: out.item_name,
+                        serial_number: out.serial_number,
+                        status: getShipmentPublicStatus(out, match),
+                        ship_date: out.ship_date || '',
+                        delivery_date: out.delivery_date || '',
+                        delivery_time: out.delivery_time || '',
+                        recipient: out.recipient || '',
+                        address: out.address || '',
+                        arrival_city: out.arrival_city || '',
+                        updated_at: out.imported_at || out.created_at,
+                    };
+                })
+                .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+
+            const yurticiConfig = getYurticiConfig();
+            const shipments = yurticiConfig.enabled
+                ? await Promise.all(baseShipments.map((s) => enrichShipmentWithYurtici(s)))
+                : baseShipments;
+
+            return sendJson(res, 200, {
+                personnel_id: personnelId,
+                personnel_name: person.personnel_name,
+                live_tracking: yurticiConfig.enabled,
+                shipments,
+            });
         }
 
         if (method === 'POST' && route === 'inventory/confirm') {
@@ -512,6 +596,7 @@ module.exports = async (req, res) => {
                 itemsToInsert.push({
                     id: randomUUID(),
                     direction,
+                    personnel_id: String(row.personnel_id || '').trim() || undefined,
                     personnel_name: name,
                     item_name: String(row.item_name || 'Kargo').trim(),
                     serial_number: finalSerial,
