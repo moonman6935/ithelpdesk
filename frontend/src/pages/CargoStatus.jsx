@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from '../components/ui/alert';
 import { Badge } from '../components/ui/badge';
 import { Truck, AlertCircle, Package, MapPin, Calendar, User, ExternalLink, History, Lock } from 'lucide-react';
 import api from '../lib/api';
-import { buildYurticiTrackingUrl, getShipmentTrackingNumber } from '../lib/yurticiTracking';
+import { buildYurticiTrackingUrl, getGonderiKodu } from '../lib/yurticiTracking';
 
 const STATUS_STYLES = {
   in_transit: 'bg-orange-100 text-orange-800 border-orange-200',
@@ -185,8 +185,8 @@ const CargoStatus = () => {
           </div>
 
           {result.shipments.map((shipment) => {
-            const trackingNo = getShipmentTrackingNumber(shipment);
-            const trackingUrl = buildYurticiTrackingUrl(trackingNo, shipment.yurtici?.tracking_url);
+            const gonderiKodu = getGonderiKodu(shipment);
+            const inquiryUrl = buildYurticiTrackingUrl(gonderiKodu);
 
             return (
             <Card key={shipment.id} className="glass-panel border-0 overflow-hidden">
@@ -206,15 +206,15 @@ const CargoStatus = () => {
                 </div>
               </CardHeader>
               <CardContent className="grid sm:grid-cols-2 gap-3 text-sm text-gray-600 pt-0">
-                {trackingNo && (
+                {gonderiKodu && (
                   <div className="sm:col-span-2 rounded-xl border border-orange-200 bg-orange-50/70 p-4">
                     <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-                      {t('cargoTracking.trackingNo')}
+                      {t('cargoTracking.shipmentCode')}
                     </p>
-                    <p className="font-mono text-xl font-bold text-gray-900 mb-3">{trackingNo}</p>
-                    {trackingUrl && (
+                    <p className="font-mono text-xl font-bold text-gray-900 mb-3">{gonderiKodu}</p>
+                    {inquiryUrl && (
                       <a
-                        href={trackingUrl}
+                        href={inquiryUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 text-red-600 font-semibold hover:underline"

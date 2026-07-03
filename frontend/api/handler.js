@@ -1,7 +1,7 @@
 const { randomUUID } = require('crypto');
 const { getDb, ensureDefaultAdmin } = require('./_lib/db');
 const { hashPassword, verifyPassword, createAccessToken, verifyAccessToken, isStrongPassword } = require('./_lib/auth');
-const { enrichShipmentWithYurtici, getYurticiConfig } = require('./_lib/yurticiKargo');
+const { enrichShipmentWithYurtici, getYurticiConfig, buildPublicTrackingUrl } = require('./_lib/yurticiKargo');
 const {
     normalizeCargoKey,
     namesMatch,
@@ -360,6 +360,7 @@ async function buildCargoStatusResponse(db, person, queryName = '') {
                 id: record.id,
                 item_name: record.item_name,
                 serial_number: record.serial_number,
+                gonderi_kodu: record.gonderi_kodu || '',
                 status: getShipmentPublicStatus(record, match),
                 ship_date: record.ship_date || '',
                 delivery_date: record.delivery_date || '',
@@ -375,7 +376,15 @@ async function buildCargoStatusResponse(db, person, queryName = '') {
     const yurticiConfig = getYurticiConfig();
     const shipments = yurticiConfig.enabled
         ? await Promise.all(baseShipments.map((s) => enrichShipmentWithYurtici(s)))
-        : baseShipments;
+        : baseShipments.map((s) => {
+            const code = String(s.gonderi_kodu || s.serial_number || '').trim();
+            if (!code || /^(KARGO|SN|IMP)-/i.test(code)) return s;
+            return {
+                ...s,
+                gonderi_kodu: s.gonderi_kodu || code,
+                yurtici: { enabled: false, tracking_url: buildPublicTrackingUrl(code) },
+            };
+        });
 
     return {
         personnel_id: person.personnel_id,
@@ -961,6 +970,7 @@ module.exports = async (req, res) => {
                     personnel_id: String(row.personnel_id || '').trim() || undefined,
                     personnel_name: name,
                     item_name: String(row.item_name || 'Kargo').trim(),
+                    gonderi_kodu: String(row.gonderi_kodu || '').trim() || undefined,
                     serial_number: finalSerial,
                     created_at: row.created_at || now,
                     imported_at: now,

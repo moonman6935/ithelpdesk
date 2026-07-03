@@ -1,19 +1,52 @@
-export function getShipmentTrackingNumber(shipment) {
-    const docId = String(shipment?.yurtici?.doc_id ?? '').trim();
-    const cargoKey = String(shipment?.yurtici?.cargo_key ?? '').trim();
-    const serial = String(shipment?.serial_number ?? '').trim();
+const YURTICI_INQUIRY_BASE =
+    'https://www.yurticikargo.com/tr/online-servisler/gonderi-sorgula';
 
-    if (docId) return docId;
+function isInternalYurticiUrl(url) {
+    const value = String(url ?? '').trim();
+    if (!value) return true;
+    return value.includes('selfservis.yurticikargo.com');
+}
+
+export function getGonderiKodu(shipment) {
+    const explicit = String(shipment?.gonderi_kodu ?? shipment?.shipment_code ?? '').trim();
+    if (explicit) return explicit;
+
+    const cargoKey = String(shipment?.yurtici?.cargo_key ?? '').trim();
     if (cargoKey) return cargoKey;
+
+    const docId = String(shipment?.yurtici?.doc_id ?? '').trim();
+    if (docId) return docId;
+
+    const serial = String(shipment?.serial_number ?? '').trim();
     if (serial && !/^(KARGO|SN|IMP)-/i.test(serial)) return serial;
+
     return '';
 }
 
-export function buildYurticiTrackingUrl(trackingNumber, preferredUrl) {
-    const number = String(trackingNumber ?? '').trim();
-    if (!number) return '';
+/** @deprecated use getGonderiKodu */
+export function getShipmentTrackingNumber(shipment) {
+    return getGonderiKodu(shipment);
+}
 
-    if (preferredUrl) return preferredUrl;
+export function buildYurticiInquiryUrl(gonderiKodu) {
+    const code = String(gonderiKodu ?? '').trim();
+    if (!code) return '';
+    return `${YURTICI_INQUIRY_BASE}?code=${encodeURIComponent(code)}`;
+}
 
-    return `https://www.yurticikargo.com/tr/online-servisler/gonderi-sorgula?code=${encodeURIComponent(number)}`;
+export function buildYurticiTrackingUrl(gonderiKodu, preferredUrl) {
+    const code = String(gonderiKodu ?? '').trim();
+    if (!code) return '';
+
+    const preferred = String(preferredUrl ?? '').trim();
+    if (
+        preferred &&
+        !isInternalYurticiUrl(preferred) &&
+        preferred.includes('yurticikargo.com') &&
+        preferred.includes('gonderi-sorgula')
+    ) {
+        return preferred;
+    }
+
+    return buildYurticiInquiryUrl(code);
 }

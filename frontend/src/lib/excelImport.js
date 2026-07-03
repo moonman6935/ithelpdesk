@@ -46,6 +46,19 @@ function parseSpecialField(text) {
     return { itemName, serial };
 }
 
+function extractGonderiKodu(row) {
+    return String(
+        row['Gönderi Kodu'] ??
+        row['Gonderi Kodu'] ??
+        row['Gönderi No'] ??
+        row['Gonderi No'] ??
+        row['Referans No'] ??
+        row['Referans Kodu'] ??
+        row['Referans'] ??
+        ''
+    ).trim();
+}
+
 function rowToCargoRecord(row, format) {
     if (format !== 'cargo') {
         const base = rowToRecord(row, format);
@@ -54,12 +67,14 @@ function rowToCargoRecord(row, format) {
 
     const name = String(row['Alıcı Müşteri'] ?? row['Alici Musteri'] ?? '').trim();
     const { itemName, serial } = parseSpecialField(row['Özel Alan 2'] ?? row['Ozel Alan 2']);
+    const gonderiKodu = extractGonderiKodu(row);
     if (!name) return null;
 
     return {
         personnel_name: name,
         item_name: itemName,
-        serial_number: serial || `KARGO-${row.No ?? Date.now()}`,
+        gonderi_kodu: gonderiKodu,
+        serial_number: serial || gonderiKodu || `KARGO-${row.No ?? Date.now()}`,
         created_at: parseDeliveryDate(row['Teslim Tarihi'], row['Teslim Saati']),
         row_no: row.No ?? null,
         address: String(row['Alıcı Adresi'] ?? '').trim(),

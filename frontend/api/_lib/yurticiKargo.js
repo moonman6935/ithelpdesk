@@ -273,53 +273,74 @@ async function queryYurticiShipment(key, keyType = 0) {
 
 async function enrichShipmentWithYurtici(shipment) {
     const config = getYurticiConfig();
+    const gonderiKodu = String(shipment.gonderi_kodu ?? '').trim();
     const serialKey = String(shipment.serial_number || '').trim();
-    const fallbackUrl = buildPublicTrackingUrl(serialKey);
+    const queryKey = gonderiKodu || serialKey;
+
+    const applyPublicLink = (record, code) => {
+        const resolved = String(code ?? '').trim();
+        if (!resolved) return record;
+        return {
+            ...record,
+            gonderi_kodu: resolved,
+            yurtici: {
+                ...(record.yurtici || {}),
+                tracking_url: buildPublicTrackingUrl(resolved),
+            },
+        };
+    };
 
     if (!config.enabled) {
-        return {
-            ...shipment,
-            yurtici: {
-                enabled: false,
-                tracking_url: fallbackUrl || undefined,
+        const code = gonderiKodu || (isTrackableKey(serialKey) ? serialKey : '');
+        return applyPublicLink(
+            {
+                ...shipment,
+                yurtici: { enabled: false },
             },
-        };
+            code
+        );
     }
 
-    const key = serialKey;
-    if (!isTrackableKey(key)) {
-        return {
-            ...shipment,
-            yurtici: {
-                enabled: true,
-                skipped: true,
-                tracking_url: fallbackUrl || undefined,
+    if (!isTrackableKey(queryKey)) {
+        return applyPublicLink(
+            {
+                ...shipment,
+                yurtici: {
+                    enabled: true,
+                    skipped: true,
+                },
             },
-        };
+            gonderiKodu
+        );
     }
 
-    let tracking = await queryYurticiShipment(key, 0);
+    let tracking = await queryYurticiShipment(queryKey, 0);
     if (!tracking.ok && !tracking.skipped) {
-        tracking = await queryYurticiShipment(key, 1);
+        tracking = await queryYurticiShipment(queryKey, 1);
     }
 
     if (!tracking.ok) {
-        return {
-            ...shipment,
-            yurtici: {
-                enabled: true,
-                found: false,
-                error: tracking.error || 'Canlı takip bilgisi alınamadı',
-                tracking_url: fallbackUrl || undefined,
+        return applyPublicLink(
+            {
+                ...shipment,
+                yurtici: {
+                    enabled: true,
+                    found: false,
+                    error: tracking.error || 'Canlı takip bilgisi alınamadı',
+                },
             },
-        };
+            gonderiKodu || queryKey
+        );
     }
+
+    const resolvedCode = tracking.cargo_key || tracking.doc_id || gonderiKodu || queryKey;
 
     const enriched = {
         ...shipment,
         status: tracking.public_status || shipment.status,
         delivery_date: tracking.delivery_date || shipment.delivery_date,
         delivery_time: tracking.delivery_time || shipment.delivery_time,
+        gonderi_kodu: resolvedCode,
         yurtici: {
             enabled: true,
             found: true,
@@ -327,30 +348,12 @@ async function enrichShipmentWithYurtici(shipment) {
             cargo_key: tracking.cargo_key,
             status_label: tracking.status_label,
             status_code: tracking.status_code,
-            tracking_url: tracking.tracking_url,
             receiver_info: tracking.receiver_info,
             events: tracking.events,
         },
     };
 
-    if (config.customerCode && !enriched.yurtici.tracking_url && tracking.doc_id) {
-        const today = new Date();
-        const dd = String(today.getDate()).padStart(2, '0');
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        const yyyy = today.getFullYear();
-        enriched.yurtici.tracking_url =
-            `https://selfservis.yurticikargo.com/reports/SavReportsFromParamFields.aspx?ssfldvn=99&sskurkod=${encodeURIComponent(config.customerCode)}&refnumber=${encodeURIComponent(tracking.doc_id)}&date=${dd}.${mm}.${yyyy}`;
-    }
-
-    if (!enriched.yurtici.tracking_url) {
-        const publicNumber = tracking.doc_id || tracking.cargo_key || key;
-        if (publicNumber) {
-            enriched.yurtici.tracking_url =
-                `https://www.yurticikargo.com/tr/online-servisler/gonderi-sorgula?code=${encodeURIComponent(publicNumber)}`;
-        }
-    }
-
-    return enriched;
+    return applyPublicLink(enriched, resolvedCode);
 }
 
 function buildPublicTrackingUrl(trackingNumber) {
