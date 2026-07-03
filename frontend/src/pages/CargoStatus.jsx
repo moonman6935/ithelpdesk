@@ -46,6 +46,7 @@ const CargoStatus = () => {
     try {
       const response = await api.post('/api/cargo/check-name', { personnel_name: name });
       if (response.data.found) {
+        setPersonnelId('');
         setStep(2);
       } else {
         setError(t('cargoTracking.nameNotFound'));
@@ -134,12 +135,20 @@ const CargoStatus = () => {
                 <div className="relative flex-1">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <Input
-                    placeholder="100002"
+                    type="password"
+                    name="cargo-personnel-verify"
+                    placeholder={t('cargoTracking.personnelCodePlaceholder')}
                     value={personnelId}
                     onChange={(e) => setPersonnelId(e.target.value.replace(/\D/g, '').slice(0, 6))}
                     maxLength={6}
                     inputMode="numeric"
-                    className="text-lg py-6 pl-10"
+                    autoComplete="new-password"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    className="text-lg py-6 pl-10 tracking-widest"
                   />
                 </div>
                 <Button onClick={verifyAndFetch} disabled={loading} variant="brand" className="px-8 py-6 h-auto shrink-0">
