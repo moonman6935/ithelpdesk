@@ -2,6 +2,12 @@ const { randomUUID } = require('crypto');
 const { getDb, ensureDefaultAdmin } = require('./_lib/db');
 const { hashPassword, verifyPassword, createAccessToken } = require('./_lib/auth');
 const { enrichShipmentWithYurtici, getYurticiConfig } = require('./_lib/yurticiKargo');
+const {
+    normalizeCargoKey,
+    namesMatch,
+    personMatchesCargo,
+    isTrackableShipmentDirection,
+} = require('./_lib/cargoMatch');
 const jwt = require('jsonwebtoken');
 
 const SECRET_KEY = process.env.SECRET_KEY || 'b4f2c8d9e1a3c5b7a9d0e2f4a6b8c0d2';
@@ -55,16 +61,15 @@ async function requireSystemAdmin(db, req, res) {
     return role;
 }
 
-function normalizeCargoKey(value) {
-    return String(value ?? '')
-        .toLowerCase()
-        .trim()
-        .replace(/ı/g, 'i')
-        .replace(/ğ/g, 'g')
-        .replace(/ü/g, 'u')
-        .replace(/ş/g, 's')
-        .replace(/ö/g, 'o')
-        .replace(/ç/g, 'c');
+function getShipmentPublicStatus(cargo, incomingMatch) {
+    if (cargo.direction === 'incoming') {
+        if (cargo.return_flag || cargo.return_reason) return 'returned';
+        if (cargo.delivery_date || cargo.recipient) return 'delivered';
+        return 'in_transit';
+    }
+    if (incomingMatch) return 'returned';
+    if (cargo.delivery_date || cargo.recipient) return 'delivered';
+    return 'in_transit';
 }
 
 function findCargoMatch(outgoing, incomingList) {
@@ -131,12 +136,6 @@ function attachCargoMatches(items, direction, allCargo) {
     });
 }
 
-function getShipmentPublicStatus(outgoing, incomingMatch) {
-    if (incomingMatch) return 'returned';
-    if (outgoing.delivery_date || outgoing.recipient) return 'delivered';
-    return 'in_transit';
-}
-
 async function resolvePersonnelById(db, personnelId) {
     const inv = await db.collection('inventory').findOne(
         { personnel_id: personnelId },
@@ -157,76 +156,93 @@ async function resolvePersonnelById(db, personnelId) {
     return null;
 }
 
-function namesMatch(inputName, storedName) {
-    const inputKey = normalizeCargoKey(inputName);
-    const storedKey = normalizeCargoKey(storedName);
-    if (!inputKey || !storedKey) return false;
-    if (inputKey === storedKey) return true;
-
-    const inputWords = inputKey.split(/\s+/).filter((w) => w.length >= 2);
-    if (!inputWords.length) return false;
-    return inputWords.every((word) => storedKey.includes(word));
-}
-
 async function verifyPersonnelIdentity(db, personnelId, personnelName) {
     if (!/^\d{6}$/.test(personnelId)) return null;
 
-    const inv = await db.collection('inventory').findOne(
-        { personnel_id: personnelId },
-        { projection: { _id: 0, personnel_name: 1, personnel_id: 1 } }
-    );
-    if (!inv?.personnel_name) return null;
-    if (!namesMatch(personnelName, inv.personnel_name)) return null;
+    const invRecords = await db.collection('inventory')
+        .find({ personnel_id: personnelId }, { projection: { _id: 0, personnel_name: 1, personnel_id: 1 } })
+        .toArray();
+    if (!invRecords.length) return null;
 
-    return {
-        personnel_id: personnelId,
-        personnel_name: String(inv.personnel_name).trim(),
-    };
+    const canonicalName = String(invRecords[0].personnel_name ?? '').trim();
+    if (!canonicalName) return null;
+
+    const inventoryMatch = invRecords.some((inv) => namesMatch(personnelName, inv.personnel_name));
+    if (inventoryMatch) {
+        return { personnel_id: personnelId, personnel_name: canonicalName };
+    }
+
+    const cargoRecords = await db.collection('cargo')
+        .find({}, { projection: { _id: 0, personnel_name: 1, recipient: 1, personnel_id: 1 } })
+        .toArray();
+    const cargoMatch = cargoRecords.some((cargo) =>
+        personMatchesCargo(
+            cargo,
+            { personnel_id: personnelId, personnel_name: canonicalName },
+            personnelName
+        )
+    );
+
+    if (cargoMatch) {
+        return { personnel_id: personnelId, personnel_name: canonicalName };
+    }
+
+    return null;
 }
 
 async function personnelNameExists(db, personnelName) {
     const trimmed = String(personnelName ?? '').trim();
     if (trimmed.length < 3) return false;
 
-    const [invNames, cargoNames] = await Promise.all([
+    const [invNames, cargoRecords] = await Promise.all([
         db.collection('inventory').distinct('personnel_name'),
-        db.collection('cargo').distinct('personnel_name'),
+        db.collection('cargo')
+            .find({}, { projection: { _id: 0, personnel_name: 1, recipient: 1 } })
+            .toArray(),
     ]);
 
-    const allNames = [...new Set([...invNames, ...cargoNames].filter(Boolean))];
-    return allNames.some((name) => namesMatch(trimmed, name));
+    if (invNames.some((name) => namesMatch(trimmed, name))) return true;
+
+    return cargoRecords.some(
+        (cargo) =>
+            namesMatch(trimmed, cargo.personnel_name) || namesMatch(trimmed, cargo.recipient)
+    );
 }
 
-async function buildCargoStatusResponse(db, person) {
+async function buildCargoStatusResponse(db, person, queryName = '') {
     const allCargo = await db.collection('cargo').find({}, { projection: { _id: 0 } }).toArray();
     const incoming = allCargo.filter((c) => c.direction === 'incoming');
-    const personnelId = person.personnel_id;
+
+    const matched = allCargo.filter((cargo) => personMatchesCargo(cargo, person, queryName));
+
+    let shipmentRecords = matched.filter((cargo) => isTrackableShipmentDirection(cargo.direction));
+    if (!shipmentRecords.length) {
+        shipmentRecords = matched.filter((cargo) => cargo.direction === 'incoming');
+    }
 
     const shipmentMap = new Map();
-    allCargo
-        .filter((c) => c.direction === 'outgoing')
-        .filter(
-            (c) =>
-                c.personnel_id === personnelId ||
-                namesMatch(person.personnel_name, c.personnel_name)
-        )
-        .forEach((item) => shipmentMap.set(item.id, item));
+    shipmentRecords.forEach((item) => {
+        const dedupeKey = normalizeCargoKey(item.serial_number) || item.id;
+        if (!shipmentMap.has(dedupeKey)) {
+            shipmentMap.set(dedupeKey, item);
+        }
+    });
 
     const baseShipments = [...shipmentMap.values()]
-        .map((out) => {
-            const match = findCargoMatch(out, incoming);
+        .map((record) => {
+            const match = record.direction === 'incoming' ? null : findCargoMatch(record, incoming);
             return {
-                id: out.id,
-                item_name: out.item_name,
-                serial_number: out.serial_number,
-                status: getShipmentPublicStatus(out, match),
-                ship_date: out.ship_date || '',
-                delivery_date: out.delivery_date || '',
-                delivery_time: out.delivery_time || '',
-                recipient: out.recipient || '',
-                address: out.address || '',
-                arrival_city: out.arrival_city || '',
-                updated_at: out.imported_at || out.created_at,
+                id: record.id,
+                item_name: record.item_name,
+                serial_number: record.serial_number,
+                status: getShipmentPublicStatus(record, match),
+                ship_date: record.ship_date || '',
+                delivery_date: record.delivery_date || '',
+                delivery_time: record.delivery_time || '',
+                recipient: record.recipient || '',
+                address: record.address || '',
+                arrival_city: record.arrival_city || '',
+                updated_at: record.imported_at || record.created_at,
             };
         })
         .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
@@ -237,7 +253,7 @@ async function buildCargoStatusResponse(db, person) {
         : baseShipments;
 
     return {
-        personnel_id: personnelId,
+        personnel_id: person.personnel_id,
         personnel_name: person.personnel_name,
         live_tracking: yurticiConfig.enabled,
         shipments,
@@ -357,7 +373,7 @@ module.exports = async (req, res) => {
                 });
             }
 
-            const result = await buildCargoStatusResponse(db, person);
+            const result = await buildCargoStatusResponse(db, person, personnelName);
             return sendJson(res, 200, { ...result, verified: true });
         }
 
