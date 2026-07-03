@@ -1,10 +1,18 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const SECRET_KEY = process.env.SECRET_KEY || 'b4f2c8d9e1a3c5b7a9d0e2f4a6b8c0d2';
+function getSecretKey() {
+    const key = process.env.SECRET_KEY;
+    if (!key || String(key).length < 32) {
+        const error = new Error('SECRET_KEY yapılandırması eksik veya çok kısa (min 32 karakter)');
+        error.statusCode = 503;
+        throw error;
+    }
+    return key;
+}
 
 function hashPassword(password) {
-    return bcrypt.hashSync(password, 10);
+    return bcrypt.hashSync(password, 12);
 }
 
 function verifyPassword(plainPassword, hashedPassword) {
@@ -12,7 +20,23 @@ function verifyPassword(plainPassword, hashedPassword) {
 }
 
 function createAccessToken(username) {
-    return jwt.sign({ sub: username }, SECRET_KEY, { expiresIn: '24h' });
+    return jwt.sign({ sub: username }, getSecretKey(), { expiresIn: '8h' });
 }
 
-module.exports = { hashPassword, verifyPassword, createAccessToken };
+function verifyAccessToken(token) {
+    return jwt.verify(token, getSecretKey());
+}
+
+function isStrongPassword(password) {
+    const value = String(password ?? '');
+    return value.length >= 10;
+}
+
+module.exports = {
+    getSecretKey,
+    hashPassword,
+    verifyPassword,
+    createAccessToken,
+    verifyAccessToken,
+    isStrongPassword,
+};

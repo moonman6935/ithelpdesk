@@ -8,12 +8,12 @@ let cachedDb = null;
 function mongoErrorMessage(err) {
     const msg = err?.message || '';
     if (err?.code === 8000 || msg.includes('bad auth') || msg.includes('Authentication failed')) {
-        const e = new Error('MongoDB sifre veya kullanici adi hatali. Vercel MONGO_URL icindeki sifreyi kontrol edin.');
+        const e = new Error('Veritabanı bağlantı hatası');
         e.statusCode = 503;
         return e;
     }
     if (err?.name === 'MongoServerSelectionError' || msg.includes('timed out') || msg.includes('ECONNREFUSED')) {
-        const e = new Error('MongoDB baglantisi kurulamadi. Atlas → Network Access → 0.0.0.0/0 ekleyin.');
+        const e = new Error('Veritabanı bağlantı hatası');
         e.statusCode = 503;
         return e;
     }
@@ -22,7 +22,7 @@ function mongoErrorMessage(err) {
 
 async function getDb() {
     if (!process.env.MONGO_URL) {
-        const error = new Error('MONGO_URL ortam degiskeni tanimli degil. Vercel ayarlarindan MongoDB Atlas baglanti dizesini ekleyin.');
+        const error = new Error('Veritabanı yapılandırması eksik');
         error.statusCode = 503;
         throw error;
     }
@@ -50,15 +50,25 @@ async function getDb() {
 
 async function ensureDefaultAdmin(db) {
     const adminCount = await db.collection('users').countDocuments({ role: 'system_admin' });
-    if (adminCount === 0) {
-        await db.collection('users').insertOne({
-            id: randomUUID(),
-            username: 'admin',
-            password_hash: hashPassword('admin123'),
-            role: 'system_admin',
-            created_at: new Date().toISOString(),
-        });
+    if (adminCount > 0) return;
+
+    const username = String(process.env.BOOTSTRAP_ADMIN_USER ?? '').trim();
+    const password = String(process.env.BOOTSTRAP_ADMIN_PASSWORD ?? '').trim();
+
+    if (!username || !password || password.length < 10) {
+        console.warn(
+            'Sistem yöneticisi yok. İlk kurulum için BOOTSTRAP_ADMIN_USER ve BOOTSTRAP_ADMIN_PASSWORD tanımlayın.'
+        );
+        return;
     }
+
+    await db.collection('users').insertOne({
+        id: randomUUID(),
+        username,
+        password_hash: hashPassword(password),
+        role: 'system_admin',
+        created_at: new Date().toISOString(),
+    });
 }
 
 module.exports = { getDb, ensureDefaultAdmin };

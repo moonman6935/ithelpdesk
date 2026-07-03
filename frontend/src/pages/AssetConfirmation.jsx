@@ -5,12 +5,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Input } from '../components/ui/input';
 import { Checkbox } from '../components/ui/checkbox';
 import { Alert, AlertDescription } from '../components/ui/alert';
-import { CheckCircle, AlertCircle, Package } from 'lucide-react';
+import { Badge } from '../components/ui/badge';
+import { CheckCircle, AlertCircle, Package, User, Lock } from 'lucide-react';
 import api from '../lib/api';
 import PageShell from '../components/PageShell';
 
 const AssetConfirmation = () => {
     const { t } = useLanguage();
+    const [step, setStep] = useState(1);
+    const [personnelName, setPersonnelName] = useState('');
     const [personnelId, setPersonnelId] = useState('');
     const [assets, setAssets] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -19,17 +22,64 @@ const AssetConfirmation = () => {
     const [isAccepted, setIsAccepted] = useState(false);
     const [success, setSuccess] = useState(false);
 
+    const resetFlow = () => {
+        setStep(1);
+        setPersonnelName('');
+        setPersonnelId('');
+        setAssets([]);
+        setError('');
+        setConfirmed(false);
+        setIsAccepted(false);
+    };
+
+    const checkName = async () => {
+        const name = personnelName.trim();
+        if (name.length < 3) {
+            setError(t('assetConfirmation.enterFullName'));
+            return;
+        }
+
+        setLoading(true);
+        setError('');
+
+        try {
+            const response = await api.post('/api/cargo/check-name', { personnel_name: name });
+            if (response.data.found) {
+                setPersonnelId('');
+                setStep(2);
+            } else {
+                setError(t('assetConfirmation.nameNotFound'));
+            }
+        } catch {
+            setError(t('assetConfirmation.error'));
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const fetchAssets = async () => {
         if (personnelId.length !== 6) {
             setError(t('assetConfirmation.enterPersonnelNo'));
             return;
         }
+
         setLoading(true);
         setError('');
         setConfirmed(false);
+        setAssets([]);
+
         try {
-            const response = await api.get(`/api/inventory/${personnelId}`);
-            if (response.data.items.length === 0) {
+            const response = await api.post('/api/inventory/lookup', {
+                personnel_name: personnelName.trim(),
+                personnel_id: personnelId,
+            });
+
+            if (!response.data.verified) {
+                setError(t('assetConfirmation.verifyFailed'));
+                return;
+            }
+
+            if (!response.data.items?.length) {
                 setError(t('assetConfirmation.noAssets'));
             } else if (response.data.is_confirmed) {
                 setConfirmed(true);
@@ -37,8 +87,8 @@ const AssetConfirmation = () => {
             } else {
                 setAssets(response.data.items);
             }
-        } catch (err) {
-            setError('Hata oluştu. Lütfen tekrar deneyin.');
+        } catch {
+            setError(t('assetConfirmation.error'));
         } finally {
             setLoading(false);
         }
@@ -48,13 +98,12 @@ const AssetConfirmation = () => {
         try {
             await api.post('/api/inventory/confirm', {
                 personnel_id: personnelId,
-                personnel_name: assets[0]?.personnel_name || 'Bilinmiyor',
+                personnel_name: personnelName.trim(),
                 items: assets,
-                status: 'confirmed'
             });
             setSuccess(true);
-        } catch (err) {
-            setError('Onay gönderilirken hata oluştu.');
+        } catch {
+            setError(t('assetConfirmation.confirmError'));
         }
     };
 
@@ -69,25 +118,62 @@ const AssetConfirmation = () => {
     }
 
     return (
-        <PageShell theme="rose" icon={Package} title={t('assetConfirmation.title')} subtitle={t('assetConfirmation.enterPersonnelNo')}>
+        <PageShell theme="rose" icon={Package} title={t('assetConfirmation.title')} subtitle={t('assetConfirmation.subtitle')}>
                 <Card className="glass-panel border-0 shadow-xl">
                     <CardHeader className="bg-gradient-to-r from-rose-50/80 to-white/50 rounded-t-2xl">
                         <CardTitle className="text-3xl">{t('assetConfirmation.title')}</CardTitle>
-                        <CardDescription>{t('assetConfirmation.enterPersonnelNo')}</CardDescription>
+                        <CardDescription>
+                            {step === 1 ? t('assetConfirmation.step1Description') : t('assetConfirmation.step2Description')}
+                        </CardDescription>
                     </CardHeader>
                     <CardContent className="pt-6">
-                        <div className="flex gap-4 mb-8">
-                            <Input
-                                placeholder="Örn: 123456"
-                                value={personnelId}
-                                onChange={(e) => setPersonnelId(e.target.value)}
-                                maxLength={6}
-                                className="text-lg py-6"
-                            />
-                            <Button onClick={fetchAssets} loading={loading} variant="brand" className="px-8 py-6 h-auto">
-                                {t('assetConfirmation.checkAssets')}
-                            </Button>
-                        </div>
+                        {step === 1 ? (
+                            <div className="flex flex-col sm:flex-row gap-4 mb-4">
+                                <Input
+                                    placeholder={t('assetConfirmation.namePlaceholder')}
+                                    value={personnelName}
+                                    onChange={(e) => setPersonnelName(e.target.value)}
+                                    className="text-lg py-6"
+                                    autoComplete="name"
+                                />
+                                <Button onClick={checkName} disabled={loading} variant="brand" className="px-8 py-6 h-auto shrink-0">
+                                    {loading ? '...' : t('assetConfirmation.continue')}
+                                </Button>
+                            </div>
+                        ) : (
+                            <div className="space-y-4 mb-4">
+                                <div className="flex items-center gap-2 text-sm text-gray-600 bg-rose-50 rounded-lg px-4 py-3">
+                                    <User className="w-4 h-4 text-rose-600 shrink-0" />
+                                    <span>{personnelName}</span>
+                                    <button
+                                        type="button"
+                                        onClick={resetFlow}
+                                        className="ml-auto text-red-600 text-xs font-medium hover:underline"
+                                    >
+                                        {t('assetConfirmation.changeName')}
+                                    </button>
+                                </div>
+                                <div className="flex flex-col sm:flex-row gap-4">
+                                    <div className="relative flex-1">
+                                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                        <Input
+                                            type="password"
+                                            name="asset-personnel-verify"
+                                            placeholder={t('assetConfirmation.personnelCodePlaceholder')}
+                                            value={personnelId}
+                                            onChange={(e) => setPersonnelId(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                            maxLength={6}
+                                            inputMode="numeric"
+                                            autoComplete="new-password"
+                                            className="text-lg py-6 pl-10 tracking-widest"
+                                        />
+                                    </div>
+                                    <Button onClick={fetchAssets} disabled={loading} variant="brand" className="px-8 py-6 h-auto shrink-0">
+                                        {loading ? '...' : t('assetConfirmation.checkAssets')}
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
 
                         {error && (
                             <Alert variant="destructive" className="mb-6">

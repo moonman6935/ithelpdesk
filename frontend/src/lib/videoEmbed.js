@@ -21,11 +21,14 @@ export function getVideoEmbedInfo(url) {
   }
 
   if (/\.(mp4|webm|ogg)(\?|$)/i.test(trimmed)) {
-    return { type: 'direct', embedUrl: trimmed };
-  }
-
-  if (/embed|player\./i.test(trimmed)) {
-    return { type: 'iframe', embedUrl: trimmed };
+    try {
+      const parsed = new URL(trimmed);
+      if (parsed.protocol === 'https:') {
+        return { type: 'direct', embedUrl: trimmed };
+      }
+    } catch {
+      return null;
+    }
   }
 
   return { type: 'link', embedUrl: trimmed };

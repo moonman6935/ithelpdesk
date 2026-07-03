@@ -1,6 +1,6 @@
 const { randomUUID } = require('crypto');
 const { getDb, ensureDefaultAdmin } = require('./_lib/db');
-const { hashPassword, verifyPassword, createAccessToken } = require('./_lib/auth');
+const { hashPassword, verifyPassword, createAccessToken, verifyAccessToken, isStrongPassword } = require('./_lib/auth');
 const { enrichShipmentWithYurtici, getYurticiConfig } = require('./_lib/yurticiKargo');
 const {
     normalizeCargoKey,
@@ -8,9 +8,15 @@ const {
     personMatchesCargo,
     isTrackableShipmentDirection,
 } = require('./_lib/cargoMatch');
-const jwt = require('jsonwebtoken');
+const {
+    applySecurityHeaders,
+    safeErrorDetail,
+    requireRateLimit,
+    coerceString,
+    isValidPersonnelId,
+} = require('./_lib/security');
+const { isAllowedVideoUrl } = require('./_lib/videoValidate');
 
-const SECRET_KEY = process.env.SECRET_KEY || 'b4f2c8d9e1a3c5b7a9d0e2f4a6b8c0d2';
 const ALLOWED_ROLES = ['admin', 'system_admin', 'viewer'];
 const WRITE_ROLES = ['system_admin'];
 
@@ -18,7 +24,7 @@ function getAuthUsername(req) {
     const auth = req.headers.authorization;
     if (!auth || !auth.startsWith('Bearer ')) return null;
     try {
-        const payload = jwt.verify(auth.slice(7), SECRET_KEY);
+        const payload = verifyAccessToken(auth.slice(7));
         return payload.sub || null;
     } catch {
         return null;
@@ -419,6 +425,8 @@ function parseRoute(req) {
 }
 
 module.exports = async (req, res) => {
+    applySecurityHeaders(res);
+
     const route = parseRoute(req);
     const segments = route ? route.split('/').filter(Boolean) : [];
     const method = req.method;
@@ -432,7 +440,14 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'POST' && route === 'auth/login') {
-            const { username, password } = req.body || {};
+            if (!requireRateLimit(req, res, 'auth-login', { max: 8, windowMs: 60_000 })) return;
+
+            const username = coerceString(req.body?.username, 64);
+            const password = coerceString(req.body?.password, 128);
+            if (!username || !password) {
+                return sendError(res, 400, 'Kullanıcı adı ve şifre gerekli');
+            }
+
             const user = await db.collection('users').findOne({ username });
             if (!user || !verifyPassword(password, user.password_hash)) {
                 return sendError(res, 401, 'Hatalı kullanıcı adı veya şifre');
@@ -445,8 +460,30 @@ module.exports = async (req, res) => {
             });
         }
 
-        if (method === 'GET' && segments[0] === 'inventory' && segments.length === 2) {
-            const personnelId = segments[1];
+        if (method === 'POST' && route === 'inventory/lookup') {
+            if (!requireRateLimit(req, res, 'inventory-lookup', { max: 15, windowMs: 60_000 })) return;
+
+            const personnelName = coerceString(req.body?.personnel_name, 120);
+            const personnelId = coerceString(req.body?.personnel_id, 6);
+
+            if (personnelName.length < 3) {
+                return sendError(res, 400, 'Geçerli ad soyad giriniz');
+            }
+            if (!isValidPersonnelId(personnelId)) {
+                return sendError(res, 400, 'Geçerli 6 haneli personel numarası gerekli');
+            }
+
+            const person = await verifyPersonnelIdentity(db, personnelId, personnelName);
+            if (!person) {
+                return sendJson(res, 200, {
+                    personnel_id: personnelId,
+                    personnel_name: null,
+                    verified: false,
+                    items: [],
+                    is_confirmed: false,
+                });
+            }
+
             const items = await db.collection('inventory')
                 .find({ personnel_id: personnelId, status: 'assigned' }, { projection: { _id: 0 } })
                 .toArray();
@@ -458,11 +495,19 @@ module.exports = async (req, res) => {
                 .next();
 
             const is_confirmed = Boolean(confirmation && confirmation.status === 'confirmed');
-            return sendJson(res, 200, { items, is_confirmed });
+            return sendJson(res, 200, {
+                personnel_id: personnelId,
+                personnel_name: person.personnel_name,
+                verified: true,
+                items,
+                is_confirmed,
+            });
         }
 
         if (method === 'POST' && route === 'cargo/check-name') {
-            const personnelName = String(req.body?.personnel_name ?? '').trim();
+            if (!requireRateLimit(req, res, 'cargo-check-name', { max: 20, windowMs: 60_000 })) return;
+
+            const personnelName = coerceString(req.body?.personnel_name, 120);
             if (personnelName.length < 3) {
                 return sendError(res, 400, 'Geçerli ad soyad giriniz');
             }
@@ -472,13 +517,15 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'POST' && route === 'cargo/status') {
-            const personnelName = String(req.body?.personnel_name ?? '').trim();
-            const personnelId = String(req.body?.personnel_id ?? '').trim();
+            if (!requireRateLimit(req, res, 'cargo-status', { max: 15, windowMs: 60_000 })) return;
+
+            const personnelName = coerceString(req.body?.personnel_name, 120);
+            const personnelId = coerceString(req.body?.personnel_id, 6);
 
             if (personnelName.length < 3) {
                 return sendError(res, 400, 'Geçerli ad soyad giriniz');
             }
-            if (!/^\d{6}$/.test(personnelId)) {
+            if (!isValidPersonnelId(personnelId)) {
                 return sendError(res, 400, 'Geçerli 6 haneli personel numarası gerekli');
             }
 
@@ -496,30 +543,34 @@ module.exports = async (req, res) => {
             return sendJson(res, 200, { ...result, verified: true });
         }
 
-        if (method === 'GET' && segments[0] === 'cargo' && segments[1] === 'status' && segments.length === 3) {
-            const personnelId = segments[2];
-            if (!/^\d{6}$/.test(personnelId)) {
-                return sendError(res, 400, 'Geçerli 6 haneli personel numarası gerekli');
-            }
-
-            const person = await resolvePersonnelById(db, personnelId);
-            if (!person) {
-                return sendJson(res, 200, {
-                    personnel_id: personnelId,
-                    personnel_name: null,
-                    shipments: [],
-                });
-            }
-
-            const result = await buildCargoStatusResponse(db, person);
-            return sendJson(res, 200, result);
-        }
-
         if (method === 'POST' && route === 'inventory/confirm') {
-            const confirmation = { ...(req.body || {}) };
-            confirmation.confirmed_at = new Date().toISOString();
-            confirmation.id = randomUUID();
-            confirmation.status = 'confirmed';
+            if (!requireRateLimit(req, res, 'inventory-confirm', { max: 10, windowMs: 60_000 })) return;
+
+            const personnelName = coerceString(req.body?.personnel_name, 120);
+            const personnelId = coerceString(req.body?.personnel_id, 6);
+
+            if (!isValidPersonnelId(personnelId) || personnelName.length < 3) {
+                return sendError(res, 400, 'Kimlik doğrulama bilgileri eksik');
+            }
+
+            const person = await verifyPersonnelIdentity(db, personnelId, personnelName);
+            if (!person) {
+                return sendError(res, 403, 'Ad soyad ile personel numarası eşleşmiyor');
+            }
+
+            const items = Array.isArray(req.body?.items) ? req.body.items : [];
+            const confirmation = {
+                id: randomUUID(),
+                personnel_id: personnelId,
+                personnel_name: person.personnel_name,
+                items: items.map((item) => ({
+                    item_name: coerceString(item?.item_name, 200),
+                    serial_number: coerceString(item?.serial_number, 100),
+                })),
+                status: 'confirmed',
+                confirmed_at: new Date().toISOString(),
+            };
+
             await db.collection('confirmations').insertOne(confirmation);
             return sendJson(res, 200, { status: 'success', id: confirmation.id });
         }
@@ -888,17 +939,22 @@ module.exports = async (req, res) => {
         if (method === 'POST' && route === 'admin/users') {
             if (!(await requireSystemAdmin(db, req, res))) return;
             const data = req.body || {};
+            const username = coerceString(data.username, 64);
+            const password = coerceString(data.password, 128);
+            if (!username || !isStrongPassword(password)) {
+                return sendError(res, 400, 'Geçerli kullanıcı adı ve en az 10 karakterlik şifre gerekli');
+            }
             if (!ALLOWED_ROLES.includes(data.role)) {
                 return sendError(res, 400, 'Geçersiz rol');
             }
-            const existing = await db.collection('users').findOne({ username: data.username });
+            const existing = await db.collection('users').findOne({ username });
             if (existing) {
                 return sendError(res, 400, 'Bu kullanıcı adı zaten mevcut');
             }
             await db.collection('users').insertOne({
                 id: randomUUID(),
-                username: data.username,
-                password_hash: hashPassword(data.password),
+                username,
+                password_hash: hashPassword(password),
                 role: data.role || 'admin',
                 created_at: new Date().toISOString(),
             });
@@ -912,8 +968,8 @@ module.exports = async (req, res) => {
             if (!authUsername || !current_password || !new_password) {
                 return sendError(res, 400, 'Mevcut şifre ve yeni şifre gerekli');
             }
-            if (new_password.length < 6) {
-                return sendError(res, 400, 'Yeni şifre en az 6 karakter olmalı');
+            if (!isStrongPassword(new_password)) {
+                return sendError(res, 400, 'Yeni şifre en az 10 karakter olmalı');
             }
             const user = await db.collection('users').findOne({ username: authUsername });
             if (!user || !verifyPassword(current_password, user.password_hash)) {
@@ -1008,6 +1064,9 @@ module.exports = async (req, res) => {
             if (!titles || !video_url) {
                 return sendError(res, 400, 'En az bir dilde başlık ve video bağlantısı gerekli');
             }
+            if (!isAllowedVideoUrl(video_url)) {
+                return sendError(res, 400, 'Yalnızca YouTube, Vimeo veya HTTPS video bağlantıları kabul edilir');
+            }
             const video = {
                 id: randomUUID(),
                 titles,
@@ -1029,6 +1088,9 @@ module.exports = async (req, res) => {
             const video_url = String(data.video_url || '').trim();
             if (!titles || !video_url) {
                 return sendError(res, 400, 'En az bir dilde başlık ve video bağlantısı gerekli');
+            }
+            if (!isAllowedVideoUrl(video_url)) {
+                return sendError(res, 400, 'Yalnızca YouTube, Vimeo veya HTTPS video bağlantıları kabul edilir');
             }
             const result = await db.collection('troubleshooting_videos').updateOne(
                 { id: videoId },
@@ -1076,7 +1138,6 @@ module.exports = async (req, res) => {
     } catch (err) {
         console.error('API error:', err);
         const status = err.statusCode || 500;
-        const detail = err.message || 'Sunucu hatası';
-        return sendError(res, status, detail);
+        return sendError(res, status, safeErrorDetail(err));
     }
 };
