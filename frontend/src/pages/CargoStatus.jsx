@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Input } from '../components/ui/input';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { Badge } from '../components/ui/badge';
-import { Truck, AlertCircle, Package, MapPin, Calendar, User, ExternalLink, History } from 'lucide-react';
+import { Truck, AlertCircle, Package, MapPin, Calendar, User, ExternalLink, History, Lock } from 'lucide-react';
 import api from '../lib/api';
 
 const STATUS_STYLES = {
@@ -18,12 +18,46 @@ const STATUS_STYLES = {
 
 const CargoStatus = () => {
   const { t } = useLanguage();
+  const [step, setStep] = useState(1);
+  const [personnelName, setPersonnelName] = useState('');
   const [personnelId, setPersonnelId] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
 
-  const fetchStatus = async () => {
+  const resetFlow = () => {
+    setStep(1);
+    setPersonnelName('');
+    setPersonnelId('');
+    setError('');
+    setResult(null);
+  };
+
+  const checkName = async () => {
+    const name = personnelName.trim();
+    if (name.length < 3) {
+      setError(t('cargoTracking.enterFullName'));
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await api.post('/api/cargo/check-name', { personnel_name: name });
+      if (response.data.found) {
+        setStep(2);
+      } else {
+        setError(t('cargoTracking.nameNotFound'));
+      }
+    } catch {
+      setError(t('cargoTracking.error'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const verifyAndFetch = async () => {
     if (personnelId.length !== 6) {
       setError(t('cargoTracking.enterPersonnelNo'));
       return;
@@ -34,10 +68,14 @@ const CargoStatus = () => {
     setResult(null);
 
     try {
-      const response = await api.get(`/api/cargo/status/${personnelId}`);
+      const response = await api.post('/api/cargo/status', {
+        personnel_name: personnelName.trim(),
+        personnel_id: personnelId,
+      });
       setResult(response.data);
-      if (!response.data.personnel_name) {
-        setError(t('cargoTracking.notFound'));
+
+      if (!response.data.verified || !response.data.personnel_name) {
+        setError(t('cargoTracking.verifyFailed'));
       } else if (!response.data.shipments?.length) {
         setError(t('cargoTracking.noShipments'));
       }
@@ -58,24 +96,60 @@ const CargoStatus = () => {
       <Card className="glass-panel border-0 shadow-xl mb-6">
         <CardHeader className="bg-gradient-to-r from-orange-50/80 to-white/50 rounded-t-2xl">
           <CardTitle className="text-2xl">{t('cargoTracking.lookupTitle')}</CardTitle>
-          <CardDescription>{t('cargoTracking.enterPersonnelNo')}</CardDescription>
+          <CardDescription>
+            {step === 1 ? t('cargoTracking.step1Description') : t('cargoTracking.step2Description')}
+          </CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
-          <div className="flex flex-col sm:flex-row gap-4 mb-4">
-            <Input
-              placeholder="123456"
-              value={personnelId}
-              onChange={(e) => setPersonnelId(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              maxLength={6}
-              inputMode="numeric"
-              className="text-lg py-6"
-            />
-            <Button onClick={fetchStatus} disabled={loading} variant="brand" className="px-8 py-6 h-auto shrink-0">
-              {loading ? '...' : t('cargoTracking.checkStatus')}
-            </Button>
-          </div>
+          {step === 1 ? (
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Input
+                  placeholder={t('cargoTracking.namePlaceholder')}
+                  value={personnelName}
+                  onChange={(e) => setPersonnelName(e.target.value)}
+                  className="text-lg py-6"
+                  autoComplete="name"
+                />
+                <Button onClick={checkName} disabled={loading} variant="brand" className="px-8 py-6 h-auto shrink-0">
+                  {loading ? '...' : t('cargoTracking.continue')}
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-sm text-gray-600 bg-orange-50 rounded-lg px-4 py-3">
+                <User className="w-4 h-4 text-orange-600 shrink-0" />
+                <span>{personnelName}</span>
+                <button
+                  type="button"
+                  onClick={resetFlow}
+                  className="ml-auto text-red-600 text-xs font-medium hover:underline"
+                >
+                  {t('cargoTracking.changeName')}
+                </button>
+              </div>
 
-          <p className="text-sm text-gray-500">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="relative flex-1">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    placeholder="100002"
+                    value={personnelId}
+                    onChange={(e) => setPersonnelId(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    maxLength={6}
+                    inputMode="numeric"
+                    className="text-lg py-6 pl-10"
+                  />
+                </div>
+                <Button onClick={verifyAndFetch} disabled={loading} variant="brand" className="px-8 py-6 h-auto shrink-0">
+                  {loading ? '...' : t('cargoTracking.checkStatus')}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          <p className="text-sm text-gray-500 mt-4">
             {t('cargoTracking.hint')}{' '}
             <Link to="/asset-confirmation" className="text-red-600 font-medium hover:underline">
               {t('assetConfirmation.title')}

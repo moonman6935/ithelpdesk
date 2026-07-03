@@ -157,6 +157,93 @@ async function resolvePersonnelById(db, personnelId) {
     return null;
 }
 
+function namesMatch(inputName, storedName) {
+    const inputKey = normalizeCargoKey(inputName);
+    const storedKey = normalizeCargoKey(storedName);
+    if (!inputKey || !storedKey) return false;
+    if (inputKey === storedKey) return true;
+
+    const inputWords = inputKey.split(/\s+/).filter((w) => w.length >= 2);
+    if (!inputWords.length) return false;
+    return inputWords.every((word) => storedKey.includes(word));
+}
+
+async function verifyPersonnelIdentity(db, personnelId, personnelName) {
+    if (!/^\d{6}$/.test(personnelId)) return null;
+
+    const inv = await db.collection('inventory').findOne(
+        { personnel_id: personnelId },
+        { projection: { _id: 0, personnel_name: 1, personnel_id: 1 } }
+    );
+    if (!inv?.personnel_name) return null;
+    if (!namesMatch(personnelName, inv.personnel_name)) return null;
+
+    return {
+        personnel_id: personnelId,
+        personnel_name: String(inv.personnel_name).trim(),
+    };
+}
+
+async function personnelNameExists(db, personnelName) {
+    const trimmed = String(personnelName ?? '').trim();
+    if (trimmed.length < 3) return false;
+
+    const [invNames, cargoNames] = await Promise.all([
+        db.collection('inventory').distinct('personnel_name'),
+        db.collection('cargo').distinct('personnel_name'),
+    ]);
+
+    const allNames = [...new Set([...invNames, ...cargoNames].filter(Boolean))];
+    return allNames.some((name) => namesMatch(trimmed, name));
+}
+
+async function buildCargoStatusResponse(db, person) {
+    const allCargo = await db.collection('cargo').find({}, { projection: { _id: 0 } }).toArray();
+    const incoming = allCargo.filter((c) => c.direction === 'incoming');
+    const personnelId = person.personnel_id;
+
+    const shipmentMap = new Map();
+    allCargo
+        .filter((c) => c.direction === 'outgoing')
+        .filter(
+            (c) =>
+                c.personnel_id === personnelId ||
+                namesMatch(person.personnel_name, c.personnel_name)
+        )
+        .forEach((item) => shipmentMap.set(item.id, item));
+
+    const baseShipments = [...shipmentMap.values()]
+        .map((out) => {
+            const match = findCargoMatch(out, incoming);
+            return {
+                id: out.id,
+                item_name: out.item_name,
+                serial_number: out.serial_number,
+                status: getShipmentPublicStatus(out, match),
+                ship_date: out.ship_date || '',
+                delivery_date: out.delivery_date || '',
+                delivery_time: out.delivery_time || '',
+                recipient: out.recipient || '',
+                address: out.address || '',
+                arrival_city: out.arrival_city || '',
+                updated_at: out.imported_at || out.created_at,
+            };
+        })
+        .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+
+    const yurticiConfig = getYurticiConfig();
+    const shipments = yurticiConfig.enabled
+        ? await Promise.all(baseShipments.map((s) => enrichShipmentWithYurtici(s)))
+        : baseShipments;
+
+    return {
+        personnel_id: personnelId,
+        personnel_name: person.personnel_name,
+        live_tracking: yurticiConfig.enabled,
+        shipments,
+    };
+}
+
 function parseVideoTitles(data) {
     const titles = {
         tr: String(data.titles?.tr ?? data.title_tr ?? data.title ?? '').trim(),
@@ -239,6 +326,41 @@ module.exports = async (req, res) => {
             return sendJson(res, 200, { items, is_confirmed });
         }
 
+        if (method === 'POST' && route === 'cargo/check-name') {
+            const personnelName = String(req.body?.personnel_name ?? '').trim();
+            if (personnelName.length < 3) {
+                return sendError(res, 400, 'Geçerli ad soyad giriniz');
+            }
+
+            const found = await personnelNameExists(db, personnelName);
+            return sendJson(res, 200, { found });
+        }
+
+        if (method === 'POST' && route === 'cargo/status') {
+            const personnelName = String(req.body?.personnel_name ?? '').trim();
+            const personnelId = String(req.body?.personnel_id ?? '').trim();
+
+            if (personnelName.length < 3) {
+                return sendError(res, 400, 'Geçerli ad soyad giriniz');
+            }
+            if (!/^\d{6}$/.test(personnelId)) {
+                return sendError(res, 400, 'Geçerli 6 haneli personel numarası gerekli');
+            }
+
+            const person = await verifyPersonnelIdentity(db, personnelId, personnelName);
+            if (!person) {
+                return sendJson(res, 200, {
+                    personnel_id: personnelId,
+                    personnel_name: null,
+                    verified: false,
+                    shipments: [],
+                });
+            }
+
+            const result = await buildCargoStatusResponse(db, person);
+            return sendJson(res, 200, { ...result, verified: true });
+        }
+
         if (method === 'GET' && segments[0] === 'cargo' && segments[1] === 'status' && segments.length === 3) {
             const personnelId = segments[2];
             if (!/^\d{6}$/.test(personnelId)) {
@@ -254,46 +376,8 @@ module.exports = async (req, res) => {
                 });
             }
 
-            const allCargo = await db.collection('cargo').find({}, { projection: { _id: 0 } }).toArray();
-            const incoming = allCargo.filter((c) => c.direction === 'incoming');
-            const nameKey = normalizeCargoKey(person.personnel_name);
-
-            const shipmentMap = new Map();
-            allCargo
-                .filter((c) => c.direction === 'outgoing')
-                .filter((c) => c.personnel_id === personnelId || normalizeCargoKey(c.personnel_name) === nameKey)
-                .forEach((item) => shipmentMap.set(item.id, item));
-
-            const baseShipments = [...shipmentMap.values()]
-                .map((out) => {
-                    const match = findCargoMatch(out, incoming);
-                    return {
-                        id: out.id,
-                        item_name: out.item_name,
-                        serial_number: out.serial_number,
-                        status: getShipmentPublicStatus(out, match),
-                        ship_date: out.ship_date || '',
-                        delivery_date: out.delivery_date || '',
-                        delivery_time: out.delivery_time || '',
-                        recipient: out.recipient || '',
-                        address: out.address || '',
-                        arrival_city: out.arrival_city || '',
-                        updated_at: out.imported_at || out.created_at,
-                    };
-                })
-                .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
-
-            const yurticiConfig = getYurticiConfig();
-            const shipments = yurticiConfig.enabled
-                ? await Promise.all(baseShipments.map((s) => enrichShipmentWithYurtici(s)))
-                : baseShipments;
-
-            return sendJson(res, 200, {
-                personnel_id: personnelId,
-                personnel_name: person.personnel_name,
-                live_tracking: yurticiConfig.enabled,
-                shipments,
-            });
+            const result = await buildCargoStatusResponse(db, person);
+            return sendJson(res, 200, result);
         }
 
         if (method === 'POST' && route === 'inventory/confirm') {
