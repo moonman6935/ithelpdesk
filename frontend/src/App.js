@@ -12,6 +12,7 @@ import AssetConfirmation from "./pages/AssetConfirmation";
 import CargoStatus from "./pages/CargoStatus";
 import AdminDashboard from "./pages/AdminDashboard";
 import FAQ from "./pages/FAQ";
+import CitrixSetup from "./pages/CitrixSetup";
 import VideoTutorials from "./pages/VideoTutorials";
 import LoginPage from "./pages/LoginPage";
 import SiteBackground from "./components/SiteBackground";
@@ -32,6 +33,7 @@ function App() {
               <Route path="/headset-test" element={<HeadsetTest />} />
               <Route path="/troubleshooting" element={<Troubleshooting />} />
               <Route path="/faq" element={<FAQ />} />
+              <Route path="/faq/citrix-kurulum" element={<CitrixSetup />} />
               <Route path="/video-tutorials" element={<VideoTutorials />} />
               <Route path="/asset-confirmation" element={<AssetConfirmation />} />
               <Route path="/cargo-status" element={<CargoStatus />} />

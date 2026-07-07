@@ -1,13 +1,16 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import PageShell from '../components/PageShell';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { Badge } from '../components/ui/badge';
-import { HelpCircle, Mic, ListChecks, Headphones, Settings, Globe, Monitor, Chrome, AlertTriangle } from 'lucide-react';
+import { HelpCircle, Mic, ListChecks, Headphones, Settings, Globe, Monitor, Chrome, AlertTriangle, Download, ArrowRight } from 'lucide-react';
 
 const faqItems = [
+  { id: 'citrixInstall', icon: Download, isGuide: true },
   { id: 'q1', icon: Mic },
   { id: 'q2', icon: ListChecks },
   { id: 'q3', icon: Headphones, images: ['win10-speaker.png', 'win11-speaker.png'], imageLabels: ['win10', 'win11'] },
@@ -37,6 +40,15 @@ const FAQ = () => {
         {paragraphs.map((text, idx) => (
           <p key={idx} className="text-gray-700 leading-relaxed">{text}</p>
         ))}
+
+        {item.isGuide && (
+          <Link to="/faq/citrix-kurulum">
+            <Button className="mt-2 bg-indigo-600 hover:bg-indigo-700">
+              {t('faq.citrixInstall.openGuide')}
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </Link>
+        )}
 
         {item.hasSteps && (
           <div className="space-y-6 mt-4">
@@ -87,6 +99,24 @@ const FAQ = () => {
               <p>{t('faq.introText')}</p>
             </AlertDescription>
           </Alert>
+
+          <Card className="mb-8 border-2 border-indigo-300 bg-gradient-to-r from-indigo-50 to-cyan-50 shadow-md overflow-hidden">
+            <CardContent className="p-6 flex flex-col sm:flex-row items-center gap-6">
+              <div className="w-16 h-16 rounded-2xl bg-indigo-600 flex items-center justify-center shrink-0">
+                <Download className="w-8 h-8 text-white" />
+              </div>
+              <div className="flex-1 text-center sm:text-left">
+                <h3 className="text-xl font-bold text-gray-900 mb-1">{t('faq.citrixInstall.featuredTitle')}</h3>
+                <p className="text-gray-600 text-sm">{t('faq.citrixInstall.featuredDesc')}</p>
+              </div>
+              <Link to="/faq/citrix-kurulum" className="shrink-0">
+                <Button size="lg" className="bg-indigo-600 hover:bg-indigo-700">
+                  {t('faq.citrixInstall.openGuide')}
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
 
           <Card className="glass-panel border-0">
             <CardHeader className="bg-gradient-to-r from-violet-50/80 to-white/50 rounded-t-2xl">

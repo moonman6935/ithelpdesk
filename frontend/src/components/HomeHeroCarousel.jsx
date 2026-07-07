@@ -3,11 +3,12 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { translations } from '../translations/translations';
 import { Button } from './ui/button';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ChevronLeft, ChevronRight, Sparkles, Monitor, RefreshCw, MessageSquare, Package, ShieldCheck, Laptop, Cable, Truck, ClipboardCheck } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, Sparkles, Monitor, RefreshCw, MessageSquare, Package, ShieldCheck, Laptop, Cable, Truck, ClipboardCheck, Download } from 'lucide-react';
 import { useIsMobile } from '../hooks/useMediaQuery';
 
 const SLIDE_META = [
   { Icon: Sparkles, gradient: 'from-red-500 via-red-600 to-orange-500', blob: 'bg-yellow-300/30' },
+  { Icon: Download, gradient: 'from-indigo-600 via-blue-700 to-violet-800', blob: 'bg-indigo-300/30' },
   { Icon: Monitor, gradient: 'from-blue-600 via-blue-700 to-indigo-700', blob: 'bg-sky-300/30' },
   { Icon: RefreshCw, gradient: 'from-emerald-500 via-teal-600 to-cyan-600', blob: 'bg-lime-300/30' },
   { Icon: MessageSquare, gradient: 'from-violet-600 via-purple-600 to-fuchsia-600', blob: 'bg-pink-300/30' },
