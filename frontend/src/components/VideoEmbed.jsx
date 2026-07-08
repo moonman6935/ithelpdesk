@@ -1,7 +1,7 @@
 import React from 'react';
-import { getVideoEmbedInfo } from '../lib/videoEmbed';
+import { getVideoEmbedInfo, getVideoEmbedUrl } from '../lib/videoEmbed';
 
-const VideoEmbed = ({ url, title }) => {
+const VideoEmbed = ({ url, title, autoplay = false }) => {
   const info = getVideoEmbedInfo(url);
   if (!info) return null;
 
@@ -10,6 +10,7 @@ const VideoEmbed = ({ url, title }) => {
       <video
         src={info.embedUrl}
         controls
+        autoPlay={autoplay}
         className="w-full aspect-video rounded-xl bg-black"
         title={title}
       >
@@ -31,9 +32,11 @@ const VideoEmbed = ({ url, title }) => {
     );
   }
 
+  const embedUrl = getVideoEmbedUrl(url, { autoplay }) || info.embedUrl;
+
   return (
     <iframe
-      src={info.embedUrl}
+      src={embedUrl}
       title={title}
       className="w-full aspect-video rounded-xl bg-black"
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

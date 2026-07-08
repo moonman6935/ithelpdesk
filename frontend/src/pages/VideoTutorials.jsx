@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import PageShell from '../components/PageShell';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Card, CardContent } from '../components/ui/card';
 import { Video, Loader2 } from 'lucide-react';
 import api from '../lib/api';
-import VideoEmbed from '../components/VideoEmbed';
 import { getVideoTitle } from '../lib/videoTitles';
+import VideoTutorialGrid from '../components/VideoTutorialGrid';
 
 const VideoTutorials = () => {
   const { t, language } = useLanguage();
@@ -44,21 +44,11 @@ const VideoTutorials = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-8">
-          {videos.map((video) => {
-            const title = getVideoTitle(video, language);
-            return (
-            <Card key={video.id} className="glass-panel border-0 overflow-hidden">
-              <CardHeader className="bg-gradient-to-r from-cyan-50/80 to-white/50">
-                <CardTitle className="text-xl">{title}</CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <VideoEmbed url={video.video_url} title={title} />
-              </CardContent>
-            </Card>
-            );
-          })}
-        </div>
+        <VideoTutorialGrid
+          videos={videos}
+          language={language}
+          getTitle={getVideoTitle}
+        />
       )}
     </PageShell>
   );

@@ -33,3 +33,25 @@ export function getVideoEmbedInfo(url) {
 
   return { type: 'link', embedUrl: trimmed };
 }
+
+export function getVideoThumbnail(url) {
+  const trimmed = String(url || '').trim();
+  const youtubeMatch = trimmed.match(
+    /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/
+  );
+  if (youtubeMatch) {
+    return `https://img.youtube.com/vi/${youtubeMatch[1]}/hqdefault.jpg`;
+  }
+  return null;
+}
+
+export function getVideoEmbedUrl(url, { autoplay = false } = {}) {
+  const info = getVideoEmbedInfo(url);
+  if (!info) return null;
+  if (info.type === 'direct' || info.type === 'link') return info.embedUrl;
+  if (autoplay) {
+    const sep = info.embedUrl.includes('?') ? '&' : '?';
+    return `${info.embedUrl}${sep}autoplay=1`;
+  }
+  return info.embedUrl;
+}
