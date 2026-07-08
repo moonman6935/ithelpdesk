@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { Alert, AlertDescription } from '../components/ui/alert';
+import ExpandableScreenshot from '../components/ExpandableScreenshot';
 import {
   Download, Monitor, CheckCircle2, RotateCcw, ExternalLink,
   FileDown, MousePointerClick, ShieldCheck, Play, ArrowLeft,
@@ -33,27 +34,6 @@ const CitrixSetup = () => {
 
   const imgSrc = (file) => `${process.env.PUBLIC_URL}/citrix-setup/${file}`;
 
-  const renderVisual = (stepNum) => {
-    const screenshot = STEP_SCREENS[stepNum];
-    if (!screenshot) return null;
-
-    const isInstaller = stepNum >= 3;
-
-    return (
-      <div
-        className={`rounded-xl overflow-hidden border-2 shadow-xl ${
-          isInstaller ? 'border-gray-200 bg-[#0d4f5c]' : 'border-gray-300 bg-white'
-        }`}
-      >
-        <img
-          src={imgSrc(screenshot)}
-          alt={t(`citrixSetup.step${stepNum}.title`)}
-          className="w-full block"
-        />
-      </div>
-    );
-  };
-
   return (
     <PageShell
       theme="cyan"
@@ -68,7 +48,7 @@ const CitrixSetup = () => {
         </Link>
       </div>
 
-      <Alert className="mb-8 border-2 border-indigo-200 bg-indigo-50/90">
+      <Alert className="mb-6 border-2 border-indigo-200 bg-indigo-50/90">
         <Download className="w-5 h-5 text-indigo-600" />
         <AlertDescription className="ml-2 text-indigo-900">
           <p className="font-semibold mb-1">{t('citrixSetup.alertTitle')}</p>
@@ -76,7 +56,7 @@ const CitrixSetup = () => {
         </AlertDescription>
       </Alert>
 
-      <div className="mb-8 text-center">
+      <div className="mb-6 text-center">
         <a href={CITRIX_DOWNLOAD_URL} target="_blank" rel="noopener noreferrer">
           <Button size="lg" variant="brand" className="bg-indigo-600 hover:bg-indigo-700 px-8">
             <ExternalLink className="w-5 h-5 mr-2" />
@@ -85,48 +65,60 @@ const CitrixSetup = () => {
         </a>
       </div>
 
-      <div className="space-y-8">
-        <StaggerChildren>
-        {Array.from({ length: STEP_COUNT }, (_, i) => i + 1).map((stepNum) => {
-          const Icon = icons[stepNum - 1];
-          return (
-            <Card key={stepNum} className="glass-panel border-0 overflow-hidden shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-indigo-50/90 to-cyan-50/50 pb-4">
-                <div className="flex items-start gap-4">
-                  <Badge className="bg-indigo-600 text-white text-lg px-3 py-1 shrink-0">
-                    {stepNum}
-                  </Badge>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Icon className="w-5 h-5 text-indigo-600 shrink-0" />
-                      <CardTitle className="text-xl">{t(`citrixSetup.step${stepNum}.title`)}</CardTitle>
-                    </div>
-                    <p className="text-gray-600 text-sm leading-relaxed">
-                      {t(`citrixSetup.step${stepNum}.desc`)}
-                    </p>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-6">
-                {renderVisual(stepNum)}
+      <StaggerChildren>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 xl:gap-6">
+          {Array.from({ length: STEP_COUNT }, (_, i) => i + 1).map((stepNum) => {
+            const Icon = icons[stepNum - 1];
+            const screenshot = STEP_SCREENS[stepNum];
+            const stepTitle = t(`citrixSetup.step${stepNum}.title`);
+            const tip = t(`citrixSetup.step${stepNum}.tip`);
+            const hasTip = tip && tip !== `citrixSetup.step${stepNum}.tip`;
+            const isInstaller = stepNum >= 3;
 
-                {(() => {
-                  const tip = t(`citrixSetup.step${stepNum}.tip`);
-                  if (!tip || tip === `citrixSetup.step${stepNum}.tip`) return null;
-                  return (
-                    <p className="mt-4 text-sm text-indigo-700 bg-indigo-50 rounded-lg p-3 border border-indigo-100">
+            return (
+              <Card
+                key={stepNum}
+                className="glass-panel border-0 overflow-hidden shadow-lg h-full flex flex-col"
+              >
+                <CardHeader className="bg-gradient-to-r from-indigo-50/90 to-cyan-50/50 pb-3 pt-4 px-4">
+                  <div className="flex items-start gap-3">
+                    <Badge className="bg-indigo-600 text-white text-base px-2.5 py-0.5 shrink-0">
+                      {stepNum}
+                    </Badge>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Icon className="w-4 h-4 text-indigo-600 shrink-0" />
+                        <CardTitle className="text-base sm:text-lg leading-snug">{stepTitle}</CardTitle>
+                      </div>
+                      <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
+                        {t(`citrixSetup.step${stepNum}.desc`)}
+                      </p>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-4 px-4 pb-4 flex-1 flex flex-col gap-3">
+                  {screenshot && (
+                    <ExpandableScreenshot
+                      src={imgSrc(screenshot)}
+                      alt={stepTitle}
+                      title={stepTitle}
+                      darkFrame={isInstaller}
+                    />
+                  )}
+
+                  {hasTip && (
+                    <p className="text-xs text-indigo-700 bg-indigo-50 rounded-lg p-2.5 border border-indigo-100 mt-auto">
                       <strong>{t('citrixSetup.tipLabel')}:</strong> {tip}
                     </p>
-                  );
-                })()}
-              </CardContent>
-            </Card>
-          );
-        })}
-        </StaggerChildren>
-      </div>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </StaggerChildren>
 
-      <Card className="mt-10 border-2 border-green-200 bg-green-50/50">
+      <Card className="mt-8 border-2 border-green-200 bg-green-50/50">
         <CardContent className="p-6 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <CheckCircle2 className="w-6 h-6 text-green-600" />

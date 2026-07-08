@@ -729,3 +729,18 @@
 .video-expand-shell__player {
   background: #000;
 }
+
+.image-expand-shell[data-phase="expand"],
+.image-expand-shell[data-phase="close"] {
+  width: min(96vw, 1140px) !important;
+  max-height: 92vh;
+}
+
+.image-expand-shell__body {
+  overflow: auto;
+  max-height: calc(92vh - 3.25rem);
+}
+
+.image-expand-shell__header {
+  background: linear-gradient(90deg, #4338ca, #0891b2);
+}
