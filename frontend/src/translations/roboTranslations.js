@@ -25,6 +25,8 @@ export const roboTranslations = {
     escalateMessage: 'Rocket.Chat üzerinden IT_Helpdesk kanalına yazın. Mesajınızda adınız, AnyDesk ID ve sorunu detaylı açıklayın.',
     escalateTip: 'Destek talebi örneği: "Merhaba, [Ad Soyad] — AnyDesk: [ID] — Citrix ses sorunu devam ediyor, kontrol listesini uyguladım."',
     openRocketChat: 'Rocket.Chat\'i aç',
+    searching: 'Çözüm aranıyor, bir dakika…',
+    searchingTitle: 'Robo arıyor',
     typing: 'Robo yazıyor…',
     topics: {
       citrix: 'Citrix',
@@ -180,6 +182,8 @@ export const roboTranslations = {
     escalateMessage: 'Schreiben Sie im Rocket.Chat-Kanal IT_Helpdesk. Nennen Sie Ihren Namen, AnyDesk-ID und eine detaillierte Problembeschreibung.',
     escalateTip: 'Beispiel: "Hallo, [Name] — AnyDesk: [ID] — Citrix-Soundproblem besteht weiterhin, Checkliste erledigt."',
     openRocketChat: 'Rocket.Chat öffnen',
+    searching: 'Lösung wird gesucht, einen Moment…',
+    searchingTitle: 'Robo sucht',
     typing: 'Robo schreibt…',
     topics: {
       citrix: 'Citrix',
@@ -335,6 +339,8 @@ export const roboTranslations = {
     escalateMessage: 'Message the IT_Helpdesk channel on Rocket.Chat. Include your name, AnyDesk ID, and a detailed description.',
     escalateTip: 'Example: "Hi, [Name] — AnyDesk: [ID] — Citrix audio issue persists, checklist completed."',
     openRocketChat: 'Open Rocket.Chat',
+    searching: 'Searching for a solution, one moment…',
+    searchingTitle: 'Robo is searching',
     typing: 'Robo is typing…',
     topics: {
       citrix: 'Citrix',

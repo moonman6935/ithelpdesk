@@ -28,7 +28,9 @@ import {
   Layers,
   RotateCcw,
 } from 'lucide-react';
-import RoboDog from './RoboDog';
+import RoboDog, { RoboDogArena } from './RoboDog';
+
+const SEARCH_DURATION_MS = 4200;
 
 const ICON_MAP = {
   monitor: Monitor,
@@ -78,31 +80,58 @@ function RoboOverlay({ onClose }) {
   const [checked, setChecked] = useState({});
   const [showTyping, setShowTyping] = useState(false);
   const [phase, setPhase] = useState('flow');
+  const [dogMode, setDogMode] = useState('roam');
+  const [isSearching, setIsSearching] = useState(false);
 
   const node = getFlowNode(nodeId);
+
+  const syncDogModeForNode = useCallback((id, flowPhase) => {
+    if (flowPhase === 'resolved' || flowPhase === 'escalate') {
+      setDogMode('roam');
+      return;
+    }
+    const n = getFlowNode(id);
+    if (n.type === 'choices') setDogMode('still');
+    else if (n.type === 'checklist') setDogMode('roam');
+    else setDogMode('still');
+  }, []);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    setDogMode('roam');
+    const settle = window.setTimeout(() => {
+      syncDogModeForNode('root', 'flow');
+    }, 2200);
     return () => {
       document.body.style.overflow = prev;
+      window.clearTimeout(settle);
     };
-  }, []);
+  }, [syncDogModeForNode]);
 
   const goTo = (nextId, dir = 'forward') => {
-    setShowTyping(true);
+    setSlideDir(dir);
+    setNodeId(nextId);
+    setChecked({});
+    setPhase('flow');
+    setShowTyping(false);
+    setIsSearching(false);
+    syncDogModeForNode(nextId, 'flow');
+  };
+
+  const goToAfterSearch = (nextId, dir = 'forward') => {
+    setIsSearching(true);
+    setDogMode('search');
     setSlideDir(dir);
     window.setTimeout(() => {
-      setNodeId(nextId);
-      setChecked({});
-      setPhase('flow');
-      setShowTyping(false);
-    }, 380);
+      goTo(nextId, dir);
+    }, SEARCH_DURATION_MS);
   };
 
   const handleBack = () => {
     if (phase !== 'flow') {
       setPhase('flow');
+      syncDogModeForNode(nodeId, 'flow');
       return;
     }
     const parent = node.parent;
@@ -115,7 +144,7 @@ function RoboOverlay({ onClose }) {
       navigate(option.link);
       return;
     }
-    if (option.next) goTo(option.next, 'forward');
+    if (option.next) goToAfterSearch(option.next, 'forward');
   };
 
   const toggleCheck = (itemKey) => {
@@ -231,7 +260,10 @@ function RoboOverlay({ onClose }) {
           <button
             type="button"
             className="robo-btn robo-btn--primary w-full"
-            onClick={() => setPhase('resolved')}
+            onClick={() => {
+              setPhase('resolved');
+              setDogMode('roam');
+            }}
           >
             <PartyPopper className="w-5 h-5" />
             {t('robo.resolvedYes')}
@@ -239,7 +271,10 @@ function RoboOverlay({ onClose }) {
           <button
             type="button"
             className="robo-btn robo-btn--rocket w-full"
-            onClick={() => setPhase('escalate')}
+            onClick={() => {
+              setPhase('escalate');
+              setDogMode('roam');
+            }}
           >
             <MessageCircle className="w-5 h-5" />
             {t('robo.resolvedNo')}
@@ -299,7 +334,21 @@ function RoboOverlay({ onClose }) {
   );
 
   let content = null;
-  if (showTyping) {
+  if (isSearching) {
+    content = (
+      <div className="robo-panel">
+        <div className="robo-bubble robo-bubble--search">
+          <p className="robo-bubble__title">{t('robo.searchingTitle')}</p>
+          <p className="robo-bubble__text">{t('robo.searching')}</p>
+          <div className="robo-typing">
+            <span />
+            <span />
+            <span />
+          </div>
+        </div>
+      </div>
+    );
+  } else if (showTyping) {
     content = (
       <div className="robo-panel">
         <div className="robo-bubble">
@@ -343,7 +392,7 @@ function RoboOverlay({ onClose }) {
             </button>
           )}
           <div className="robo-overlay__avatar robo-overlay__avatar--dog">
-            <RoboDog size="sm" animated />
+            <RoboDog mode="still" size="sm" />
           </div>
           <div>
             <p className="robo-overlay__name">Robo</p>
@@ -363,7 +412,10 @@ function RoboOverlay({ onClose }) {
         </button>
       </header>
 
-      <div className="robo-overlay__body">{content}</div>
+      <div className="robo-overlay__layout">
+        <div className="robo-overlay__body">{content}</div>
+        <RoboDogArena mode={dogMode} hint={dogMode === 'search' ? t('robo.searching') : ''} />
+      </div>
     </div>
   );
 }
@@ -420,7 +472,7 @@ const RoboAssistant = () => {
           aria-label={t('robo.fabLabel')}
         >
           <span className="robo-fab__ring" aria-hidden="true" />
-          <RoboDog size="sm" animated className="robo-fab__dog" />
+          <RoboDog mode="roam" size="fab" className="robo-fab__dog" />
         </button>
         <span className="robo-fab__label">Robo</span>
       </div>
