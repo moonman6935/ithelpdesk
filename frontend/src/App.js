@@ -10,6 +10,8 @@ import AnimatedRoutes from "./components/AnimatedRoutes";
 import SiteBackground from "./components/SiteBackground";
 import AnnouncementPopup from "./components/AnnouncementPopup";
 import SplashScreen from "./components/SplashScreen";
+import RoboAssistant from "./components/RoboAssistant";
+import "./styles/robo-assistant.css";
 
 function App() {
   return (
@@ -25,6 +27,7 @@ function App() {
               <AnimatedRoutes />
             </main>
             <Footer />
+            <RoboAssistant />
           </div>
         </AppOpenTransitionProvider>
       </BrowserRouter>
