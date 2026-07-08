@@ -1,6 +1,7 @@
 export const roboTranslations = {
   tr: {
     fabLabel: 'Robo Asistan',
+    fabBubble: 'Merhaba, ben Robo! Her türlü sorununuz için buradayım.',
     greeting: 'Merhaba, ben Robo!',
     greetingSub: 'Size nasıl yardımcı olabilirim?',
     back: 'Geri',
@@ -155,6 +156,7 @@ export const roboTranslations = {
 
   de: {
     fabLabel: 'Robo Assistent',
+    fabBubble: 'Hallo, ich bin Robo! Für alle Ihre Probleme bin ich hier.',
     greeting: 'Hallo, ich bin Robo!',
     greetingSub: 'Wie kann ich Ihnen helfen?',
     back: 'Zurück',
@@ -309,6 +311,7 @@ export const roboTranslations = {
 
   en: {
     fabLabel: 'Robo Assistant',
+    fabBubble: 'Hello, I\'m Robo! I\'m here for any issue you may have.',
     greeting: 'Hello, I\'m Robo!',
     greetingSub: 'How can I help you?',
     back: 'Back',

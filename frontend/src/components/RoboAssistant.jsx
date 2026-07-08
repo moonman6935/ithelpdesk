@@ -371,14 +371,52 @@ function RoboOverlay({ onClose }) {
 const RoboAssistant = () => {
   const t = useRoboT();
   const [open, setOpen] = useState(false);
+  const [showBubble, setShowBubble] = useState(false);
+
+  useEffect(() => {
+    if (sessionStorage.getItem('robo-bubble-dismissed') === '1') return undefined;
+
+    const showTimer = window.setTimeout(() => setShowBubble(true), 1800);
+    const hideTimer = window.setTimeout(() => setShowBubble(false), 14000);
+
+    return () => {
+      window.clearTimeout(showTimer);
+      window.clearTimeout(hideTimer);
+    };
+  }, []);
+
+  const dismissBubble = () => {
+    setShowBubble(false);
+    sessionStorage.setItem('robo-bubble-dismissed', '1');
+  };
+
+  const handleOpen = () => {
+    dismissBubble();
+    setOpen(true);
+  };
 
   return (
     <>
       <div className="robo-fab">
+        {showBubble && !open && (
+          <div className="robo-fab__bubble" role="status">
+            <button
+              type="button"
+              className="robo-fab__bubble-close"
+              onClick={dismissBubble}
+              aria-label={t('robo.close')}
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+            <p className="robo-fab__bubble-text">{t('robo.fabBubble')}</p>
+            <span className="robo-fab__bubble-tail" aria-hidden="true" />
+          </div>
+        )}
+
         <button
           type="button"
           className="robo-fab__btn"
-          onClick={() => setOpen(true)}
+          onClick={handleOpen}
           aria-label={t('robo.fabLabel')}
         >
           <span className="robo-fab__ring" aria-hidden="true" />

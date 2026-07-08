@@ -55,6 +55,75 @@
   letter-spacing: 0.02em;
 }
 
+.robo-fab__bubble {
+  position: absolute;
+  bottom: calc(100% + 0.65rem);
+  right: 0;
+  width: min(17rem, calc(100vw - 2.5rem));
+  padding: 0.85rem 2rem 0.85rem 1rem;
+  border-radius: 1rem 1rem 0.25rem 1rem;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  box-shadow:
+    0 12px 40px rgba(99, 102, 241, 0.22),
+    0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+  animation: robo-bubble-in 0.55s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  z-index: 2;
+}
+
+.robo-fab__bubble-text {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  font-weight: 600;
+  color: #312e81;
+}
+
+.robo-fab__bubble-close {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  width: 1.35rem;
+  height: 1.35rem;
+  border: none;
+  border-radius: 9999px;
+  background: rgba(99, 102, 241, 0.12);
+  color: #6366f1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.robo-fab__bubble-close:hover {
+  background: rgba(99, 102, 241, 0.22);
+}
+
+.robo-fab__bubble-tail {
+  position: absolute;
+  bottom: -0.45rem;
+  right: 1.35rem;
+  width: 0.85rem;
+  height: 0.85rem;
+  background: #f0f9ff;
+  border-right: 1px solid rgba(99, 102, 241, 0.2);
+  border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+  transform: rotate(45deg);
+  border-bottom-right-radius: 3px;
+}
+
+@keyframes robo-bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @keyframes robo-fab-pulse {
   0%, 100% { box-shadow: 0 8px 32px rgba(99, 102, 241, 0.45), 0 0 0 0 rgba(99, 102, 241, 0.35); }
   50% { box-shadow: 0 8px 32px rgba(99, 102, 241, 0.55), 0 0 0 12px rgba(99, 102, 241, 0); }
