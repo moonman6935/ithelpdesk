@@ -267,7 +267,7 @@ const Home = () => {
       <HomeHeroCarousel />
 
       <section className="pt-2 md:pt-4 pb-12 md:pb-16">
-        <div className="container mx-auto px-4 lg:px-6 max-w-7xl">
+        <div className="site-container">
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-white to-red-50/60 sm:from-white/90 sm:via-white/80 sm:to-red-50/60 sm:backdrop-blur-md border border-white/70 shadow-lg p-6 md:p-10 mb-10">
             <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-violet-200/20 blur-3xl pointer-events-none decorative-blur" />
             <div className="absolute -bottom-8 -left-8 w-40 h-40 rounded-full bg-blue-200/20 blur-2xl pointer-events-none decorative-blur" />
@@ -324,8 +324,8 @@ const Home = () => {
         </div>
       </section>
 
-      <section className="py-12 md:py-16 px-4 lg:px-6">
-        <div className="container mx-auto max-w-7xl">
+      <section className="py-12 md:py-16">
+        <div className="site-container">
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-red-500 via-red-600 to-orange-600 text-white shadow-2xl border border-white/20">
             <div className="absolute inset-0 pointer-events-none decorative-blur">
               <div className="absolute -top-16 -left-16 w-72 h-72 rounded-full bg-yellow-300/20 blur-3xl" />

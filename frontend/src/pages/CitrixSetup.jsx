@@ -60,7 +60,6 @@ const CitrixSetup = () => {
       icon={Monitor}
       title={t('citrixSetup.title')}
       subtitle={t('citrixSetup.subtitle')}
-      maxWidth="max-w-4xl"
     >
       <div className="mb-6">
         <Link to="/faq" className="inline-flex items-center text-sm text-indigo-600 hover:underline font-medium">

@@ -142,7 +142,7 @@ const AssetConfirmation = () => {
 
     if (success) {
         return (
-            <div className="container mx-auto px-4 py-20 text-center">
+            <div className="site-container py-20 text-center">
                 <CheckCircle className="w-20 h-20 text-green-600 mx-auto mb-6" />
                 <h1 className="text-3xl font-bold mb-4">{t('assetConfirmation.success')}</h1>
                 <Button onClick={() => window.location.href = '/'} className="bg-red-600">Ana Sayfa</Button>

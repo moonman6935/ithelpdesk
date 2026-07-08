@@ -257,7 +257,7 @@ const PCSetup = () => {
           {/* PC Kasa Arka Panel Bağlantı Şeması */}
           <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-lg border-2 border-red-500">
             <h3 className="text-2xl font-bold text-center text-gray-900 mb-6">PC Kasası Arka Panel Bağlantıları</h3>
-            <div className="max-w-4xl mx-auto">
+            <div className="w-full mx-auto">
               <img 
                 src="https://customer-assets.emergentagent.com/job_techsupport-31/artifacts/xe9ammxl_image.png" 
                 alt="PC Kasa Arka Panel Bağlantıları - Detaylı Şema" 
@@ -331,7 +331,7 @@ const PCSetup = () => {
   const StepIcon = steps[currentStep].icon;
 
   return (
-    <PageShell theme="blue" icon={Monitor} title={t('pcSetup.title')} subtitle={t('pcSetup.subtitle')} maxWidth="max-w-5xl">
+    <PageShell theme="blue" icon={Monitor} title={t('pcSetup.title')} subtitle={t('pcSetup.subtitle')}>
       {showCompletion && <CompletionScreen />}
           <Tabs defaultValue="interactive" className="w-full">
             <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8 glass-panel p-1">

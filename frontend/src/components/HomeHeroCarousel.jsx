@@ -172,7 +172,7 @@ const HomeHeroCarousel = () => {
 
   return (
     <section className="relative pt-10 md:pt-12 pb-2 md:pb-3 overflow-hidden">
-      <div className="container mx-auto px-4 lg:px-6 max-w-7xl">
+      <div className="site-container">
         <div className="w-full relative">
           <div className="overflow-hidden rounded-3xl shadow-2xl border border-white/50 relative">
             {/* Side energy beams */}

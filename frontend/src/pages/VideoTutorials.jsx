@@ -32,7 +32,6 @@ const VideoTutorials = () => {
       icon={Video}
       title={t('videoTutorials.title')}
       subtitle={t('videoTutorials.subtitle')}
-      maxWidth="max-w-5xl"
     >
       {loading ? (
         <div className="flex justify-center py-16">

@@ -314,7 +314,7 @@ const AdminDashboard = () => {
 
     return (
         <div className="min-h-screen py-12">
-            <div className="container mx-auto px-4">
+            <div className="site-container">
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-4xl font-bold flex items-center gap-3">
                         <User className="w-10 h-10 text-red-600" />

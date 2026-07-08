@@ -83,6 +83,11 @@ code {
 }
 
 @layer components {
+    .site-container {
+        @apply w-full mx-auto px-3 sm:px-4 md:px-5 lg:px-6 xl:px-8;
+        max-width: 100%;
+    }
+
     .glass-panel {
         @apply bg-white/85 backdrop-blur-md border border-white/70 shadow-lg rounded-3xl;
     }

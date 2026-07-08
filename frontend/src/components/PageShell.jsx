@@ -44,7 +44,7 @@ const PageShell = ({
   title,
   subtitle,
   children,
-  maxWidth = 'max-w-4xl',
+  maxWidth = '',
   centered = false,
   hideHero = false,
 }) => {
@@ -52,7 +52,7 @@ const PageShell = ({
 
   if (centered) {
     return (
-      <div className="py-12 px-4 flex items-center justify-center min-h-[calc(100vh-12rem)]">
+      <div className="site-container py-12 flex items-center justify-center min-h-[calc(100vh-12rem)]">
         <div className={`w-full ${maxWidth}`}>{children}</div>
       </div>
     );
@@ -60,7 +60,7 @@ const PageShell = ({
 
   return (
     <div className="py-10 md:py-14">
-      <div className={`container mx-auto px-4 ${maxWidth}`}>
+      <div className={`site-container ${maxWidth}`.trim()}>
         {!hideHero && Icon && title && (
           <div
             className={`relative overflow-hidden rounded-3xl bg-gradient-to-br ${colors.gradient} text-white shadow-xl border border-white/20 mb-10 p-8 md:p-12 ft-page-enter`}
