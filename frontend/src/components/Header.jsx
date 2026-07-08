@@ -33,7 +33,7 @@ const Header = () => {
       : `text-white rounded-xl ${hover}`;
 
   return (
-    <header className="z-50 site-container pt-3 pb-1 lg:sticky lg:top-0">
+    <header className="z-50 site-container pt-3 pb-1">
       <div className="w-full">
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-red-500 via-red-600 to-orange-500 shadow-xl border border-white/25">
           <div className="absolute inset-0 pointer-events-none overflow-hidden decorative-blur">
