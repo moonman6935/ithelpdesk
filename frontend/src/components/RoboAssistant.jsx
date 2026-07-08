@@ -467,11 +467,10 @@ const RoboAssistant = () => {
 
         <button
           type="button"
-          className="robo-fab__btn robo-fab__btn--dog"
+          className="robo-fab__btn"
           onClick={handleOpen}
           aria-label={t('robo.fabLabel')}
         >
-          <span className="robo-fab__ring" aria-hidden="true" />
           <RoboDog mode="still" size="fab" className="robo-fab__dog" />
         </button>
         <span className="robo-fab__label">Robo</span>

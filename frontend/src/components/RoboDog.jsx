@@ -11,7 +11,7 @@ const RoboDog = ({
   showGlass = false,
 }) => {
   const px =
-    size === 'fab' ? 44 : size === 'sm' ? 40 : size === 'stage' ? 168 : size === 'lg' ? 72 : 56;
+    size === 'fab' ? 56 : size === 'sm' ? 40 : size === 'stage' ? 168 : size === 'lg' ? 72 : 56;
 
   const glassOn = showGlass || mode === 'search';
 
