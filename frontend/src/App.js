@@ -9,12 +9,14 @@ import Footer from "./components/Footer";
 import AnimatedRoutes from "./components/AnimatedRoutes";
 import SiteBackground from "./components/SiteBackground";
 import AnnouncementPopup from "./components/AnnouncementPopup";
+import SplashScreen from "./components/SplashScreen";
 
 function App() {
   return (
     <LanguageProvider>
       <BrowserRouter>
         <AppOpenTransitionProvider>
+          <SplashScreen />
           <div className="App min-h-screen flex flex-col relative">
             <SiteBackground />
             <AnnouncementPopup />

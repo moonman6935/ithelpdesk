@@ -335,6 +335,13 @@ export const translations = {
       support: 'IT Destek',
       contact: 'İletişim'
     },
+    splash: {
+      title: 'DCS IT Destek sayfasına hoş geldiniz',
+      description: 'Bu sitede sorunlarınız için size her türlü rehber içerik hazırlanmış olup zimmet onaylama veya kargo takiplerinizi buradan yapabilirsiniz.',
+      team: 'DCS IT Türkiye Ekibi',
+      creator: 'Oluşturan Bayram Can Aslan',
+      loading: 'Yükleniyor…',
+    },
     assetConfirmation: {
       title: 'Zimmet Onaylama',
       subtitle: 'Ad soyad ve personel numaranız ile zimmet onayı verin.',
@@ -947,6 +954,13 @@ export const translations = {
       support: 'IT-Support',
       contact: 'Kontakt'
     },
+    splash: {
+      title: 'Willkommen auf der DCS IT Support-Seite',
+      description: 'Auf dieser Seite finden Sie Anleitungen zu allen gängigen Problemen. Inventarbestätigung und Sendungsverfolgung können Sie hier durchführen.',
+      team: 'DCS IT Türkei Team',
+      creator: 'Erstellt von Bayram Can Aslan',
+      loading: 'Wird geladen…',
+    },
     assetConfirmation: {
       title: 'Inventarbestätigung',
       subtitle: 'Bestätigen Sie Ihr Inventar mit Vor- und Nachname sowie Personalnummer.',
@@ -1547,6 +1561,13 @@ export const translations = {
       rights: '© 2025 DCS Communication Center. All rights reserved.',
       support: 'IT Support',
       contact: 'Contact'
+    },
+    splash: {
+      title: 'Welcome to the DCS IT Support Portal',
+      description: 'This site provides step-by-step guides for common issues. You can complete asset confirmation and track shipments here.',
+      team: 'DCS IT Turkey Team',
+      creator: 'Created by Bayram Can Aslan',
+      loading: 'Loading…',
     },
     assetConfirmation: {
       title: 'Asset Confirmation',
