@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Play } from 'lucide-react';
 import VideoEmbed from './VideoEmbed';
 import { getVideoThumbnail } from '../lib/videoEmbed';
@@ -8,6 +9,9 @@ function VideoExpandPlayer({ video, title, sourceRect, onClose }) {
   const [showPlayer, setShowPlayer] = useState(false);
 
   useEffect(() => {
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
     const raf = requestAnimationFrame(() => {
       requestAnimationFrame(() => setPhase('expand'));
     });
@@ -15,6 +19,7 @@ function VideoExpandPlayer({ video, title, sourceRect, onClose }) {
     return () => {
       cancelAnimationFrame(raf);
       clearTimeout(playerTimer);
+      document.body.style.overflow = prevOverflow;
     };
   }, []);
 
@@ -136,14 +141,16 @@ export function VideoTutorialGrid({ videos, language, getTitle }) {
         })}
       </div>
 
-      {active && (
-        <VideoExpandPlayer
-          video={active.video}
-          title={active.title}
-          sourceRect={active.rect}
-          onClose={() => setActive(null)}
-        />
-      )}
+      {active &&
+        createPortal(
+          <VideoExpandPlayer
+            video={active.video}
+            title={active.title}
+            sourceRect={active.rect}
+            onClose={() => setActive(null)}
+          />,
+          document.body
+        )}
     </>
   );
 }

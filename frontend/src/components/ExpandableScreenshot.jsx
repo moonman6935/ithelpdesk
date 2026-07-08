@@ -1,14 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, ZoomIn } from 'lucide-react';
 
 function ImageExpandOverlay({ src, alt, title, sourceRect, onClose, darkFrame }) {
   const [phase, setPhase] = useState('start');
 
   useEffect(() => {
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
     const raf = requestAnimationFrame(() => {
       requestAnimationFrame(() => setPhase('expand'));
     });
-    return () => cancelAnimationFrame(raf);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      document.body.style.overflow = prevOverflow;
+    };
   }, []);
 
   const handleClose = () => {
@@ -54,9 +62,7 @@ function ImageExpandOverlay({ src, alt, title, sourceRect, onClose, darkFrame })
             <X className="w-5 h-5" />
           </button>
         </div>
-        <div
-          className={`image-expand-shell__body ${darkFrame ? 'bg-[#0d4f5c]' : 'bg-white'}`}
-        >
+        <div className={`image-expand-shell__body ${darkFrame ? 'bg-[#0d4f5c]' : 'bg-white'}`}>
           <img src={src} alt={alt} className="w-full block" />
         </div>
       </div>
@@ -93,11 +99,11 @@ const ExpandableScreenshot = ({
           <img
             src={src}
             alt={alt}
-            className="w-full h-44 sm:h-48 object-cover object-top block transition-transform duration-500 group-hover:scale-[1.02]"
+            className="w-full h-44 sm:h-48 object-cover object-top block"
             loading="lazy"
           />
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
             <span className="w-12 h-12 rounded-full bg-white/90 text-indigo-700 flex items-center justify-center shadow-lg">
               <ZoomIn className="w-6 h-6" />
             </span>
@@ -108,16 +114,18 @@ const ExpandableScreenshot = ({
         </p>
       </button>
 
-      {active && (
-        <ImageExpandOverlay
-          src={src}
-          alt={alt}
-          title={title}
-          sourceRect={active.rect}
-          onClose={() => setActive(null)}
-          darkFrame={darkFrame}
-        />
-      )}
+      {active &&
+        createPortal(
+          <ImageExpandOverlay
+            src={src}
+            alt={alt}
+            title={title}
+            sourceRect={active.rect}
+            onClose={() => setActive(null)}
+            darkFrame={darkFrame}
+          />,
+          document.body
+        )}
     </>
   );
 };
