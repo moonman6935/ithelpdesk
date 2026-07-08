@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { translations } from '../translations/translations';
-import { Button } from './ui/button';
-import { Link } from 'react-router-dom';
+import { AppOpenLinkButton } from './AppOpenLinkButton';
 import { ArrowRight, ChevronLeft, ChevronRight, Sparkles, Monitor, RefreshCw, MessageSquare, Package, ShieldCheck, Laptop, Cable, Truck, ClipboardCheck, Download } from 'lucide-react';
 import { useIsMobile } from '../hooks/useMediaQuery';
 
@@ -74,12 +73,17 @@ function CarouselSlide({ slide, index, slidesLength, isActive, t, direction, sli
               className="flex flex-wrap gap-3 pt-2 sm:pt-4"
               style={{ animation: 'ft-stagger-up 0.6s 0.3s cubic-bezier(0.16,1,0.3,1) both' }}
             >
-              <Link to={slide.ctaLink}>
-                <Button size="lg" variant="brand" className="shadow-lg ft-neon-ring">
-                  {slide.ctaLabel}
-                  <ArrowRight className="ml-2 w-4 h-4" />
-                </Button>
-              </Link>
+              <AppOpenLinkButton
+                to={slide.ctaLink}
+                gradientClasses={`bg-gradient-to-br ${gradient}`}
+                blob={blob}
+                Icon={Icon}
+                title={slide.title}
+                buttonClassName="ft-neon-ring"
+              >
+                {slide.ctaLabel}
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </AppOpenLinkButton>
             </div>
           )}
           {index === 0 && isActive && !slide.ctaLink && (
@@ -87,17 +91,28 @@ function CarouselSlide({ slide, index, slidesLength, isActive, t, direction, sli
               className="flex flex-wrap gap-3 pt-2 sm:pt-4"
               style={{ animation: 'ft-stagger-up 0.6s 0.3s cubic-bezier(0.16,1,0.3,1) both' }}
             >
-              <Link to="/pc-setup">
-                <Button size="lg" variant="brand" className="shadow-lg ft-neon-ring">
-                  {t('home.getStarted')}
-                  <ArrowRight className="ml-2 w-4 h-4" />
-                </Button>
-              </Link>
-              <Link to="/faq">
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
-                  {t('header.faq')}
-                </Button>
-              </Link>
+              <AppOpenLinkButton
+                to="/pc-setup"
+                gradientClasses="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800"
+                blob="bg-sky-300/25"
+                Icon={Monitor}
+                title={t('home.getStarted')}
+                buttonClassName="ft-neon-ring"
+              >
+                {t('home.getStarted')}
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </AppOpenLinkButton>
+              <AppOpenLinkButton
+                to="/faq"
+                gradientClasses="bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-700"
+                blob="bg-pink-300/25"
+                Icon={Sparkles}
+                title={t('header.faq')}
+                variant="outline"
+                buttonClassName="border-white text-white hover:bg-white/10"
+              >
+                {t('header.faq')}
+              </AppOpenLinkButton>
             </div>
           )}
         </div>

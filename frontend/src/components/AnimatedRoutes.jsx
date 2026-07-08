@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import FuturisticTransitionOverlay from './FuturisticTransitionOverlay';
+import { useAppOpenTransition } from '../contexts/AppOpenTransitionContext';
 import Home from '../pages/Home';
 import PCSetup from '../pages/PCSetup';
 import HeadsetTest from '../pages/HeadsetTest';
@@ -15,6 +16,7 @@ import LoginPage from '../pages/LoginPage';
 
 const AnimatedRoutes = () => {
   const location = useLocation();
+  const { consumeSkipRouteTransition } = useAppOpenTransition();
   const [overlay, setOverlay] = useState(false);
   const [entering, setEntering] = useState(true);
   const isFirst = useRef(true);
@@ -29,8 +31,9 @@ const AnimatedRoutes = () => {
       return () => clearTimeout(t);
     }
 
-    if (reducedMotion.current) {
+    if (consumeSkipRouteTransition() || reducedMotion.current) {
       setEntering(false);
+      setOverlay(false);
       return;
     }
 
@@ -44,7 +47,7 @@ const AnimatedRoutes = () => {
       clearTimeout(hideOverlay);
       clearTimeout(endEnter);
     };
-  }, [location.pathname]);
+  }, [location.pathname, consumeSkipRouteTransition]);
 
   const pageClass = entering && !reducedMotion.current ? 'ft-page-enter' : '';
 

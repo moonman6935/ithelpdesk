@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAppOpenTransition } from '../contexts/AppOpenTransitionContext';
 import { Button } from '../components/ui/button';
 import {
   Monitor,
@@ -46,7 +47,7 @@ const FEATURE_CARDS = [
     Icon: AlertCircle,
     gradient: 'from-orange-500 via-amber-500 to-red-600',
     blob: 'bg-yellow-300/25',
-    accent: 'bg-orange-400/20',
+    accent: 'bg-amber-400/20',
     titleKey: 'home.features.support',
     descKey: 'home.features.supportDesc',
     ctaKey: 'header.troubleshooting',
@@ -60,6 +61,7 @@ const EXTRA_CARDS = [
     Icon: HelpCircle,
     gradient: 'from-violet-600 via-purple-600 to-fuchsia-700',
     blob: 'bg-pink-300/25',
+    accent: 'bg-fuchsia-400/20',
     titleKey: 'header.faq',
     descKey: 'home.features.faqDesc',
   },
@@ -69,6 +71,7 @@ const EXTRA_CARDS = [
     Icon: ClipboardCheck,
     gradient: 'from-rose-500 via-pink-600 to-red-700',
     blob: 'bg-rose-300/25',
+    accent: 'bg-pink-400/20',
     titleKey: 'home.features.assets',
     descKey: 'home.features.assetsDesc',
     ctaKey: 'home.fillAssetForm',
@@ -79,6 +82,7 @@ const EXTRA_CARDS = [
     Icon: Truck,
     gradient: 'from-amber-500 via-orange-600 to-red-600',
     blob: 'bg-amber-300/25',
+    accent: 'bg-orange-400/20',
     titleKey: 'home.features.cargo',
     descKey: 'home.features.cargoDesc',
     ctaKey: 'home.trackCargo',
@@ -86,10 +90,27 @@ const EXTRA_CARDS = [
 ];
 
 function ColorCard({ gradient, blob, accent, Icon, title, description, cta, to, compact }) {
+  const { openFromElement } = useAppOpenTransition();
+
+  const handleClick = (e) => {
+    const card = e.currentTarget.querySelector('[data-app-card]');
+    if (!card) return;
+    e.preventDefault();
+    openFromElement(card, {
+      to,
+      gradientClasses: `bg-gradient-to-br ${gradient}`,
+      blob,
+      accent,
+      Icon,
+      title,
+    });
+  };
+
   return (
-    <Link to={to} className="block group h-full">
+    <Link to={to} onClick={handleClick} className="block group h-full">
       <div
-        className={`relative overflow-hidden rounded-3xl bg-gradient-to-br ${gradient} text-white shadow-xl border border-white/10 h-full transition-all duration-300 sm:hover:scale-[1.02] sm:hover:shadow-2xl`}
+        data-app-card
+        className={`app-card-source relative overflow-hidden rounded-3xl bg-gradient-to-br ${gradient} text-white shadow-xl border border-white/10 h-full transition-shadow duration-300 sm:group-hover:shadow-2xl`}
       >
         <div className="absolute inset-0 pointer-events-none overflow-hidden decorative-blur">
           <div className={`absolute -top-8 -right-8 w-40 h-40 rounded-full ${blob} blur-2xl`} />
@@ -113,7 +134,7 @@ function ColorCard({ gradient, blob, accent, Icon, title, description, cta, to, 
 
           {cta && (
             <div className="mt-6 pt-4 border-t border-white/15">
-              <span className="inline-flex items-center text-sm font-semibold bg-white/15 hover:bg-white/25 px-4 py-2 rounded-full transition-colors">
+              <span className="inline-flex items-center text-sm font-semibold bg-white/15 group-hover:bg-white/25 px-4 py-2 rounded-full transition-colors">
                 {cta}
                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </span>
@@ -131,6 +152,8 @@ const QUICK_LINKS = [
     labelKey: 'home.subtitle',
     Icon: Sparkles,
     gradient: 'from-red-500 to-orange-500',
+    blob: 'bg-orange-300/30',
+    accent: 'bg-red-300/20',
     to: '/pc-setup',
   },
   {
@@ -138,6 +161,8 @@ const QUICK_LINKS = [
     labelKey: 'home.quickLinks.faq',
     Icon: HelpCircle,
     gradient: 'from-violet-500 to-purple-600',
+    blob: 'bg-purple-300/30',
+    accent: 'bg-violet-300/20',
     to: '/faq',
   },
   {
@@ -159,6 +184,8 @@ const QUICK_LINKS = [
     labelKey: 'home.quickLinks.cargo',
     Icon: Truck,
     gradient: 'from-amber-500 to-orange-600',
+    blob: 'bg-amber-300/30',
+    accent: 'bg-orange-300/20',
     to: '/cargo-status',
   },
   {
@@ -166,12 +193,16 @@ const QUICK_LINKS = [
     labelKey: 'home.quickLinks.assetForm',
     Icon: ClipboardCheck,
     gradient: 'from-rose-500 to-pink-600',
+    blob: 'bg-rose-300/30',
+    accent: 'bg-pink-300/20',
     to: '/asset-confirmation',
   },
 ];
 
-function QuickLinkPill({ label, Icon, gradient, to, href }) {
-  const className = `inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r ${gradient} text-white text-sm font-semibold shadow-md hover:shadow-lg hover:scale-[1.03] transition-all duration-300`;
+function QuickLinkPill({ label, Icon, gradient, blob, accent, to, href }) {
+  const { openFromElement } = useAppOpenTransition();
+  const pillGradient = gradient;
+  const className = `app-card-source inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r ${pillGradient} text-white text-sm font-semibold shadow-md hover:shadow-lg transition-shadow duration-300`;
 
   if (href) {
     return (
@@ -182,10 +213,48 @@ function QuickLinkPill({ label, Icon, gradient, to, href }) {
     );
   }
 
+  const handleClick = (e) => {
+    e.preventDefault();
+    openFromElement(e.currentTarget, {
+      to,
+      gradientClasses: `bg-gradient-to-r ${pillGradient}`,
+      blob: blob || 'bg-white/20',
+      accent: accent || 'bg-white/10',
+      Icon,
+      title: label,
+    });
+  };
+
   return (
-    <Link to={to} className={className}>
+    <Link to={to} onClick={handleClick} className={className}>
       <Icon className="w-4 h-4 shrink-0" />
       <span>{label}</span>
+    </Link>
+  );
+}
+
+function AppOpenButton({ to, gradientClasses, blob, accent, Icon, title, children, className, variant }) {
+  const { openFromElement } = useAppOpenTransition();
+
+  const handleClick = (e) => {
+    e.preventDefault();
+    const el = e.currentTarget.querySelector('[data-app-card]');
+    if (!el) return;
+    openFromElement(el, {
+      to,
+      gradientClasses,
+      blob: blob || 'bg-white/20',
+      accent: accent || 'bg-white/10',
+      Icon,
+      title,
+    });
+  };
+
+  return (
+    <Link to={to} onClick={handleClick} className="inline-block w-full sm:w-auto">
+      <Button size="lg" variant={variant} data-app-card className={`app-card-source ${className || ''}`}>
+        {children}
+      </Button>
     </Link>
   );
 }
@@ -197,7 +266,6 @@ const Home = () => {
     <div className="min-h-screen">
       <HomeHeroCarousel />
 
-      {/* Features */}
       <section className="pt-2 md:pt-4 pb-12 md:pb-16">
         <div className="container mx-auto px-4 lg:px-6 max-w-7xl">
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-white to-red-50/60 sm:from-white/90 sm:via-white/80 sm:to-red-50/60 sm:backdrop-blur-md border border-white/70 shadow-lg p-6 md:p-10 mb-10">
@@ -211,6 +279,8 @@ const Home = () => {
                     label={t(link.labelKey)}
                     Icon={link.Icon}
                     gradient={link.gradient}
+                    blob={link.blob}
+                    accent={link.accent}
                     to={link.to}
                     href={link.href}
                   />
@@ -254,7 +324,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="py-12 md:py-16 px-4 lg:px-6">
         <div className="container mx-auto max-w-7xl">
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-red-500 via-red-600 to-orange-600 text-white shadow-2xl border border-white/20">
@@ -270,30 +339,42 @@ const Home = () => {
                 {t('home.cta.description')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link to="/pc-setup">
-                <Button size="lg" className="bg-white text-red-600 hover:bg-gray-100 text-lg px-8 py-6 shadow-lg w-full sm:w-auto">
-                    {t('home.getStarted')}
-                    <ArrowRight className="ml-2 w-5 h-5" />
-                  </Button>
-                </Link>
-                <Link to="/headset-test">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="border-2 border-white text-white hover:bg-white/10 text-lg px-8 py-6 w-full sm:w-auto"
-                  >
-                    {t('home.testHeadset')}
-                  </Button>
-                </Link>
-                <Link to="/faq">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="border-2 border-white/60 text-white hover:bg-white/10 text-lg px-8 py-6 w-full sm:w-auto"
-                  >
-                    {t('header.faq')}
-                  </Button>
-                </Link>
+                <AppOpenButton
+                  to="/pc-setup"
+                  gradientClasses="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800"
+                  blob="bg-sky-300/25"
+                  accent="bg-sky-400/20"
+                  Icon={Monitor}
+                  title={t('home.getStarted')}
+                  className="bg-white text-red-600 hover:bg-gray-100 text-lg px-8 py-6 shadow-lg w-full sm:w-auto"
+                >
+                  {t('home.getStarted')}
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </AppOpenButton>
+                <AppOpenButton
+                  to="/headset-test"
+                  gradientClasses="bg-gradient-to-br from-emerald-500 via-teal-600 to-cyan-700"
+                  blob="bg-lime-300/25"
+                  accent="bg-emerald-400/20"
+                  Icon={Headphones}
+                  title={t('home.testHeadset')}
+                  variant="outline"
+                  className="border-2 border-white text-white hover:bg-white/10 text-lg px-8 py-6 w-full sm:w-auto"
+                >
+                  {t('home.testHeadset')}
+                </AppOpenButton>
+                <AppOpenButton
+                  to="/faq"
+                  gradientClasses="bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-700"
+                  blob="bg-pink-300/25"
+                  accent="bg-fuchsia-400/20"
+                  Icon={HelpCircle}
+                  title={t('header.faq')}
+                  variant="outline"
+                  className="border-2 border-white/60 text-white hover:bg-white/10 text-lg px-8 py-6 w-full sm:w-auto"
+                >
+                  {t('header.faq')}
+                </AppOpenButton>
               </div>
             </div>
           </div>
