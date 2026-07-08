@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
-import PageShell from '../components/PageShell';
+import PageShell, { StaggerChildren } from '../components/PageShell';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
@@ -87,6 +87,7 @@ const CitrixSetup = () => {
       </div>
 
       <div className="space-y-8">
+        <StaggerChildren>
         {Array.from({ length: STEP_COUNT }, (_, i) => i + 1).map((stepNum) => {
           const Icon = icons[stepNum - 1];
           return (
@@ -123,6 +124,7 @@ const CitrixSetup = () => {
             </Card>
           );
         })}
+        </StaggerChildren>
       </div>
 
       <Card className="mt-10 border-2 border-green-200 bg-green-50/50">

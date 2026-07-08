@@ -1,0 +1,73 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
+import FuturisticTransitionOverlay from './FuturisticTransitionOverlay';
+import Home from '../pages/Home';
+import PCSetup from '../pages/PCSetup';
+import HeadsetTest from '../pages/HeadsetTest';
+import Troubleshooting from '../pages/Troubleshooting';
+import AssetConfirmation from '../pages/AssetConfirmation';
+import CargoStatus from '../pages/CargoStatus';
+import AdminDashboard from '../pages/AdminDashboard';
+import FAQ from '../pages/FAQ';
+import CitrixSetup from '../pages/CitrixSetup';
+import VideoTutorials from '../pages/VideoTutorials';
+import LoginPage from '../pages/LoginPage';
+
+const AnimatedRoutes = () => {
+  const location = useLocation();
+  const [overlay, setOverlay] = useState(false);
+  const [entering, setEntering] = useState(true);
+  const isFirst = useRef(true);
+  const reducedMotion = useRef(
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+
+  useEffect(() => {
+    if (isFirst.current) {
+      isFirst.current = false;
+      const t = setTimeout(() => setEntering(false), 700);
+      return () => clearTimeout(t);
+    }
+
+    if (reducedMotion.current) {
+      setEntering(false);
+      return;
+    }
+
+    setOverlay(true);
+    setEntering(true);
+
+    const hideOverlay = setTimeout(() => setOverlay(false), 550);
+    const endEnter = setTimeout(() => setEntering(false), 700);
+
+    return () => {
+      clearTimeout(hideOverlay);
+      clearTimeout(endEnter);
+    };
+  }, [location.pathname]);
+
+  const pageClass = entering && !reducedMotion.current ? 'ft-page-enter' : '';
+
+  return (
+    <>
+      <FuturisticTransitionOverlay active={overlay} />
+      <div key={location.pathname} className={`relative ${pageClass}`}>
+        <Routes location={location}>
+          <Route path="/" element={<Home />} />
+          <Route path="/pc-setup" element={<PCSetup />} />
+          <Route path="/headset-test" element={<HeadsetTest />} />
+          <Route path="/troubleshooting" element={<Troubleshooting />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/faq/citrix-kurulum" element={<CitrixSetup />} />
+          <Route path="/video-tutorials" element={<VideoTutorials />} />
+          <Route path="/asset-confirmation" element={<AssetConfirmation />} />
+          <Route path="/cargo-status" element={<CargoStatus />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/login" element={<LoginPage />} />
+        </Routes>
+      </div>
+    </>
+  );
+};
+
+export default AnimatedRoutes;

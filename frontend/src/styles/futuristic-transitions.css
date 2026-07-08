@@ -1,0 +1,299 @@
+/* ── Futuristic page & slide transitions ── */
+
+@keyframes ft-page-enter {
+  0% {
+    opacity: 0;
+    transform: perspective(1200px) rotateX(8deg) translateY(40px) scale(0.94);
+    filter: blur(12px) brightness(1.4);
+  }
+  40% {
+    filter: blur(4px) brightness(1.15);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(1200px) rotateX(0deg) translateY(0) scale(1);
+    filter: blur(0) brightness(1);
+  }
+}
+
+@keyframes ft-page-exit {
+  0% {
+    opacity: 1;
+    transform: perspective(1200px) rotateX(0deg) scale(1);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: perspective(1200px) rotateX(-6deg) translateY(-30px) scale(0.92);
+    filter: blur(10px) brightness(0.7);
+  }
+}
+
+@keyframes ft-overlay-sweep {
+  0% {
+    transform: translateX(-120%) skewX(-12deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(220%) skewX(-12deg);
+    opacity: 0;
+  }
+}
+
+@keyframes ft-overlay-flash {
+  0%, 100% { opacity: 0; }
+  30% { opacity: 0.35; }
+  50% { opacity: 0.15; }
+}
+
+@keyframes ft-grid-pulse {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.45; }
+}
+
+@keyframes ft-scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes ft-glitch {
+  0%, 90%, 100% {
+    transform: translate(0);
+    text-shadow: none;
+  }
+  92% {
+    transform: translate(-3px, 1px);
+    text-shadow: 3px 0 #00f0ff, -3px 0 #ff00aa;
+  }
+  94% {
+    transform: translate(3px, -1px);
+    text-shadow: -3px 0 #00f0ff, 3px 0 #ff00aa;
+  }
+  96% {
+    transform: translate(-2px, 0);
+    text-shadow: 2px 0 #7c3aed, -2px 0 #06b6d4;
+  }
+}
+
+@keyframes ft-neon-pulse {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(0, 240, 255, 0.4), 0 0 20px rgba(124, 58, 237, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.8), 0 0 40px rgba(255, 0, 170, 0.4), 0 0 60px rgba(124, 58, 237, 0.3);
+  }
+}
+
+@keyframes ft-slide-in-right {
+  0% {
+    opacity: 0;
+    transform: perspective(1000px) rotateY(-25deg) translateX(80px) scale(0.85);
+    filter: blur(8px);
+  }
+  60% {
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(1000px) rotateY(0deg) translateX(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes ft-slide-in-left {
+  0% {
+    opacity: 0;
+    transform: perspective(1000px) rotateY(25deg) translateX(-80px) scale(0.85);
+    filter: blur(8px);
+  }
+  60% {
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(1000px) rotateY(0deg) translateX(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes ft-icon-burst {
+  0% {
+    transform: scale(0.5) rotate(-20deg);
+    opacity: 0;
+    filter: brightness(2);
+  }
+  50% {
+    transform: scale(1.15) rotate(5deg);
+    filter: brightness(1.5);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+    filter: brightness(1);
+  }
+}
+
+@keyframes ft-energy-ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+    border-color: rgba(0, 240, 255, 0.8);
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+    border-color: rgba(255, 0, 170, 0);
+  }
+}
+
+@keyframes ft-stagger-up {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+    filter: blur(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes ft-dot-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.4); }
+}
+
+.ft-page-enter {
+  animation: ft-page-enter 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transform-origin: center top;
+}
+
+.ft-page-exit {
+  animation: ft-page-exit 0.35s cubic-bezier(0.55, 0, 1, 0.45) both;
+  transform-origin: center top;
+}
+
+.ft-glitch-text {
+  animation: ft-glitch 0.6s ease-out;
+}
+
+.ft-neon-ring {
+  animation: ft-neon-pulse 2s ease-in-out infinite;
+}
+
+.ft-slide-enter-right {
+  animation: ft-slide-in-right 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.ft-slide-enter-left {
+  animation: ft-slide-in-left 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.ft-icon-burst {
+  animation: ft-icon-burst 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.ft-stagger-item {
+  animation: ft-stagger-up 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.ft-carousel-track {
+  transition: transform 0.85s cubic-bezier(0.65, 0, 0.15, 1);
+  will-change: transform;
+}
+
+.ft-carousel-track.ft-carousel-fast {
+  transition-duration: 0.55s;
+}
+
+/* Transition overlay */
+.ft-overlay {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.ft-overlay__flash {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(124, 58, 237, 0.25), rgba(255, 0, 170, 0.15));
+  animation: ft-overlay-flash 0.55s ease-out both;
+}
+
+.ft-overlay__sweep {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 240, 255, 0.15),
+    rgba(255, 255, 255, 0.35),
+    rgba(255, 0, 170, 0.15),
+    transparent
+  );
+  animation: ft-overlay-sweep 0.55s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.ft-overlay__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0, 240, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.08) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: ft-grid-pulse 0.55s ease-out both;
+  transform: perspective(500px) rotateX(60deg) scale(2);
+  transform-origin: center bottom;
+}
+
+.ft-overlay__scanline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #00f0ff, #ff00aa, transparent);
+  box-shadow: 0 0 20px #00f0ff, 0 0 40px #ff00aa;
+  animation: ft-scanline 0.55s linear both;
+}
+
+.ft-energy-ring {
+  position: absolute;
+  inset: -8px;
+  border-radius: inherit;
+  border: 2px solid rgba(0, 240, 255, 0.6);
+  animation: ft-energy-ring 1.2s ease-out infinite;
+  pointer-events: none;
+}
+
+.ft-dot-active {
+  animation: ft-dot-pulse 1.5s ease-in-out infinite;
+  box-shadow: 0 0 8px currentColor, 0 0 16px currentColor;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ft-page-enter,
+  .ft-page-exit,
+  .ft-glitch-text,
+  .ft-slide-enter-right,
+  .ft-slide-enter-left,
+  .ft-icon-burst,
+  .ft-stagger-item,
+  .ft-carousel-track,
+  .ft-overlay *,
+  .ft-neon-ring,
+  .ft-energy-ring,
+  .ft-dot-active {
+    animation: none !important;
+    transition: none !important;
+    filter: none !important;
+  }
+}

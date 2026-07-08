@@ -15,6 +15,7 @@ import {
   Truck,
 } from 'lucide-react';
 import HomeHeroCarousel from '../components/HomeHeroCarousel';
+import { StaggerChildren } from '../components/PageShell';
 
 const FEATURE_CARDS = [
   {
@@ -222,7 +223,7 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <StaggerChildren className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             {FEATURE_CARDS.map((card) => (
               <ColorCard
                 key={card.key}
@@ -234,9 +235,9 @@ const Home = () => {
                 Icon={card.Icon}
               />
             ))}
-          </div>
+          </StaggerChildren>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <StaggerChildren className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {EXTRA_CARDS.map((card) => (
               <ColorCard
                 key={card.key}
@@ -249,7 +250,7 @@ const Home = () => {
                 Icon={card.Icon}
               />
             ))}
-          </div>
+          </StaggerChildren>
         </div>
       </section>
 

@@ -63,7 +63,7 @@ const PageShell = ({
       <div className={`container mx-auto px-4 ${maxWidth}`}>
         {!hideHero && Icon && title && (
           <div
-            className={`relative overflow-hidden rounded-3xl bg-gradient-to-br ${colors.gradient} text-white shadow-xl border border-white/20 mb-10 p-8 md:p-12`}
+            className={`relative overflow-hidden rounded-3xl bg-gradient-to-br ${colors.gradient} text-white shadow-xl border border-white/20 mb-10 p-8 md:p-12 ft-page-enter`}
           >
             <div className="absolute inset-0 pointer-events-none overflow-hidden decorative-blur">
               <div className={`absolute -top-10 -right-10 w-48 h-48 rounded-full ${colors.blob} blur-2xl`} />
@@ -82,6 +82,24 @@ const PageShell = ({
         )}
         {children}
       </div>
+    </div>
+  );
+};
+
+export function StaggerChildren({ children, className = '' }) {
+  return (
+    <div className={className}>
+      {React.Children.map(children, (child, i) => {
+        if (!React.isValidElement(child)) return child;
+        return (
+          <div
+            className="ft-stagger-item"
+            style={{ animationDelay: `${i * 0.08}s` }}
+          >
+            {child}
+          </div>
+        );
+      })}
     </div>
   );
 };
