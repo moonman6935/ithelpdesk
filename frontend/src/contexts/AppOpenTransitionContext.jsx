@@ -4,6 +4,12 @@ import AppOpenOverlay from '../components/AppOpenOverlay';
 
 const AppOpenTransitionContext = createContext(null);
 
+/** Expand animation duration (matches CSS) */
+const EXPAND_MS = 520;
+/** Pause on full screen so title can be read */
+const HOLD_MS = 1100;
+const REVEAL_MS = 450;
+
 export function AppOpenTransitionProvider({ children }) {
   const navigate = useNavigate();
   const [transition, setTransition] = useState(null);
@@ -56,7 +62,7 @@ export function AppOpenTransitionProvider({ children }) {
       to,
     });
 
-    const raf = requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         setTransition((prev) => (prev ? { ...prev, phase: 'expand' } : null));
       });
@@ -64,16 +70,17 @@ export function AppOpenTransitionProvider({ children }) {
 
     timersRef.current.push(
       setTimeout(() => {
+        setTransition((prev) => (prev ? { ...prev, phase: 'hold' } : null));
+      }, EXPAND_MS),
+      setTimeout(() => {
         navigate(to);
         setTransition((prev) => (prev ? { ...prev, phase: 'reveal' } : null));
-      }, 520),
+      }, EXPAND_MS + HOLD_MS),
       setTimeout(() => {
         element.classList.remove('app-card-hidden');
         setTransition(null);
-      }, 880)
+      }, EXPAND_MS + HOLD_MS + REVEAL_MS)
     );
-
-    return () => cancelAnimationFrame(raf);
   }, [navigate]);
 
   const isTransitioning = transition !== null;

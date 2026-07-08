@@ -1,8 +1,9 @@
 import React from 'react';
 
 const AppOpenOverlay = ({ phase, rect, gradientClasses, blob, accent, Icon, title }) => {
-  const isExpanded = phase === 'expand' || phase === 'reveal';
+  const isExpanded = phase === 'expand' || phase === 'hold' || phase === 'reveal';
   const isRevealing = phase === 'reveal';
+  const showContent = phase === 'expand' || phase === 'hold';
 
   return (
     <>
@@ -30,14 +31,20 @@ const AppOpenOverlay = ({ phase, rect, gradientClasses, blob, accent, Icon, titl
           <div className={`absolute bottom-4 left-4 w-24 h-24 rounded-full ${accent} blur-xl opacity-80`} />
         </div>
 
-        <div className="app-open-icon-layer absolute inset-0 flex flex-col items-center justify-center text-white">
+        <div
+          className={`app-open-icon-layer absolute inset-0 flex flex-col items-center justify-center text-white px-6 ${
+            showContent ? 'app-open-icon-layer--visible' : ''
+          }`}
+        >
           {Icon && (
-            <div className="w-20 h-20 rounded-3xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center mb-4 shadow-2xl">
-              <Icon className="w-10 h-10 text-white" strokeWidth={1.5} />
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center mb-5 shadow-2xl">
+              <Icon className="w-10 h-10 sm:w-12 sm:h-12 text-white" strokeWidth={1.5} />
             </div>
           )}
           {title && (
-            <p className="text-lg font-bold text-center px-6 max-w-xs drop-shadow-lg">{title}</p>
+            <p className="text-xl sm:text-3xl font-bold text-center max-w-lg drop-shadow-lg leading-tight">
+              {title}
+            </p>
           )}
         </div>
 

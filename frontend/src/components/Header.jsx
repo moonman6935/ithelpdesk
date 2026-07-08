@@ -1,18 +1,93 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAppOpenTransition } from '../contexts/AppOpenTransitionContext';
 import { Button } from './ui/button';
 import BrandLogo from './BrandLogo';
+import {
+  Home,
+  Monitor,
+  Headphones,
+  AlertCircle,
+  HelpCircle,
+  ClipboardCheck,
+  Truck,
+  Video,
+} from 'lucide-react';
 
 const NAV_ITEMS = [
-  { path: '/', labelKey: 'header.home', hover: 'nav-hover-red' },
-  { path: '/pc-setup', labelKey: 'header.pcSetup', hover: 'nav-hover-blue' },
-  { path: '/headset-test', labelKey: 'header.headsetTest', hover: 'nav-hover-emerald' },
-  { path: '/troubleshooting', labelKey: 'header.troubleshooting', hover: 'nav-hover-orange' },
-  { path: '/faq', labelKey: 'header.faq', hover: 'nav-hover-violet' },
-  { path: '/asset-confirmation', labelKey: 'assetConfirmation.title', hover: 'nav-hover-rose' },
-  { path: '/cargo-status', labelKey: 'cargoTracking.nav', hover: 'nav-hover-orange' },
-  { path: '/video-tutorials', labelKey: 'header.videoTutorials', hover: 'nav-hover-cyan' },
+  {
+    path: '/',
+    labelKey: 'header.home',
+    hover: 'nav-hover-red',
+    Icon: Home,
+    gradientClasses: 'bg-gradient-to-br from-red-500 via-red-600 to-orange-500',
+    blob: 'bg-yellow-300/25',
+    accent: 'bg-orange-300/20',
+  },
+  {
+    path: '/pc-setup',
+    labelKey: 'header.pcSetup',
+    hover: 'nav-hover-blue',
+    Icon: Monitor,
+    gradientClasses: 'bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800',
+    blob: 'bg-sky-300/25',
+    accent: 'bg-sky-400/20',
+  },
+  {
+    path: '/headset-test',
+    labelKey: 'header.headsetTest',
+    hover: 'nav-hover-emerald',
+    Icon: Headphones,
+    gradientClasses: 'bg-gradient-to-br from-emerald-500 via-teal-600 to-cyan-700',
+    blob: 'bg-lime-300/25',
+    accent: 'bg-emerald-400/20',
+  },
+  {
+    path: '/troubleshooting',
+    labelKey: 'header.troubleshooting',
+    hover: 'nav-hover-orange',
+    Icon: AlertCircle,
+    gradientClasses: 'bg-gradient-to-br from-orange-500 via-amber-500 to-red-600',
+    blob: 'bg-yellow-300/25',
+    accent: 'bg-amber-400/20',
+  },
+  {
+    path: '/faq',
+    labelKey: 'header.faq',
+    hover: 'nav-hover-violet',
+    Icon: HelpCircle,
+    gradientClasses: 'bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-700',
+    blob: 'bg-pink-300/25',
+    accent: 'bg-fuchsia-400/20',
+  },
+  {
+    path: '/asset-confirmation',
+    labelKey: 'assetConfirmation.title',
+    hover: 'nav-hover-rose',
+    Icon: ClipboardCheck,
+    gradientClasses: 'bg-gradient-to-br from-rose-500 via-pink-600 to-red-700',
+    blob: 'bg-rose-300/25',
+    accent: 'bg-pink-400/20',
+  },
+  {
+    path: '/cargo-status',
+    labelKey: 'cargoTracking.nav',
+    hover: 'nav-hover-orange',
+    Icon: Truck,
+    gradientClasses: 'bg-gradient-to-br from-amber-500 via-orange-600 to-red-600',
+    blob: 'bg-amber-300/25',
+    accent: 'bg-orange-400/20',
+  },
+  {
+    path: '/video-tutorials',
+    labelKey: 'header.videoTutorials',
+    hover: 'nav-hover-cyan',
+    Icon: Video,
+    gradientClasses: 'bg-gradient-to-br from-cyan-500 via-sky-600 to-blue-700',
+    blob: 'bg-sky-300/25',
+    accent: 'bg-blue-400/20',
+  },
 ];
 
 const LANGUAGES = [
@@ -20,6 +95,38 @@ const LANGUAGES = [
   { code: 'de', name: 'Deutsch', flag: 'https://flagcdn.com/w80/de.png' },
   { code: 'en', name: 'English', flag: 'https://flagcdn.com/w80/us.png' },
 ];
+
+function NavLinkButton({ item, active, className, size = 'sm' }) {
+  const { t } = useLanguage();
+  const { openFromElement } = useAppOpenTransition();
+  const label = t(item.labelKey);
+
+  const handleClick = (e) => {
+    if (active) return;
+    e.preventDefault();
+    openFromElement(e.currentTarget, {
+      to: item.path,
+      gradientClasses: item.gradientClasses,
+      blob: item.blob,
+      accent: item.accent,
+      Icon: item.Icon,
+      title: label,
+    });
+  };
+
+  return (
+    <Link to={item.path} onClick={handleClick}>
+      <Button
+        data-app-card
+        variant="ghost"
+        size={size}
+        className={`app-card-source transition-all duration-300 ${className}`}
+      >
+        {label}
+      </Button>
+    </Link>
+  );
+}
 
 const Header = () => {
   const { language, setLanguage, t } = useLanguage();
@@ -85,29 +192,24 @@ const Header = () => {
 
             <nav className="hidden lg:flex items-center justify-center flex-wrap gap-1 mt-3 pt-3 border-t border-white/20">
               {NAV_ITEMS.map((item) => (
-                <Link key={item.path} to={item.path}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className={`transition-all duration-300 ${navButtonClass(item.path, item.hover)}`}
-                  >
-                    {t(item.labelKey)}
-                  </Button>
-                </Link>
+                <NavLinkButton
+                  key={item.path}
+                  item={item}
+                  active={isActive(item.path)}
+                  className={navButtonClass(item.path, item.hover)}
+                />
               ))}
             </nav>
 
             <nav className="lg:hidden flex flex-wrap items-center justify-center gap-1 mt-3 pt-3 border-t border-white/20">
               {NAV_ITEMS.map((item) => (
-                <Link key={item.path} to={item.path}>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className={`text-xs transition-all duration-300 ${navButtonClass(item.path, item.hover)}`}
-                  >
-                    {t(item.labelKey)}
-                  </Button>
-                </Link>
+                <NavLinkButton
+                  key={item.path}
+                  item={item}
+                  active={isActive(item.path)}
+                  className={`text-xs ${navButtonClass(item.path, item.hover)}`}
+                  size="sm"
+                />
               ))}
             </nav>
           </div>
