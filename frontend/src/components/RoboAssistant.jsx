@@ -472,7 +472,7 @@ const RoboAssistant = () => {
           aria-label={t('robo.fabLabel')}
         >
           <span className="robo-fab__ring" aria-hidden="true" />
-          <RoboDog mode="roam" size="fab" className="robo-fab__dog" />
+          <RoboDog mode="still" size="fab" className="robo-fab__dog" />
         </button>
         <span className="robo-fab__label">Robo</span>
       </div>
