@@ -556,6 +556,15 @@ function validateCarouselPayload(data) {
 }
 
 const DEFAULT_CAROUSEL_COUNT = 11;
+const DEFAULT_CAROUSEL_DURATION_MS = 7000;
+const MIN_CAROUSEL_DURATION_MS = 3000;
+const MAX_CAROUSEL_DURATION_MS = 60000;
+
+function clampCarouselDuration(ms) {
+    const value = Number(ms);
+    if (!Number.isFinite(value)) return DEFAULT_CAROUSEL_DURATION_MS;
+    return Math.min(MAX_CAROUSEL_DURATION_MS, Math.max(MIN_CAROUSEL_DURATION_MS, Math.round(value)));
+}
 
 function buildDefaultCarouselOrder() {
     return Array.from({ length: DEFAULT_CAROUSEL_COUNT }, (_, i) => `default-${i}`);
@@ -563,6 +572,20 @@ function buildDefaultCarouselOrder() {
 
 function isDefaultCarouselSlideId(id) {
     return /^default-\d+$/.test(String(id || ''));
+}
+
+function getValidCarouselSlideIds(customIds) {
+    return new Set([...buildDefaultCarouselOrder(), ...customIds]);
+}
+
+function sanitizeSlideDurations(map, customIds) {
+    const valid = getValidCarouselSlideIds(customIds);
+    const result = {};
+    if (!map || typeof map !== 'object') return result;
+    for (const [id, ms] of Object.entries(map)) {
+        if (valid.has(id)) result[id] = clampCarouselDuration(ms);
+    }
+    return result;
 }
 
 function normalizeCarouselOrderIds(order, customIds) {
@@ -595,9 +618,13 @@ function normalizeCarouselOrderIds(order, customIds) {
     return normalized;
 }
 
-async function getCarouselOrderDoc(db, customIds) {
+async function getCarouselConfig(db, customIds) {
     const doc = await db.collection('carousel_config').findOne({ _id: 'order' });
-    return normalizeCarouselOrderIds(doc?.slide_ids, customIds);
+    return {
+        order: normalizeCarouselOrderIds(doc?.slide_ids, customIds),
+        default_duration_ms: clampCarouselDuration(doc?.default_duration_ms ?? DEFAULT_CAROUSEL_DURATION_MS),
+        slide_durations: sanitizeSlideDurations(doc?.slide_durations, customIds),
+    };
 }
 
 async function saveCarouselOrderDoc(db, order) {
@@ -608,9 +635,65 @@ async function saveCarouselOrderDoc(db, order) {
                 slide_ids: order,
                 updated_at: new Date().toISOString(),
             },
+            $setOnInsert: {
+                default_duration_ms: DEFAULT_CAROUSEL_DURATION_MS,
+                slide_durations: {},
+            },
         },
         { upsert: true }
     );
+}
+
+async function saveCarouselSettingsDoc(db, customIds, settings) {
+    const current = await getCarouselConfig(db, customIds);
+    const nextDurations = {
+        ...current.slide_durations,
+        ...(settings.slide_durations || {}),
+    };
+    const cleanedDurations = sanitizeSlideDurations(nextDurations, customIds);
+
+    await db.collection('carousel_config').updateOne(
+        { _id: 'order' },
+        {
+            $set: {
+                slide_ids: current.order,
+                default_duration_ms: settings.default_duration_ms ?? current.default_duration_ms,
+                slide_durations: cleanedDurations,
+                updated_at: new Date().toISOString(),
+            },
+        },
+        { upsert: true }
+    );
+
+    return {
+        order: current.order,
+        default_duration_ms: settings.default_duration_ms ?? current.default_duration_ms,
+        slide_durations: cleanedDurations,
+    };
+}
+
+function validateCarouselSettings(body, customIds) {
+    const valid = getValidCarouselSlideIds(customIds);
+    const result = {};
+
+    if (body?.default_duration_ms != null) {
+        result.default_duration_ms = clampCarouselDuration(body.default_duration_ms);
+    }
+
+    if (body?.slide_durations && typeof body.slide_durations === 'object') {
+        result.slide_durations = {};
+        for (const [id, ms] of Object.entries(body.slide_durations)) {
+            if (valid.has(id)) {
+                result.slide_durations[id] = clampCarouselDuration(ms);
+            }
+        }
+    }
+
+    if (!result.default_duration_ms && !result.slide_durations) {
+        return { error: 'Geçersiz süre ayarları' };
+    }
+
+    return result;
 }
 
 function validateCarouselReorder(order, customIds) {
@@ -1390,8 +1473,13 @@ module.exports = async (req, res) => {
                 .map(normalizeCarouselDoc)
                 .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
             const customIds = allCustom.map((slide) => slide.id);
-            const order = await getCarouselOrderDoc(db, customIds);
-            return sendJson(res, 200, { order, slides: customSlides });
+            const config = await getCarouselConfig(db, customIds);
+            return sendJson(res, 200, {
+                order: config.order,
+                slides: customSlides,
+                default_duration_ms: config.default_duration_ms,
+                slide_durations: config.slide_durations,
+            });
         }
 
         if (method === 'GET' && route === 'admin/carousel-slides') {
@@ -1402,8 +1490,27 @@ module.exports = async (req, res) => {
                 .toArray()
                 .then((rows) => rows.map(normalizeCarouselDoc));
             const customIds = slides.map((slide) => slide.id);
-            const order = await getCarouselOrderDoc(db, customIds);
-            return sendJson(res, 200, { slides, order });
+            const config = await getCarouselConfig(db, customIds);
+            return sendJson(res, 200, {
+                slides,
+                order: config.order,
+                default_duration_ms: config.default_duration_ms,
+                slide_durations: config.slide_durations,
+            });
+        }
+
+        if (method === 'PUT' && route === 'admin/carousel-slides/settings') {
+            if (!(await requireWriteAccess(db, req, res))) return;
+            const allCustom = await db.collection('carousel_slides')
+                .find({}, { projection: { id: 1, _id: 0 } })
+                .toArray();
+            const customIds = allCustom.map((slide) => slide.id);
+            const validated = validateCarouselSettings(req.body || {}, customIds);
+            if (validated.error) {
+                return sendError(res, 400, validated.error);
+            }
+            const config = await saveCarouselSettingsDoc(db, customIds, validated);
+            return sendJson(res, 200, { status: 'success', ...config });
         }
 
         if (method === 'PUT' && route === 'admin/carousel-slides/reorder') {
@@ -1440,12 +1547,19 @@ module.exports = async (req, res) => {
                 .find({}, { projection: { id: 1, _id: 0 } })
                 .toArray();
             const customIds = allCustom.map((row) => row.id);
-            const order = await getCarouselOrderDoc(db, customIds);
+            const config = await getCarouselConfig(db, customIds);
+            const order = [...config.order];
             if (!order.includes(slide.id)) {
                 order.push(slide.id);
                 await saveCarouselOrderDoc(db, order);
             }
-            return sendJson(res, 200, { status: 'success', slide: normalizeCarouselDoc(slide), order });
+            return sendJson(res, 200, {
+                status: 'success',
+                slide: normalizeCarouselDoc(slide),
+                order,
+                default_duration_ms: config.default_duration_ms,
+                slide_durations: config.slide_durations,
+            });
         }
 
         if (method === 'PUT' && segments[0] === 'admin' && segments[1] === 'carousel-slides' && segments.length === 3) {
@@ -1486,8 +1600,12 @@ module.exports = async (req, res) => {
                 .find({}, { projection: { id: 1, _id: 0 } })
                 .toArray();
             const customIds = remaining.map((row) => row.id);
-            const order = (await getCarouselOrderDoc(db, customIds)).filter((id) => id !== slideId);
+            const config = await getCarouselConfig(db, customIds);
+            const order = config.order.filter((id) => id !== slideId);
+            const slide_durations = { ...config.slide_durations };
+            delete slide_durations[slideId];
             await saveCarouselOrderDoc(db, normalizeCarouselOrderIds(order, customIds));
+            await saveCarouselSettingsDoc(db, customIds, { slide_durations });
             return sendJson(res, 200, { status: 'success' });
         }
 

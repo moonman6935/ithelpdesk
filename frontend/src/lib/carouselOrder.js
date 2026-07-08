@@ -125,3 +125,29 @@ export function getSlideLabelFromId(slideId, { defaultSlides, customSlides, lang
   const display = slideToDisplay(custom, language);
   return display.title || slideId;
 }
+
+export const DEFAULT_CAROUSEL_DURATION_MS = 7000;
+export const MIN_CAROUSEL_DURATION_MS = 3000;
+export const MAX_CAROUSEL_DURATION_MS = 60000;
+
+export function clampCarouselDuration(ms) {
+  const value = Number(ms);
+  if (!Number.isFinite(value)) return DEFAULT_CAROUSEL_DURATION_MS;
+  return Math.min(MAX_CAROUSEL_DURATION_MS, Math.max(MIN_CAROUSEL_DURATION_MS, Math.round(value)));
+}
+
+export function getSlideDurationMs(slideId, timing) {
+  const custom = timing?.slide_durations?.[slideId];
+  if (custom != null) return clampCarouselDuration(custom);
+  return clampCarouselDuration(timing?.default_duration_ms ?? DEFAULT_CAROUSEL_DURATION_MS);
+}
+
+export function durationMsToSeconds(ms) {
+  return Math.round(clampCarouselDuration(ms) / 1000);
+}
+
+export function durationSecondsToMs(seconds) {
+  const value = Number(seconds);
+  if (!Number.isFinite(value)) return DEFAULT_CAROUSEL_DURATION_MS;
+  return clampCarouselDuration(value * 1000);
+}

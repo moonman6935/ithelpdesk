@@ -5,7 +5,7 @@ import { AppOpenLinkButton } from './AppOpenLinkButton';
 import { ArrowRight, ChevronLeft, ChevronRight, Monitor, Sparkles } from 'lucide-react';
 import { useIsMobile } from '../hooks/useMediaQuery';
 import api from '../lib/api';
-import { resolveOrderedCarouselSlides } from '../lib/carouselOrder';
+import { resolveOrderedCarouselSlides, getSlideDurationMs } from '../lib/carouselOrder';
 
 function CarouselSlide({ slide, index, slidesLength, isActive, t, direction, slideKey, isWelcomeSlide }) {
   const meta = slide.meta;
@@ -134,6 +134,10 @@ const HomeHeroCarousel = () => {
   const isMobile = useIsMobile();
   const [carouselOrder, setCarouselOrder] = useState(null);
   const [customSlides, setCustomSlides] = useState([]);
+  const [carouselTiming, setCarouselTiming] = useState({
+    default_duration_ms: 7000,
+    slide_durations: {},
+  });
   const defaultSlides = translations[language]?.home?.carouselSlides || translations.tr.home.carouselSlides;
 
   const slides = useMemo(
@@ -165,10 +169,15 @@ const HomeHeroCarousel = () => {
         if (Array.isArray(data)) {
           setCustomSlides(data);
           setCarouselOrder(null);
+          setCarouselTiming({ default_duration_ms: 7000, slide_durations: {} });
           return;
         }
         setCustomSlides(data.slides || []);
         setCarouselOrder(data.order || null);
+        setCarouselTiming({
+          default_duration_ms: data.default_duration_ms ?? 7000,
+          slide_durations: data.slide_durations || {},
+        });
       })
       .catch(() => {
         if (!cancelled) {
@@ -208,13 +217,18 @@ const HomeHeroCarousel = () => {
   const prev = useCallback(() => goTo(active - 1, 'left'), [active, goTo]);
 
   useEffect(() => {
-    const timer = window.setInterval(() => {
+    if (!slidesLength) return undefined;
+    const currentSlide = slides[active];
+    if (!currentSlide?.slideId) return undefined;
+
+    const duration = getSlideDurationMs(currentSlide.slideId, carouselTiming);
+    const timer = window.setTimeout(() => {
       if (document.hidden || animating) return;
       goTo(active + 1, 'right');
-    }, 7000);
+    }, duration);
 
-    return () => window.clearInterval(timer);
-  }, [active, animating, goTo]);
+    return () => window.clearTimeout(timer);
+  }, [active, animating, goTo, slides, slidesLength, carouselTiming]);
 
   if (!slidesLength) return null;
 

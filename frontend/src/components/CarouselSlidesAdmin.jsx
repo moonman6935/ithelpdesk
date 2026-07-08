@@ -29,6 +29,12 @@ import {
   isDefaultSlideId,
   getDefaultSlideIndex,
   DEFAULT_SLIDE_META,
+  DEFAULT_CAROUSEL_DURATION_MS,
+  MIN_CAROUSEL_DURATION_MS,
+  MAX_CAROUSEL_DURATION_MS,
+  durationMsToSeconds,
+  durationSecondsToMs,
+  getSlideDurationMs,
 } from '../lib/carouselOrder';
 
 const LANG_FIELDS = [
@@ -72,6 +78,9 @@ const CarouselSlidesAdmin = () => {
   const [editForm, setEditForm] = useState(EMPTY_CAROUSEL_FORM);
   const [saving, setSaving] = useState(false);
   const [reordering, setReordering] = useState(false);
+  const [defaultDurationMs, setDefaultDurationMs] = useState(7000);
+  const [slideDurations, setSlideDurations] = useState({});
+  const [savingDuration, setSavingDuration] = useState(false);
 
   const defaultSlides =
     translations[language]?.home?.carouselSlides || translations.tr.home.carouselSlides;
@@ -83,10 +92,14 @@ const CarouselSlidesAdmin = () => {
       if (Array.isArray(data)) {
         setSlides(data);
         setOrder(buildDefaultCarouselOrder(defaultSlides.length));
+        setDefaultDurationMs(DEFAULT_CAROUSEL_DURATION_MS);
+        setSlideDurations({});
         return;
       }
       setSlides(data.slides || []);
       setOrder(data.order || buildDefaultCarouselOrder(defaultSlides.length));
+      setDefaultDurationMs(data.default_duration_ms ?? DEFAULT_CAROUSEL_DURATION_MS);
+      setSlideDurations(data.slide_durations || {});
     } catch {
       console.error('Slaytlar yüklenemedi');
     }
@@ -122,6 +135,52 @@ const CarouselSlidesAdmin = () => {
 
   const getSlideTitle = (slideId) =>
     getSlideLabelFromId(slideId, { defaultSlides, customSlides: slides, language });
+
+  const getDurationSecondsForSlide = (slideId) =>
+    durationMsToSeconds(getSlideDurationMs(slideId, {
+      default_duration_ms: defaultDurationMs,
+      slide_durations: slideDurations,
+    }));
+
+  const persistSettings = async (payload) => {
+    setSavingDuration(true);
+    try {
+      const res = await api.put('/api/admin/carousel-slides/settings', payload);
+      if (res.data?.default_duration_ms != null) {
+        setDefaultDurationMs(res.data.default_duration_ms);
+      }
+      if (res.data?.slide_durations) {
+        setSlideDurations(res.data.slide_durations);
+      }
+    } catch (err) {
+      alert(err.response?.data?.detail || t('admin.carousel.durationError'));
+      fetchSlides();
+    } finally {
+      setSavingDuration(false);
+    }
+  };
+
+  const handleDefaultDurationBlur = async (seconds) => {
+    const ms = durationSecondsToMs(seconds);
+    if (ms === defaultDurationMs) return;
+    setDefaultDurationMs(ms);
+    await persistSettings({ default_duration_ms: ms });
+  };
+
+  const handleSlideDurationBlur = async (slideId, seconds) => {
+    const ms = durationSecondsToMs(seconds);
+    const currentMs = getSlideDurationMs(slideId, {
+      default_duration_ms: defaultDurationMs,
+      slide_durations: slideDurations,
+    });
+    if (ms === currentMs) return;
+    const nextDurations = { ...slideDurations, [slideId]: ms };
+    setSlideDurations(nextDurations);
+    await persistSettings({ slide_durations: { [slideId]: ms } });
+  };
+
+  const minDurationSec = Math.round(MIN_CAROUSEL_DURATION_MS / 1000);
+  const maxDurationSec = Math.round(MAX_CAROUSEL_DURATION_MS / 1000);
 
   const validateForm = (data) => {
     const payload = formToPayload(data);
@@ -317,7 +376,27 @@ const CarouselSlidesAdmin = () => {
           </CardTitle>
           <CardDescription>{t('admin.carousel.orderDesc')}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          <div className="rounded-xl border bg-orange-50/60 p-4 flex flex-col sm:flex-row sm:items-end gap-3">
+            <div className="flex-1">
+              <label className="block text-sm font-medium mb-1">{t('admin.carousel.defaultDuration')}</label>
+              <p className="text-xs text-gray-500 mb-2">{t('admin.carousel.defaultDurationHint')}</p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <Input
+                type="number"
+                min={minDurationSec}
+                max={maxDurationSec}
+                defaultValue={durationMsToSeconds(defaultDurationMs)}
+                key={`default-duration-${defaultDurationMs}`}
+                disabled={savingDuration}
+                className="w-24 text-center"
+                onBlur={(e) => handleDefaultDurationBlur(e.target.value)}
+              />
+              <span className="text-sm text-gray-600">{t('admin.carousel.seconds')}</span>
+            </div>
+          </div>
+
           <ul className="space-y-2">
             {order.map((slideId, index) => {
               const customSlide = slides.find((s) => s.id === slideId);
@@ -361,6 +440,20 @@ const CarouselSlidesAdmin = () => {
                         <Badge className="bg-gray-400 text-xs">{t('admin.carousel.inactive')}</Badge>
                       )}
                     </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <Input
+                      type="number"
+                      min={minDurationSec}
+                      max={maxDurationSec}
+                      defaultValue={getDurationSecondsForSlide(slideId)}
+                      key={`duration-${slideId}-${getDurationSecondsForSlide(slideId)}`}
+                      disabled={savingDuration || reordering}
+                      className="w-16 h-9 text-center text-sm px-1"
+                      title={t('admin.carousel.slideDuration')}
+                      onBlur={(e) => handleSlideDurationBlur(slideId, e.target.value)}
+                    />
+                    <span className="text-xs text-gray-500 w-4">{t('admin.carousel.secondsShort')}</span>
                   </div>
                   <div className="flex gap-1 shrink-0">
                     <Button
