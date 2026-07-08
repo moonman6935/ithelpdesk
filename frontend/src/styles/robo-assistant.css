@@ -12,42 +12,126 @@
 
 .robo-fab__btn {
   position: relative;
-  width: 4.25rem;
-  height: 4.25rem;
+  width: 4.5rem;
+  height: 4.5rem;
   border-radius: 9999px;
   border: none;
   cursor: pointer;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 45%, #06b6d4 100%);
+  background: linear-gradient(145deg, #fff8e1 0%, #ffe082 40%, #ffb74d 100%);
   box-shadow:
-    0 8px 32px rgba(99, 102, 241, 0.45),
-    0 0 0 0 rgba(99, 102, 241, 0.5);
-  animation: robo-fab-pulse 2.5s ease-in-out infinite;
+    0 8px 28px rgba(245, 158, 11, 0.4),
+    0 0 0 0 rgba(251, 191, 36, 0.45);
+  animation: robo-fab-pulse-dog 2.2s ease-in-out infinite;
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
+  overflow: visible;
 }
 
 .robo-fab__btn:hover {
-  transform: scale(1.08);
-  box-shadow: 0 12px 40px rgba(99, 102, 241, 0.55);
+  transform: scale(1.1);
+  box-shadow: 0 12px 36px rgba(245, 158, 11, 0.5);
+}
+
+.robo-fab__btn:hover .robo-dog--animated .robo-dog__tail {
+  animation-duration: 0.16s;
+}
+
+.robo-fab__dog {
+  position: relative;
+  z-index: 1;
+  margin-top: -2px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+}
+
+@keyframes robo-fab-pulse-dog {
+  0%, 100% {
+    box-shadow: 0 8px 28px rgba(245, 158, 11, 0.4), 0 0 0 0 rgba(251, 191, 36, 0.35);
+  }
+  50% {
+    box-shadow: 0 8px 28px rgba(245, 158, 11, 0.5), 0 0 0 10px rgba(251, 191, 36, 0);
+  }
+}
+
+/* ── Robo Dog mascot (XP search companion style) ── */
+.robo-dog--animated {
+  animation: robo-dog-idle 2.4s ease-in-out infinite;
+}
+
+.robo-dog--animated .robo-dog__tail {
+  transform-origin: 20px 40px;
+  animation: robo-dog-wag 0.28s ease-in-out infinite alternate;
+}
+
+.robo-dog--animated .robo-dog__ear--left {
+  transform-origin: 26px 18px;
+  animation: robo-dog-ear-left 1.8s ease-in-out infinite;
+}
+
+.robo-dog--animated .robo-dog__ear--right {
+  transform-origin: 58px 18px;
+  animation: robo-dog-ear-right 2.1s ease-in-out infinite;
+}
+
+.robo-dog--animated .robo-dog__eyes {
+  animation: robo-dog-blink 4.5s ease-in-out infinite;
+}
+
+.robo-dog--animated .robo-dog__glass {
+  transform-origin: 62px 50px;
+  animation: robo-dog-glass 3s ease-in-out infinite;
+}
+
+@keyframes robo-dog-idle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes robo-dog-wag {
+  from { transform: rotate(-22deg); }
+  to { transform: rotate(28deg); }
+}
+
+@keyframes robo-dog-ear-left {
+  0%, 85%, 100% { transform: rotate(0deg); }
+  90% { transform: rotate(-8deg); }
+}
+
+@keyframes robo-dog-ear-right {
+  0%, 80%, 100% { transform: rotate(0deg); }
+  88% { transform: rotate(8deg); }
+}
+
+@keyframes robo-dog-blink {
+  0%, 96%, 100% { transform: scaleY(1); }
+  97% { transform: scaleY(0.12); }
+  98% { transform: scaleY(1); }
+}
+
+@keyframes robo-dog-glass {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(8deg); }
+}
+
+.robo-overlay__avatar--dog {
+  background: linear-gradient(145deg, #fff8e1, #ffcc80);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.45);
+  overflow: visible;
+  width: 3.25rem;
+  height: 3.25rem;
 }
 
 .robo-fab__ring {
   position: absolute;
   inset: -4px;
   border-radius: 9999px;
-  border: 2px solid rgba(255, 255, 255, 0.35);
+  border: 2px solid rgba(255, 255, 255, 0.5);
   animation: robo-ring-spin 4s linear infinite;
-}
-
-.robo-fab__icon {
-  position: relative;
-  z-index: 1;
-  color: #fff;
 }
 
 .robo-fab__label {
   font-size: 0.7rem;
   font-weight: 700;
-  color: #4338ca;
+  color: #b45309;
   background: rgba(255, 255, 255, 0.92);
   padding: 0.2rem 0.55rem;
   border-radius: 9999px;
@@ -579,7 +663,13 @@
   .robo-panel,
   .robo-choice,
   .robo-check-item,
-  .robo-result__icon {
+  .robo-result__icon,
+  .robo-dog--animated,
+  .robo-dog--animated .robo-dog__tail,
+  .robo-dog--animated .robo-dog__ear--left,
+  .robo-dog--animated .robo-dog__ear--right,
+  .robo-dog--animated .robo-dog__eyes,
+  .robo-dog--animated .robo-dog__glass {
     animation: none !important;
   }
 }

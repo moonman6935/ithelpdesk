@@ -5,7 +5,6 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { roboTranslations } from '../translations/roboTranslations';
 import { getFlowNode, ROCKET_CHAT_URL } from '../lib/roboFlows';
 import {
-  Bot,
   X,
   ArrowLeft,
   Check,
@@ -29,6 +28,7 @@ import {
   Layers,
   RotateCcw,
 } from 'lucide-react';
+import RoboDog from './RoboDog';
 
 const ICON_MAP = {
   monitor: Monitor,
@@ -342,8 +342,8 @@ function RoboOverlay({ onClose }) {
               <ArrowLeft className="w-5 h-5" />
             </button>
           )}
-          <div className="robo-overlay__avatar">
-            <Bot className="w-6 h-6 text-white" />
+          <div className="robo-overlay__avatar robo-overlay__avatar--dog">
+            <RoboDog size="sm" animated />
           </div>
           <div>
             <p className="robo-overlay__name">Robo</p>
@@ -415,12 +415,12 @@ const RoboAssistant = () => {
 
         <button
           type="button"
-          className="robo-fab__btn"
+          className="robo-fab__btn robo-fab__btn--dog"
           onClick={handleOpen}
           aria-label={t('robo.fabLabel')}
         >
           <span className="robo-fab__ring" aria-hidden="true" />
-          <Bot className="robo-fab__icon w-8 h-8" strokeWidth={1.5} />
+          <RoboDog size="sm" animated className="robo-fab__dog" />
         </button>
         <span className="robo-fab__label">Robo</span>
       </div>
