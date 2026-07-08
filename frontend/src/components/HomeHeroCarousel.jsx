@@ -1,29 +1,14 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { translations } from '../translations/translations';
 import { AppOpenLinkButton } from './AppOpenLinkButton';
 import { ArrowRight, ChevronLeft, ChevronRight, Monitor, Sparkles } from 'lucide-react';
 import { useIsMobile } from '../hooks/useMediaQuery';
 import api from '../lib/api';
-import { buildSlideMeta } from '../lib/carouselThemes';
-import { slideToDisplay } from '../lib/carouselSlideContent';
-
-const DEFAULT_SLIDE_META = [
-  { template: 'red', icon: 'sparkles' },
-  { template: 'indigo', icon: 'download' },
-  { template: 'blue', icon: 'monitor' },
-  { template: 'emerald', icon: 'refresh' },
-  { template: 'violet', icon: 'message' },
-  { template: 'amber', icon: 'package' },
-  { template: 'slate', icon: 'shield' },
-  { template: 'cyan', icon: 'laptop' },
-  { template: 'teal', icon: 'cable' },
-  { template: 'amber', icon: 'truck' },
-  { template: 'rose', icon: 'clipboard' },
-];
+import { resolveOrderedCarouselSlides } from '../lib/carouselOrder';
 
 function CarouselSlide({ slide, index, slidesLength, isActive, t, direction, slideKey, isWelcomeSlide }) {
-  const meta = slide.meta || buildSlideMeta('red', 'sparkles');
+  const meta = slide.meta;
   const { Icon, gradient, blob } = meta;
   const enterClass = direction === 'left' ? 'ft-slide-enter-left' : 'ft-slide-enter-right';
 
@@ -147,29 +132,21 @@ function CarouselSlide({ slide, index, slidesLength, isActive, t, direction, sli
 const HomeHeroCarousel = () => {
   const { language, t } = useLanguage();
   const isMobile = useIsMobile();
+  const [carouselOrder, setCarouselOrder] = useState(null);
   const [customSlides, setCustomSlides] = useState([]);
   const defaultSlides = translations[language]?.home?.carouselSlides || translations.tr.home.carouselSlides;
 
-  const slides = [
-    ...defaultSlides.map((slide, index) => {
-      const preset = DEFAULT_SLIDE_META[index] || DEFAULT_SLIDE_META[0];
-      return {
-        ...slide,
-        slideId: `default-${index}`,
-        meta: buildSlideMeta(preset.template, preset.icon),
-        isWelcomeSlide: index === 0,
-      };
-    }),
-    ...customSlides.map((slide) => {
-      const display = slideToDisplay(slide, language);
-      return {
-        ...display,
-        slideId: slide.id,
-        meta: buildSlideMeta(display.template, display.icon),
-        isWelcomeSlide: false,
-      };
-    }),
-  ];
+  const slides = useMemo(
+    () =>
+      resolveOrderedCarouselSlides({
+        order: carouselOrder,
+        defaultSlides,
+        customSlides,
+        language,
+        activeOnly: true,
+      }),
+    [carouselOrder, defaultSlides, customSlides, language]
+  );
 
   const [active, setActive] = useState(0);
   const [animating, setAnimating] = useState(false);
@@ -180,12 +157,24 @@ const HomeHeroCarousel = () => {
 
   useEffect(() => {
     let cancelled = false;
-    api.get('/api/carousel-slides')
+    api
+      .get('/api/carousel-slides')
       .then((res) => {
-        if (!cancelled) setCustomSlides(res.data || []);
+        if (cancelled) return;
+        const data = res.data;
+        if (Array.isArray(data)) {
+          setCustomSlides(data);
+          setCarouselOrder(null);
+          return;
+        }
+        setCustomSlides(data.slides || []);
+        setCarouselOrder(data.order || null);
       })
       .catch(() => {
-        if (!cancelled) setCustomSlides([]);
+        if (!cancelled) {
+          setCustomSlides([]);
+          setCarouselOrder(null);
+        }
       });
     return () => {
       cancelled = true;
@@ -226,6 +215,8 @@ const HomeHeroCarousel = () => {
 
     return () => window.clearInterval(timer);
   }, [active, animating, goTo]);
+
+  if (!slidesLength) return null;
 
   return (
     <section className="relative pt-6 md:pt-8 pb-2 md:pb-4 overflow-hidden">

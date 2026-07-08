@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { translations } from '../translations/translations';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import { Badge } from './ui/badge';
-import { Images, Plus, Trash2, Pencil, Save, X, Eye } from 'lucide-react';
+import { Images, Plus, Trash2, Pencil, Save, X, Eye, ChevronUp, ChevronDown, GripVertical } from 'lucide-react';
 import api from '../lib/api';
 import {
   CAROUSEL_TEMPLATES,
@@ -22,6 +23,13 @@ import {
   normalizeCarouselSlide,
   slideToForm,
 } from '../lib/carouselSlideContent';
+import {
+  buildDefaultCarouselOrder,
+  getSlideLabelFromId,
+  isDefaultSlideId,
+  getDefaultSlideIndex,
+  DEFAULT_SLIDE_META,
+} from '../lib/carouselOrder';
 
 const LANG_FIELDS = [
   { titleKey: 'title', messageKey: 'message', ctaKey: 'cta_label', flag: '🇹🇷', suffix: 'tr' },
@@ -58,15 +66,27 @@ function SlidePreview({ form, language, t }) {
 const CarouselSlidesAdmin = () => {
   const { t, language } = useLanguage();
   const [slides, setSlides] = useState([]);
+  const [order, setOrder] = useState([]);
   const [form, setForm] = useState(EMPTY_CAROUSEL_FORM);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState(EMPTY_CAROUSEL_FORM);
   const [saving, setSaving] = useState(false);
+  const [reordering, setReordering] = useState(false);
+
+  const defaultSlides =
+    translations[language]?.home?.carouselSlides || translations.tr.home.carouselSlides;
 
   const fetchSlides = async () => {
     try {
       const res = await api.get('/api/admin/carousel-slides');
-      setSlides(res.data || []);
+      const data = res.data;
+      if (Array.isArray(data)) {
+        setSlides(data);
+        setOrder(buildDefaultCarouselOrder(defaultSlides.length));
+        return;
+      }
+      setSlides(data.slides || []);
+      setOrder(data.order || buildDefaultCarouselOrder(defaultSlides.length));
     } catch {
       console.error('Slaytlar yüklenemedi');
     }
@@ -74,7 +94,34 @@ const CarouselSlidesAdmin = () => {
 
   useEffect(() => {
     fetchSlides();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [language]);
+
+  const persistOrder = async (nextOrder) => {
+    setReordering(true);
+    try {
+      await api.put('/api/admin/carousel-slides/reorder', { order: nextOrder });
+    } catch (err) {
+      alert(err.response?.data?.detail || t('admin.carousel.reorderError'));
+      fetchSlides();
+    } finally {
+      setReordering(false);
+    }
+  };
+
+  const moveSlide = async (index, direction) => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= order.length) return;
+
+    const nextOrder = [...order];
+    const [moved] = nextOrder.splice(index, 1);
+    nextOrder.splice(targetIndex, 0, moved);
+    setOrder(nextOrder);
+    await persistOrder(nextOrder);
+  };
+
+  const getSlideTitle = (slideId) =>
+    getSlideLabelFromId(slideId, { defaultSlides, customSlides: slides, language });
 
   const validateForm = (data) => {
     const payload = formToPayload(data);
@@ -262,6 +309,90 @@ const CarouselSlidesAdmin = () => {
 
   return (
     <div className="space-y-8">
+      <Card className="border-2">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <GripVertical className="w-5 h-5 text-orange-600" />
+            {t('admin.carousel.orderTitle')}
+          </CardTitle>
+          <CardDescription>{t('admin.carousel.orderDesc')}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ul className="space-y-2">
+            {order.map((slideId, index) => {
+              const customSlide = slides.find((s) => s.id === slideId);
+              const defIndex = getDefaultSlideIndex(slideId);
+              const preset = customSlide
+                ? buildSlideMeta(customSlide.template, customSlide.icon)
+                : defIndex >= 0
+                  ? buildSlideMeta(
+                      DEFAULT_SLIDE_META[defIndex]?.template || 'red',
+                      DEFAULT_SLIDE_META[defIndex]?.icon || 'sparkles'
+                    )
+                  : buildSlideMeta('red', 'sparkles');
+              const { Icon, gradient } = preset;
+
+              return (
+                <li
+                  key={slideId}
+                  className="flex items-center gap-3 rounded-xl border bg-white px-3 py-3 shadow-sm"
+                >
+                  <span className="w-8 shrink-0 text-center text-sm font-bold text-gray-500">
+                    {index + 1}
+                  </span>
+                  {preset && (
+                    <div className={`w-10 h-10 shrink-0 rounded-lg bg-gradient-to-br ${gradient} flex items-center justify-center text-white`}>
+                      <Icon className="w-5 h-5" />
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-sm truncate">{getSlideTitle(slideId)}</p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {isDefaultSlideId(slideId) ? (
+                        <Badge variant="secondary" className="text-xs">
+                          {t('admin.carousel.builtIn')}
+                        </Badge>
+                      ) : (
+                        <Badge className="text-xs bg-orange-100 text-orange-800 hover:bg-orange-100">
+                          {t('admin.carousel.custom')}
+                        </Badge>
+                      )}
+                      {customSlide?.active === false && (
+                        <Badge className="bg-gray-400 text-xs">{t('admin.carousel.inactive')}</Badge>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex gap-1 shrink-0">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="h-9 w-9"
+                      disabled={reordering || index === 0}
+                      onClick={() => moveSlide(index, 'up')}
+                      aria-label={t('admin.carousel.moveUp')}
+                    >
+                      <ChevronUp className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="h-9 w-9"
+                      disabled={reordering || index === order.length - 1}
+                      onClick={() => moveSlide(index, 'down')}
+                      aria-label={t('admin.carousel.moveDown')}
+                    >
+                      <ChevronDown className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </CardContent>
+      </Card>
+
       <Card className="border-2">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

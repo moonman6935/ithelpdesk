@@ -555,6 +555,85 @@ function validateCarouselPayload(data) {
     };
 }
 
+const DEFAULT_CAROUSEL_COUNT = 11;
+
+function buildDefaultCarouselOrder() {
+    return Array.from({ length: DEFAULT_CAROUSEL_COUNT }, (_, i) => `default-${i}`);
+}
+
+function isDefaultCarouselSlideId(id) {
+    return /^default-\d+$/.test(String(id || ''));
+}
+
+function normalizeCarouselOrderIds(order, customIds) {
+    const defaultOrder = buildDefaultCarouselOrder();
+    const allIds = new Set([...defaultOrder, ...customIds]);
+    const seen = new Set();
+    const normalized = [];
+
+    (Array.isArray(order) ? order : []).forEach((id) => {
+        if (allIds.has(id) && !seen.has(id)) {
+            normalized.push(id);
+            seen.add(id);
+        }
+    });
+
+    defaultOrder.forEach((id) => {
+        if (!seen.has(id)) {
+            normalized.push(id);
+            seen.add(id);
+        }
+    });
+
+    customIds.forEach((id) => {
+        if (!seen.has(id)) {
+            normalized.push(id);
+            seen.add(id);
+        }
+    });
+
+    return normalized;
+}
+
+async function getCarouselOrderDoc(db, customIds) {
+    const doc = await db.collection('carousel_config').findOne({ _id: 'order' });
+    return normalizeCarouselOrderIds(doc?.slide_ids, customIds);
+}
+
+async function saveCarouselOrderDoc(db, order) {
+    await db.collection('carousel_config').updateOne(
+        { _id: 'order' },
+        {
+            $set: {
+                slide_ids: order,
+                updated_at: new Date().toISOString(),
+            },
+        },
+        { upsert: true }
+    );
+}
+
+function validateCarouselReorder(order, customIds) {
+    if (!Array.isArray(order) || order.length === 0) {
+        return { error: 'Geçersiz sıra listesi' };
+    }
+    const defaultIds = buildDefaultCarouselOrder();
+    const allValid = new Set([...defaultIds, ...customIds]);
+    const unique = new Set(order);
+    if (unique.size !== order.length) {
+        return { error: 'Sıra listesinde tekrar eden slayt var' };
+    }
+    if (order.length !== allValid.size) {
+        return { error: 'Tüm slaytlar sıra listesinde olmalıdır' };
+    }
+    for (const id of order) {
+        if (!allValid.has(id)) {
+            return { error: 'Geçersiz slayt kimliği' };
+        }
+    }
+    return { order };
+}
+
 function sendJson(res, status, data) {
     res.status(status).json(data);
 }
@@ -1303,11 +1382,16 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'GET' && route === 'carousel-slides') {
-            const slides = await db.collection('carousel_slides')
-                .find({ active: { $ne: false } }, { projection: { _id: 0 } })
-                .sort({ sort_order: 1, created_at: 1 })
+            const allCustom = await db.collection('carousel_slides')
+                .find({}, { projection: { _id: 0 } })
                 .toArray();
-            return sendJson(res, 200, slides.map(normalizeCarouselDoc));
+            const customSlides = allCustom
+                .filter((slide) => slide.active !== false)
+                .map(normalizeCarouselDoc)
+                .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+            const customIds = allCustom.map((slide) => slide.id);
+            const order = await getCarouselOrderDoc(db, customIds);
+            return sendJson(res, 200, { order, slides: customSlides });
         }
 
         if (method === 'GET' && route === 'admin/carousel-slides') {
@@ -1315,8 +1399,25 @@ module.exports = async (req, res) => {
             const slides = await db.collection('carousel_slides')
                 .find({}, { projection: { _id: 0 } })
                 .sort({ sort_order: 1, created_at: 1 })
+                .toArray()
+                .then((rows) => rows.map(normalizeCarouselDoc));
+            const customIds = slides.map((slide) => slide.id);
+            const order = await getCarouselOrderDoc(db, customIds);
+            return sendJson(res, 200, { slides, order });
+        }
+
+        if (method === 'PUT' && route === 'admin/carousel-slides/reorder') {
+            if (!(await requireWriteAccess(db, req, res))) return;
+            const allCustom = await db.collection('carousel_slides')
+                .find({}, { projection: { id: 1, _id: 0 } })
                 .toArray();
-            return sendJson(res, 200, slides.map(normalizeCarouselDoc));
+            const customIds = allCustom.map((slide) => slide.id);
+            const validated = validateCarouselReorder(req.body?.order, customIds);
+            if (validated.error) {
+                return sendError(res, 400, validated.error);
+            }
+            await saveCarouselOrderDoc(db, validated.order);
+            return sendJson(res, 200, { status: 'success', order: validated.order });
         }
 
         if (method === 'POST' && route === 'admin/carousel-slides') {
@@ -1335,7 +1436,16 @@ module.exports = async (req, res) => {
                 created_by: getAuthUsername(req) || 'admin',
             };
             await db.collection('carousel_slides').insertOne(slide);
-            return sendJson(res, 200, { status: 'success', slide: normalizeCarouselDoc(slide) });
+            const allCustom = await db.collection('carousel_slides')
+                .find({}, { projection: { id: 1, _id: 0 } })
+                .toArray();
+            const customIds = allCustom.map((row) => row.id);
+            const order = await getCarouselOrderDoc(db, customIds);
+            if (!order.includes(slide.id)) {
+                order.push(slide.id);
+                await saveCarouselOrderDoc(db, order);
+            }
+            return sendJson(res, 200, { status: 'success', slide: normalizeCarouselDoc(slide), order });
         }
 
         if (method === 'PUT' && segments[0] === 'admin' && segments[1] === 'carousel-slides' && segments.length === 3) {
@@ -1372,6 +1482,12 @@ module.exports = async (req, res) => {
             if (result.deletedCount === 0) {
                 return sendError(res, 404, 'Slayt bulunamadı');
             }
+            const remaining = await db.collection('carousel_slides')
+                .find({}, { projection: { id: 1, _id: 0 } })
+                .toArray();
+            const customIds = remaining.map((row) => row.id);
+            const order = (await getCarouselOrderDoc(db, customIds)).filter((id) => id !== slideId);
+            await saveCarouselOrderDoc(db, normalizeCarouselOrderIds(order, customIds));
             return sendJson(res, 200, { status: 'success' });
         }
 
