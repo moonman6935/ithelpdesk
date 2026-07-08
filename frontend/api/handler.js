@@ -446,6 +446,115 @@ function normalizeVideoDoc(video) {
     };
 }
 
+const CAROUSEL_TEMPLATE_IDS = [
+    'red', 'indigo', 'blue', 'emerald', 'violet', 'amber', 'slate', 'cyan', 'teal', 'rose', 'orange',
+];
+const CAROUSEL_ICON_IDS = [
+    'sparkles', 'download', 'monitor', 'refresh', 'message', 'package', 'shield', 'laptop', 'cable',
+    'truck', 'clipboard', 'headphones', 'alert', 'help', 'ticket', 'video', 'home', 'megaphone',
+    'wifi', 'settings', 'bell', 'star', 'zap', 'globe',
+];
+
+function parseCarouselLangField(data, field) {
+    const nested = data[field];
+    if (nested && typeof nested === 'object') {
+        return {
+            tr: String(nested.tr ?? '').trim(),
+            de: String(nested.de ?? '').trim(),
+            en: String(nested.en ?? '').trim(),
+        };
+    }
+    return {
+        tr: String(data[`${field}_tr`] ?? '').trim(),
+        de: String(data[`${field}_de`] ?? '').trim(),
+        en: String(data[`${field}_en`] ?? '').trim(),
+    };
+}
+
+function fillCarouselLangs(obj) {
+    const fallback = obj.tr || obj.de || obj.en || '';
+    return {
+        tr: obj.tr || fallback,
+        de: obj.de || fallback,
+        en: obj.en || fallback,
+    };
+}
+
+function parseCarouselTitles(data) {
+    const raw = parseCarouselLangField(data, 'titles');
+    if (!raw.tr && !raw.de && !raw.en) return null;
+    return fillCarouselLangs(raw);
+}
+
+function parseCarouselMessages(data) {
+    const raw = parseCarouselLangField(data, 'messages');
+    if (!raw.tr && !raw.de && !raw.en) return null;
+    return fillCarouselLangs(raw);
+}
+
+function parseCarouselCtaLabels(data) {
+    const raw = parseCarouselLangField(data, 'cta_labels');
+    if (!raw.tr && !raw.de && !raw.en) return { tr: '', de: '', en: '' };
+    return fillCarouselLangs(raw);
+}
+
+function isValidCarouselPath(path) {
+    if (!path) return true;
+    return path.startsWith('/') && !path.startsWith('//') && !path.includes('://');
+}
+
+function normalizeCarouselDoc(slide) {
+    if (!slide) return slide;
+    const titles = slide.titles
+        ? fillCarouselLangs(slide.titles)
+        : { tr: String(slide.title || '').trim(), de: '', en: '' };
+    const messages = slide.messages
+        ? fillCarouselLangs(slide.messages)
+        : { tr: String(slide.message || '').trim(), de: '', en: '' };
+    const cta_labels = slide.cta_labels
+        ? fillCarouselLangs(slide.cta_labels)
+        : { tr: String(slide.cta_label || '').trim(), de: '', en: '' };
+    return {
+        ...slide,
+        titles,
+        messages,
+        cta_labels,
+    };
+}
+
+function validateCarouselPayload(data) {
+    const titles = parseCarouselTitles(data);
+    const messages = parseCarouselMessages(data);
+    if (!titles || !messages) {
+        return { error: 'En az bir dilde başlık ve mesaj gerekli' };
+    }
+    const template = String(data.template || 'red').trim();
+    const icon = String(data.icon || 'sparkles').trim();
+    if (!CAROUSEL_TEMPLATE_IDS.includes(template)) {
+        return { error: 'Geçersiz slayt şablonu' };
+    }
+    if (!CAROUSEL_ICON_IDS.includes(icon)) {
+        return { error: 'Geçersiz ikon' };
+    }
+    const cta_link = String(data.cta_link || '').trim();
+    if (!isValidCarouselPath(cta_link)) {
+        return { error: 'Bağlantı / ile başlamalıdır' };
+    }
+    const cta_labels = parseCarouselCtaLabels(data);
+    if (cta_link && !cta_labels.tr && !cta_labels.de && !cta_labels.en) {
+        return { error: 'Bağlantı için en az bir dilde buton metni gerekli' };
+    }
+    return {
+        titles,
+        messages,
+        cta_link,
+        cta_labels,
+        template,
+        icon,
+        active: data.active !== false,
+    };
+}
+
 function sendJson(res, status, data) {
     res.status(status).json(data);
 }
@@ -1189,6 +1298,79 @@ module.exports = async (req, res) => {
             const result = await db.collection('troubleshooting_videos').deleteOne({ id: videoId });
             if (result.deletedCount === 0) {
                 return sendError(res, 404, 'Video bulunamadı');
+            }
+            return sendJson(res, 200, { status: 'success' });
+        }
+
+        if (method === 'GET' && route === 'carousel-slides') {
+            const slides = await db.collection('carousel_slides')
+                .find({ active: { $ne: false } }, { projection: { _id: 0 } })
+                .sort({ sort_order: 1, created_at: 1 })
+                .toArray();
+            return sendJson(res, 200, slides.map(normalizeCarouselDoc));
+        }
+
+        if (method === 'GET' && route === 'admin/carousel-slides') {
+            if (!(await requireWriteAccess(db, req, res))) return;
+            const slides = await db.collection('carousel_slides')
+                .find({}, { projection: { _id: 0 } })
+                .sort({ sort_order: 1, created_at: 1 })
+                .toArray();
+            return sendJson(res, 200, slides.map(normalizeCarouselDoc));
+        }
+
+        if (method === 'POST' && route === 'admin/carousel-slides') {
+            if (!(await requireWriteAccess(db, req, res))) return;
+            const validated = validateCarouselPayload(req.body || {});
+            if (validated.error) {
+                return sendError(res, 400, validated.error);
+            }
+            const count = await db.collection('carousel_slides').countDocuments();
+            const slide = {
+                id: randomUUID(),
+                ...validated,
+                sort_order: count,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                created_by: getAuthUsername(req) || 'admin',
+            };
+            await db.collection('carousel_slides').insertOne(slide);
+            return sendJson(res, 200, { status: 'success', slide: normalizeCarouselDoc(slide) });
+        }
+
+        if (method === 'PUT' && segments[0] === 'admin' && segments[1] === 'carousel-slides' && segments.length === 3) {
+            if (!(await requireWriteAccess(db, req, res))) return;
+            const slideId = segments[2];
+            const validated = validateCarouselPayload(req.body || {});
+            if (validated.error) {
+                return sendError(res, 400, validated.error);
+            }
+            const result = await db.collection('carousel_slides').updateOne(
+                { id: slideId },
+                {
+                    $set: {
+                        ...validated,
+                        updated_at: new Date().toISOString(),
+                        updated_by: getAuthUsername(req) || 'admin',
+                    },
+                }
+            );
+            if (result.matchedCount === 0) {
+                return sendError(res, 404, 'Slayt bulunamadı');
+            }
+            const updated = await db.collection('carousel_slides').findOne(
+                { id: slideId },
+                { projection: { _id: 0 } }
+            );
+            return sendJson(res, 200, { status: 'success', slide: normalizeCarouselDoc(updated) });
+        }
+
+        if (method === 'DELETE' && segments[0] === 'admin' && segments[1] === 'carousel-slides' && segments.length === 3) {
+            if (!(await requireWriteAccess(db, req, res))) return;
+            const slideId = segments[2];
+            const result = await db.collection('carousel_slides').deleteOne({ id: slideId });
+            if (result.deletedCount === 0) {
+                return sendError(res, 404, 'Slayt bulunamadı');
             }
             return sendJson(res, 200, { status: 'success' });
         }

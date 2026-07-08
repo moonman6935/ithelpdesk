@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from "../components/ui/alert";
 import {
     User, PlusCircle, CheckCircle2, LayoutDashboard, Package,
     RefreshCcw, Users, Trash2, ArrowLeftRight, LogOut, Dices, KeyRound, Upload,
-    Truck, PackageCheck, Megaphone, Video
+    Truck, PackageCheck, Megaphone, Video, Images
 } from "lucide-react";
 import {
     Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
@@ -20,6 +20,7 @@ import api from '../lib/api';
 import CargoPanel from '../components/CargoPanel';
 import AnnouncementAdmin from '../components/AnnouncementAdmin';
 import VideoTutorialsAdmin from '../components/VideoTutorialsAdmin';
+import CarouselSlidesAdmin from '../components/CarouselSlidesAdmin';
 import PersonnelInventoryPanel from '../components/PersonnelInventoryPanel';
 import { useNavigate } from 'react-router-dom';
 
@@ -360,6 +361,9 @@ const AdminDashboard = () => {
                             <TabsTrigger value="video-tutorials" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                                 <Video className="w-4 h-4 mr-2" /> {t('admin.videoTutorials.tab')}
                             </TabsTrigger>
+                            <TabsTrigger value="carousel-slides" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
+                                <Images className="w-4 h-4 mr-2" /> {t('admin.carousel.tab')}
+                            </TabsTrigger>
                             </>
                         )}
                         <TabsTrigger value="account" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
@@ -671,6 +675,12 @@ const AdminDashboard = () => {
                     {canWrite && (
                     <TabsContent value="video-tutorials">
                         <VideoTutorialsAdmin />
+                    </TabsContent>
+                    )}
+
+                    {canWrite && (
+                    <TabsContent value="carousel-slides">
+                        <CarouselSlidesAdmin />
                     </TabsContent>
                     )}
 
