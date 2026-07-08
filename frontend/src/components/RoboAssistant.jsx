@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { roboTranslations } from '../translations/roboTranslations';
 import { getFlowNode, ROCKET_CHAT_URL } from '../lib/roboFlows';
@@ -422,28 +422,28 @@ function RoboOverlay({ onClose }) {
 
 const RoboAssistant = () => {
   const t = useRoboT();
+  const location = useLocation();
   const [open, setOpen] = useState(false);
   const [showBubble, setShowBubble] = useState(false);
 
   useEffect(() => {
-    if (sessionStorage.getItem('robo-bubble-dismissed') === '1') return undefined;
+    setShowBubble(false);
 
-    const showTimer = window.setTimeout(() => setShowBubble(true), 1800);
+    const showTimer = window.setTimeout(() => setShowBubble(true), 1200);
     const hideTimer = window.setTimeout(() => setShowBubble(false), 14000);
 
     return () => {
       window.clearTimeout(showTimer);
       window.clearTimeout(hideTimer);
     };
-  }, []);
+  }, [location.pathname]);
 
   const dismissBubble = () => {
     setShowBubble(false);
-    sessionStorage.setItem('robo-bubble-dismissed', '1');
   };
 
   const handleOpen = () => {
-    dismissBubble();
+    setShowBubble(false);
     setOpen(true);
   };
 
