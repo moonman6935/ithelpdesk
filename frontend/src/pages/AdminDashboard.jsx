@@ -34,6 +34,34 @@ import {
 } from '../lib/adminPermissions';
 import { useNavigate } from 'react-router-dom';
 
+const TAB_MODULE_MAP = {
+    dashboard: 'dashboard',
+    add: 'assets',
+    inventory: 'inventory',
+    'outgoing-cargo': 'outgoing_cargo',
+    'incoming-cargo': 'incoming_cargo',
+    confirmations: 'confirmations',
+    announcement: 'announcement',
+    'video-tutorials': 'video_tutorials',
+    'carousel-slides': 'carousel',
+};
+
+const TAB_ORDER = [
+    'dashboard', 'add', 'inventory', 'outgoing-cargo', 'incoming-cargo',
+    'confirmations', 'users', 'announcement', 'video-tutorials', 'carousel-slides', 'account',
+];
+
+function canViewTab(tab, perms, sysAdmin) {
+    if (tab === 'account') return true;
+    if (tab === 'users') return sysAdmin;
+    const module = TAB_MODULE_MAP[tab];
+    return module ? (sysAdmin || canViewModule(perms, module)) : false;
+}
+
+function pickFirstAvailableTab(perms, sysAdmin) {
+    return TAB_ORDER.find((tab) => canViewTab(tab, perms, sysAdmin)) || 'account';
+}
+
 const AdminDashboard = () => {
     const { t } = useLanguage();
     const navigate = useNavigate();
@@ -59,9 +87,11 @@ const AdminDashboard = () => {
     const [importing, setImporting] = useState(false);
     const [printingForm, setPrintingForm] = useState(false);
     const [productNames, setProductNames] = useState([]);
+    const [loading, setLoading] = useState(true);
     const fileInputRef = useRef(null);
     const permissionsRef = useRef(permissions);
     const isSystemAdminRef = useRef(isSystemAdmin);
+    const fetchAdminDataRef = useRef(null);
 
     permissionsRef.current = permissions;
     isSystemAdminRef.current = isSystemAdmin;
@@ -83,48 +113,23 @@ const AdminDashboard = () => {
         return unauthorized;
     };
 
-    const fetchAdminData = useCallback(async (opts = {}) => {
-        const perms = opts.permissions ?? permissionsRef.current;
-        const sysAdmin = opts.isSystemAdmin ?? isSystemAdminRef.current;
-
-        const tasks = [];
-        if (canViewModule(perms, 'dashboard')) {
-            tasks.push(api.get('/api/admin/stats').then((r) => ({ key: 'stats', data: r.data })));
+    const fetchAdminData = useCallback(async () => {
+        const sysAdmin = isSystemAdminRef.current;
+        const tasks = [
+            api.get('/api/admin/stats').then((r) => ({ key: 'stats', data: r.data })),
+            api.get('/api/admin/confirmations').then((r) => ({ key: 'confirmations', data: r.data })),
+            api.get('/api/admin/inventory').then((r) => ({ key: 'inventory', data: r.data })),
+            api.get('/api/admin/product-names').then((r) => ({ key: 'productNames', data: r.data })),
+        ];
+        if (sysAdmin) {
+            tasks.push(api.get('/api/admin/users').then((r) => ({ key: 'users', data: r.data })));
         }
-        if (canViewModule(perms, 'confirmations')) {
-            tasks.push(api.get('/api/admin/confirmations').then((r) => ({ key: 'confirmations', data: r.data })));
-        }
-        if (canViewModule(perms, 'inventory')) {
-            tasks.push(api.get('/api/admin/inventory').then((r) => ({ key: 'inventory', data: r.data })));
-        }
-
         if (applySettledResults(await Promise.allSettled(tasks))) {
             navigate('/login');
-            return;
-        }
-
-        if (sysAdmin) {
-            const adminTasks = [
-                api.get('/api/admin/users').then((r) => ({ key: 'users', data: r.data })),
-            ];
-            if (canViewModule(perms, 'assets')) {
-                adminTasks.push(api.get('/api/admin/product-names').then((r) => ({ key: 'productNames', data: r.data })));
-            }
-            if (applySettledResults(await Promise.allSettled(adminTasks))) {
-                navigate('/login');
-            }
-            return;
-        }
-
-        if (canViewModule(perms, 'assets')) {
-            const namesResult = await Promise.allSettled([
-                api.get('/api/admin/product-names').then((r) => ({ key: 'productNames', data: r.data })),
-            ]);
-            if (applySettledResults(namesResult)) {
-                navigate('/login');
-            }
         }
     }, [navigate]);
+
+    fetchAdminDataRef.current = fetchAdminData;
 
     useEffect(() => {
         const token = localStorage.getItem('admin_token');
@@ -134,43 +139,61 @@ const AdminDashboard = () => {
         }
 
         let cancelled = false;
+        const role = localStorage.getItem('admin_role') || 'viewer';
+        const perms = loadStoredPermissions() || defaultPermissionsForRole(role);
+        const sysAdmin = role === 'system_admin';
+
+        permissionsRef.current = perms;
+        isSystemAdminRef.current = sysAdmin;
+        setIsSystemAdmin(sysAdmin);
+        setPermissions(perms);
+        setActiveTab(pickFirstAvailableTab(perms, sysAdmin));
 
         (async () => {
-            let role = localStorage.getItem('admin_role') || 'viewer';
-            let perms = loadStoredPermissions() || defaultPermissionsForRole(role);
-            let sysAdmin = role === 'system_admin';
-
             try {
-                const { data } = await api.get('/api/admin/me');
-                if (cancelled) return;
-                role = data.role;
-                perms = data.permissions;
-                sysAdmin = role === 'system_admin';
-                storeSessionAuth({ role, permissions: perms });
-            } catch (err) {
-                if (cancelled) return;
-                if (err.response?.status === 401) {
-                    navigate('/login');
-                    return;
-                }
+                await fetchAdminDataRef.current?.();
+            } finally {
+                if (!cancelled) setLoading(false);
             }
 
-            if (cancelled) return;
-
-            permissionsRef.current = perms;
-            isSystemAdminRef.current = sysAdmin;
-            setIsSystemAdmin(sysAdmin);
-            setPermissions(perms);
-            await fetchAdminData({ permissions: perms, isSystemAdmin: sysAdmin });
+            api.get('/api/admin/me')
+                .then(({ data }) => {
+                    if (cancelled) return;
+                    storeSessionAuth({ role: data.role, permissions: data.permissions });
+                    const refreshedSysAdmin = data.role === 'system_admin';
+                    permissionsRef.current = data.permissions;
+                    isSystemAdminRef.current = refreshedSysAdmin;
+                    setIsSystemAdmin(refreshedSysAdmin);
+                    setPermissions(data.permissions);
+                    setActiveTab((current) => (
+                        canViewTab(current, data.permissions, refreshedSysAdmin)
+                            ? current
+                            : pickFirstAvailableTab(data.permissions, refreshedSysAdmin)
+                    ));
+                    fetchAdminDataRef.current?.();
+                })
+                .catch(() => {});
         })();
 
         return () => {
             cancelled = true;
         };
-    }, [navigate, fetchAdminData]);
+    }, [navigate]);
+
+    useEffect(() => {
+        if (!canViewTab(activeTab, permissions, isSystemAdmin)) {
+            setActiveTab(pickFirstAvailableTab(permissions, isSystemAdmin));
+        }
+    }, [activeTab, permissions, isSystemAdmin]);
 
     const canView = (module) => isSystemAdmin || canViewModule(permissions, module);
     const canWrite = (module) => isSystemAdmin || canWriteModule(permissions, module);
+
+    const goToInventory = (filter = 'all') => {
+        if (!canView('inventory')) return;
+        setInventoryStatusFilter(filter);
+        setActiveTab('inventory');
+    };
 
     const fetchProductNames = useCallback(async () => {
         try {
@@ -183,35 +206,30 @@ const AdminDashboard = () => {
 
     // Intelligent ID fetcher
     useEffect(() => {
-        if (!canWriteModule(permissions, 'assets')) return undefined;
+        const canWriteAssets = isSystemAdmin || canWriteModule(permissions, 'assets');
+        if (!canWriteAssets) return undefined;
 
-        const fetchNextId = async () => {
-            if (!personnelName.trim()) {
-                setPersonnelId('');
-                return;
-            }
+        if (!personnelName.trim()) {
+            setPersonnelId('');
+            return undefined;
+        }
 
-            const timeoutId = setTimeout(async () => {
-                try {
-                    // 1. Search if name already exists
-                    const searchRes = await api.get(`/api/admin/personnel/search?name=${encodeURIComponent(personnelName)}`);
-                    if (searchRes.data.personnel_id) {
-                        setPersonnelId(searchRes.data.personnel_id);
-                    } else {
-                        // 2. If not, fetch next available ID
-                        const nextIdRes = await api.get('/api/admin/next-personnel-id');
-                        setPersonnelId(nextIdRes.data.next_id);
-                    }
-                } catch (err) {
-                    console.error('ID anlık üretilemedi');
+        const timeoutId = setTimeout(async () => {
+            try {
+                const searchRes = await api.get(`/api/admin/personnel/search?name=${encodeURIComponent(personnelName)}`);
+                if (searchRes.data.personnel_id) {
+                    setPersonnelId(searchRes.data.personnel_id);
+                } else {
+                    const nextIdRes = await api.get('/api/admin/next-personnel-id');
+                    setPersonnelId(nextIdRes.data.next_id);
                 }
-            }, 500); // 500ms debounce
+            } catch (err) {
+                console.error('ID anlık üretilemedi');
+            }
+        }, 500);
 
-            return () => clearTimeout(timeoutId);
-        };
-
-        fetchNextId();
-    }, [personnelName, permissions]);
+        return () => clearTimeout(timeoutId);
+    }, [personnelName, permissions, isSystemAdmin]);
 
     const handleRandomId = async () => {
         try {
@@ -393,6 +411,12 @@ const AdminDashboard = () => {
     return (
         <div className="min-h-screen py-12">
             <div className="site-container">
+                {loading ? (
+                    <div className="flex items-center justify-center py-24 text-gray-500">
+                        Yükleniyor...
+                    </div>
+                ) : (
+                <>
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-4xl font-bold flex items-center gap-3">
                         <User className="w-10 h-10 text-red-600" />
@@ -766,7 +790,8 @@ const AdminDashboard = () => {
                         </Card>
                     </TabsContent>
                 </Tabs>
-            </div>
+                </>
+                )}
 
             <Dialog open={Boolean(importPreview)} onOpenChange={(open) => !open && setImportPreview(null)}>
                 <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
@@ -844,6 +869,7 @@ const AdminDashboard = () => {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+            </div>
         </div>
     );
 };
