@@ -27,6 +27,7 @@ import UserManagementPanel from '../components/UserManagementPanel';
 import {
     loadStoredPermissions,
     clearSessionAuth,
+    storeSessionAuth,
     canView as canViewModule,
     canWrite as canWriteModule,
     defaultPermissionsForRole,
@@ -59,59 +60,113 @@ const AdminDashboard = () => {
     const [printingForm, setPrintingForm] = useState(false);
     const [productNames, setProductNames] = useState([]);
     const fileInputRef = useRef(null);
+    const permissionsRef = useRef(permissions);
+    const isSystemAdminRef = useRef(isSystemAdmin);
 
-    const fetchAdminData = useCallback(async () => {
-        try {
-            const requests = [];
-            if (canViewModule(permissions, 'dashboard')) {
-                requests.push(api.get('/api/admin/stats').then((r) => ({ stats: r.data })));
-            }
-            if (canViewModule(permissions, 'confirmations')) {
-                requests.push(api.get('/api/admin/confirmations').then((r) => ({ confirmations: r.data })));
-            }
-            if (canViewModule(permissions, 'inventory')) {
-                requests.push(api.get('/api/admin/inventory').then((r) => ({ inventory: r.data })));
-            }
+    permissionsRef.current = permissions;
+    isSystemAdminRef.current = isSystemAdmin;
 
-            const results = await Promise.all(requests);
-            const merged = results.reduce((acc, part) => ({ ...acc, ...part }), {});
-            if (merged.confirmations) setConfirmations(merged.confirmations);
-            if (merged.inventory) setInventory(merged.inventory);
-            if (merged.stats) setStats(merged.stats);
-
-            if (isSystemAdmin) {
-                const [userRes, namesRes] = await Promise.all([
-                    api.get('/api/admin/users'),
-                    canViewModule(permissions, 'assets')
-                        ? api.get('/api/admin/product-names')
-                        : Promise.resolve({ data: [] }),
-                ]);
-                setAdmins(userRes.data);
-                setProductNames(namesRes.data);
-            } else if (canViewModule(permissions, 'assets')) {
-                try {
-                    const namesRes = await api.get('/api/admin/product-names');
-                    setProductNames(namesRes.data);
-                } catch {
-                    setProductNames([]);
-                }
+    const applySettledResults = (results) => {
+        let unauthorized = false;
+        for (const result of results) {
+            if (result.status === 'fulfilled') {
+                const { key, data } = result.value;
+                if (key === 'stats') setStats(data);
+                if (key === 'confirmations') setConfirmations(data);
+                if (key === 'inventory') setInventory(data);
+                if (key === 'users') setAdmins(data);
+                if (key === 'productNames') setProductNames(data);
+            } else if (result.reason?.response?.status === 401) {
+                unauthorized = true;
             }
-        } catch (err) {
-            console.error('Veri çekilemedi');
-            if (err.response?.status === 401) navigate('/login');
         }
-    }, [navigate, permissions, isSystemAdmin]);
+        return unauthorized;
+    };
 
-    useEffect(() => {
-        const token = localStorage.getItem('admin_token');
-        const role = localStorage.getItem('admin_role');
-        if (!token) {
+    const fetchAdminData = useCallback(async (opts = {}) => {
+        const perms = opts.permissions ?? permissionsRef.current;
+        const sysAdmin = opts.isSystemAdmin ?? isSystemAdminRef.current;
+
+        const tasks = [];
+        if (canViewModule(perms, 'dashboard')) {
+            tasks.push(api.get('/api/admin/stats').then((r) => ({ key: 'stats', data: r.data })));
+        }
+        if (canViewModule(perms, 'confirmations')) {
+            tasks.push(api.get('/api/admin/confirmations').then((r) => ({ key: 'confirmations', data: r.data })));
+        }
+        if (canViewModule(perms, 'inventory')) {
+            tasks.push(api.get('/api/admin/inventory').then((r) => ({ key: 'inventory', data: r.data })));
+        }
+
+        if (applySettledResults(await Promise.allSettled(tasks))) {
             navigate('/login');
             return;
         }
-        setIsSystemAdmin(role === 'system_admin');
-        setPermissions(loadStoredPermissions() || defaultPermissionsForRole(role || 'viewer'));
-        fetchAdminData();
+
+        if (sysAdmin) {
+            const adminTasks = [
+                api.get('/api/admin/users').then((r) => ({ key: 'users', data: r.data })),
+            ];
+            if (canViewModule(perms, 'assets')) {
+                adminTasks.push(api.get('/api/admin/product-names').then((r) => ({ key: 'productNames', data: r.data })));
+            }
+            if (applySettledResults(await Promise.allSettled(adminTasks))) {
+                navigate('/login');
+            }
+            return;
+        }
+
+        if (canViewModule(perms, 'assets')) {
+            const namesResult = await Promise.allSettled([
+                api.get('/api/admin/product-names').then((r) => ({ key: 'productNames', data: r.data })),
+            ]);
+            if (applySettledResults(namesResult)) {
+                navigate('/login');
+            }
+        }
+    }, [navigate]);
+
+    useEffect(() => {
+        const token = localStorage.getItem('admin_token');
+        if (!token) {
+            navigate('/login');
+            return undefined;
+        }
+
+        let cancelled = false;
+
+        (async () => {
+            let role = localStorage.getItem('admin_role') || 'viewer';
+            let perms = loadStoredPermissions() || defaultPermissionsForRole(role);
+            let sysAdmin = role === 'system_admin';
+
+            try {
+                const { data } = await api.get('/api/admin/me');
+                if (cancelled) return;
+                role = data.role;
+                perms = data.permissions;
+                sysAdmin = role === 'system_admin';
+                storeSessionAuth({ role, permissions: perms });
+            } catch (err) {
+                if (cancelled) return;
+                if (err.response?.status === 401) {
+                    navigate('/login');
+                    return;
+                }
+            }
+
+            if (cancelled) return;
+
+            permissionsRef.current = perms;
+            isSystemAdminRef.current = sysAdmin;
+            setIsSystemAdmin(sysAdmin);
+            setPermissions(perms);
+            await fetchAdminData({ permissions: perms, isSystemAdmin: sysAdmin });
+        })();
+
+        return () => {
+            cancelled = true;
+        };
     }, [navigate, fetchAdminData]);
 
     const canView = (module) => isSystemAdmin || canViewModule(permissions, module);

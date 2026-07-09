@@ -912,6 +912,16 @@ module.exports = async (req, res) => {
             return sendJson(res, 200, { status: 'success', id: confirmation.id });
         }
 
+        if (method === 'GET' && route === 'admin/me') {
+            const user = await requireAdminAccess(db, req, res);
+            if (!user) return;
+            return sendJson(res, 200, {
+                username: user.username,
+                role: user.role,
+                permissions: resolveUserPermissions(user),
+            });
+        }
+
         if (method === 'GET' && route === 'admin/stats') {
             if (!(await requireModuleAccess(db, req, res, 'dashboard'))) return;
             const total_assigned = await db.collection('inventory').countDocuments({ status: 'assigned' });

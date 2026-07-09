@@ -98,11 +98,13 @@ const LANGUAGES = [
 
 function NavLinkButton({ item, active, className, size = 'sm' }) {
   const { t } = useLanguage();
+  const location = useLocation();
   const { openFromElement } = useAppOpenTransition();
   const label = t(item.labelKey);
+  const useDirectNav = location.pathname.startsWith('/admin') || location.pathname.startsWith('/login');
 
   const handleClick = (e) => {
-    if (active) return;
+    if (active || useDirectNav) return;
     e.preventDefault();
     openFromElement(e.currentTarget, {
       to: item.path,
