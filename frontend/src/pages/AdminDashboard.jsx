@@ -8,7 +8,7 @@ import { Badge } from "../components/ui/badge";
 import { Alert, AlertDescription } from "../components/ui/alert";
 import {
     User, PlusCircle, CheckCircle2, LayoutDashboard, Package,
-    RefreshCcw, Users, Trash2, ArrowLeftRight, LogOut, Dices, KeyRound, Upload,
+    RefreshCcw, Users, ArrowLeftRight, LogOut, Dices, KeyRound, Upload,
     Truck, PackageCheck, Megaphone, Video, Images, Printer
 } from "lucide-react";
 import {
@@ -23,6 +23,14 @@ import AnnouncementAdmin from '../components/AnnouncementAdmin';
 import VideoTutorialsAdmin from '../components/VideoTutorialsAdmin';
 import CarouselSlidesAdmin from '../components/CarouselSlidesAdmin';
 import PersonnelInventoryPanel from '../components/PersonnelInventoryPanel';
+import UserManagementPanel from '../components/UserManagementPanel';
+import {
+    loadStoredPermissions,
+    clearSessionAuth,
+    canView as canViewModule,
+    canWrite as canWriteModule,
+    defaultPermissionsForRole,
+} from '../lib/adminPermissions';
 import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
@@ -38,8 +46,9 @@ const AdminDashboard = () => {
     const [stats, setStats] = useState(null);
     const [admins, setAdmins] = useState([]);
     const [isSystemAdmin, setIsSystemAdmin] = useState(false);
-    const [isViewer, setIsViewer] = useState(false);
-    const [newAdmin, setNewAdmin] = useState({ username: '', password: '', role: 'viewer' });
+    const [permissions, setPermissions] = useState(() =>
+        loadStoredPermissions() || defaultPermissionsForRole(localStorage.getItem('admin_role') || 'viewer')
+    );
     const [passwordForm, setPasswordForm] = useState({
         current_password: '',
         new_password: '',
@@ -53,24 +62,33 @@ const AdminDashboard = () => {
 
     const fetchAdminData = useCallback(async () => {
         try {
-            const [confRes, invRes, statRes] = await Promise.all([
-                api.get('/api/admin/confirmations'),
-                api.get('/api/admin/inventory'),
-                api.get('/api/admin/stats')
-            ]);
-            setConfirmations(confRes.data);
-            setInventory(invRes.data);
-            setStats(statRes.data);
+            const requests = [];
+            if (canViewModule(permissions, 'dashboard')) {
+                requests.push(api.get('/api/admin/stats').then((r) => ({ stats: r.data })));
+            }
+            if (canViewModule(permissions, 'confirmations')) {
+                requests.push(api.get('/api/admin/confirmations').then((r) => ({ confirmations: r.data })));
+            }
+            if (canViewModule(permissions, 'inventory')) {
+                requests.push(api.get('/api/admin/inventory').then((r) => ({ inventory: r.data })));
+            }
 
-            const role = localStorage.getItem('admin_role');
-            if (role === 'system_admin') {
+            const results = await Promise.all(requests);
+            const merged = results.reduce((acc, part) => ({ ...acc, ...part }), {});
+            if (merged.confirmations) setConfirmations(merged.confirmations);
+            if (merged.inventory) setInventory(merged.inventory);
+            if (merged.stats) setStats(merged.stats);
+
+            if (isSystemAdmin) {
                 const [userRes, namesRes] = await Promise.all([
                     api.get('/api/admin/users'),
-                    api.get('/api/admin/product-names'),
+                    canViewModule(permissions, 'assets')
+                        ? api.get('/api/admin/product-names')
+                        : Promise.resolve({ data: [] }),
                 ]);
                 setAdmins(userRes.data);
                 setProductNames(namesRes.data);
-            } else {
+            } else if (canViewModule(permissions, 'assets')) {
                 try {
                     const namesRes = await api.get('/api/admin/product-names');
                     setProductNames(namesRes.data);
@@ -82,7 +100,7 @@ const AdminDashboard = () => {
             console.error('Veri çekilemedi');
             if (err.response?.status === 401) navigate('/login');
         }
-    }, [navigate]);
+    }, [navigate, permissions, isSystemAdmin]);
 
     useEffect(() => {
         const token = localStorage.getItem('admin_token');
@@ -92,17 +110,12 @@ const AdminDashboard = () => {
             return;
         }
         setIsSystemAdmin(role === 'system_admin');
-        setIsViewer(role === 'viewer');
+        setPermissions(loadStoredPermissions() || defaultPermissionsForRole(role || 'viewer'));
         fetchAdminData();
     }, [navigate, fetchAdminData]);
 
-    const goToInventory = (filter = 'all') => {
-        setInventoryStatusFilter(filter);
-        setActiveTab('inventory');
-    };
-
-    const roleLabel = (role) => t(`admin.roles.${role}`) || role;
-    const canWrite = isSystemAdmin;
+    const canView = (module) => isSystemAdmin || canViewModule(permissions, module);
+    const canWrite = (module) => isSystemAdmin || canWriteModule(permissions, module);
 
     const fetchProductNames = useCallback(async () => {
         try {
@@ -115,7 +128,7 @@ const AdminDashboard = () => {
 
     // Intelligent ID fetcher
     useEffect(() => {
-        if (!isSystemAdmin) return undefined;
+        if (!canWriteModule(permissions, 'assets')) return undefined;
 
         const fetchNextId = async () => {
             if (!personnelName.trim()) {
@@ -143,7 +156,7 @@ const AdminDashboard = () => {
         };
 
         fetchNextId();
-    }, [personnelName, isSystemAdmin]);
+    }, [personnelName, permissions]);
 
     const handleRandomId = async () => {
         try {
@@ -156,8 +169,8 @@ const AdminDashboard = () => {
 
     const handleLogout = () => {
         localStorage.removeItem('admin_token');
-        localStorage.removeItem('admin_role');
         localStorage.removeItem('admin_username');
+        clearSessionAuth();
         navigate('/login');
     };
 
@@ -222,28 +235,6 @@ const AdminDashboard = () => {
         }
     };
 
-    const handleAddAdmin = async (e) => {
-        e.preventDefault();
-        try {
-            await api.post('/api/admin/users', newAdmin);
-            alert('Kullanıcı eklendi');
-            setNewAdmin({ username: '', password: '', role: 'viewer' });
-            fetchAdminData();
-        } catch (err) {
-            alert(err.response?.data?.detail || 'Hata oluştu');
-        }
-    };
-
-    const deleteAdmin = async (username) => {
-        if (window.confirm('Bu yöneticiyi silmek istediğinize emin misiniz?')) {
-            try {
-                await api.delete(`/api/admin/users/${username}`);
-                fetchAdminData();
-            } catch (err) {
-                alert(err.response?.data?.detail || 'Hata oluştu');
-            }
-        }
-    };
 
     const handleChangePassword = async (e) => {
         e.preventDefault();
@@ -359,49 +350,62 @@ const AdminDashboard = () => {
 
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
                     <TabsList className="glass-panel p-1 flex-wrap h-auto border-0 shadow-md">
+                        {canView('dashboard') && (
                         <TabsTrigger value="dashboard" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                             <LayoutDashboard className="w-4 h-4 mr-2" /> {t('admin.dashboard')}
                         </TabsTrigger>
-                        {canWrite && (
+                        )}
+                        {canView('assets') && (
                         <TabsTrigger value="add" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                             <PlusCircle className="w-4 h-4 mr-2" /> {t('admin.addAsset')}
                         </TabsTrigger>
                         )}
+                        {canView('inventory') && (
                         <TabsTrigger value="inventory" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                             <Package className="w-4 h-4 mr-2" /> {t('admin.inventory')}
                         </TabsTrigger>
+                        )}
+                        {canView('outgoing_cargo') && (
                         <TabsTrigger value="outgoing-cargo" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                             <Truck className="w-4 h-4 mr-2" /> {t('admin.outgoingCargo')}
                         </TabsTrigger>
+                        )}
+                        {canView('incoming_cargo') && (
                         <TabsTrigger value="incoming-cargo" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                             <PackageCheck className="w-4 h-4 mr-2" /> {t('admin.incomingCargo')}
                         </TabsTrigger>
+                        )}
+                        {canView('confirmations') && (
                         <TabsTrigger value="confirmations" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                             <CheckCircle2 className="w-4 h-4 mr-2" /> {t('admin.confirmations')}
                         </TabsTrigger>
+                        )}
                         {isSystemAdmin && (
                             <TabsTrigger value="users" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
-                                <Users className="w-4 h-4 mr-2" /> {t('admin.adminManagement')}
+                                <Users className="w-4 h-4 mr-2" /> {t('admin.userMgmt.tab')}
                             </TabsTrigger>
                         )}
-                        {canWrite && (
-                            <>
+                        {canView('announcement') && (
                             <TabsTrigger value="announcement" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                                 <Megaphone className="w-4 h-4 mr-2" /> {t('admin.announcement.tab')}
                             </TabsTrigger>
+                        )}
+                        {canView('video_tutorials') && (
                             <TabsTrigger value="video-tutorials" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                                 <Video className="w-4 h-4 mr-2" /> {t('admin.videoTutorials.tab')}
                             </TabsTrigger>
+                        )}
+                        {canView('carousel') && (
                             <TabsTrigger value="carousel-slides" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                                 <Images className="w-4 h-4 mr-2" /> {t('admin.carousel.tab')}
                             </TabsTrigger>
-                            </>
                         )}
                         <TabsTrigger value="account" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                             <KeyRound className="w-4 h-4 mr-2" /> {t('admin.passwordTab')}
                         </TabsTrigger>
                     </TabsList>
 
+                    {canView('dashboard') && (
                     <TabsContent value="dashboard">
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                             <Card
@@ -450,8 +454,9 @@ const AdminDashboard = () => {
                             </Card>
                         </div>
                     </TabsContent>
+                    )}
 
-                    {canWrite && (
+                    {canView('assets') && (
                     <TabsContent value="add">
                         <Card className="max-w-3xl mx-auto border-2">
                             <CardHeader>
@@ -569,7 +574,7 @@ const AdminDashboard = () => {
                             inventory={inventory}
                             statusFilter={inventoryStatusFilter}
                             onStatusFilterChange={setInventoryStatusFilter}
-                            canWrite={canWrite}
+                            canWrite={canWrite('inventory')}
                             onImportClick={() => fileInputRef.current?.click()}
                             fileInputRef={fileInputRef}
                             onExcelSelect={handleExcelFileSelect}
@@ -579,11 +584,11 @@ const AdminDashboard = () => {
                     </TabsContent>
 
                     <TabsContent value="outgoing-cargo">
-                        <CargoPanel direction="outgoing" canWrite={canWrite} />
+                        <CargoPanel direction="outgoing" canWrite={canWrite('outgoing_cargo')} />
                     </TabsContent>
 
                     <TabsContent value="incoming-cargo">
-                        <CargoPanel direction="incoming" canWrite={canWrite} />
+                        <CargoPanel direction="incoming" canWrite={canWrite('incoming_cargo')} />
                     </TabsContent>
 
                     <TabsContent value="confirmations">
@@ -615,7 +620,7 @@ const AdminDashboard = () => {
                                                 </div>
                                             </div>
                                             <div className="bg-gray-50 p-6 flex items-center justify-center border-l">
-                                                {canWrite && conf.status === 'confirmed' && (
+                                                {canWrite('confirmations') && conf.status === 'confirmed' && (
                                                     <Button
                                                         onClick={() => resetConfirmation(conf.personnel_id)}
                                                         className="bg-orange-500 hover:bg-orange-600 text-white"
@@ -633,97 +638,27 @@ const AdminDashboard = () => {
 
                     {isSystemAdmin && (
                         <TabsContent value="users">
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                <Card className="md:col-span-1 border-2">
-                                    <CardHeader>
-                                        <CardTitle>{t('admin.addNewAdmin')}</CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <form onSubmit={handleAddAdmin} className="space-y-4">
-                                            <div>
-                                                <label className="block text-sm font-medium mb-1">{t('admin.username')}</label>
-                                                <Input
-                                                    value={newAdmin.username}
-                                                    onChange={(e) => setNewAdmin({ ...newAdmin, username: e.target.value })}
-                                                    required
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium mb-1">{t('admin.password')}</label>
-                                                <Input
-                                                    type="password"
-                                                    value={newAdmin.password}
-                                                    onChange={(e) => setNewAdmin({ ...newAdmin, password: e.target.value })}
-                                                    required
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium mb-1">{t('admin.role')}</label>
-                                                <select
-                                                    className="w-full p-2 border rounded"
-                                                    value={newAdmin.role}
-                                                    onChange={(e) => setNewAdmin({ ...newAdmin, role: e.target.value })}
-                                                >
-                                                    <option value="viewer">{roleLabel('viewer')}</option>
-                                                    <option value="admin">{roleLabel('admin')}</option>
-                                                    <option value="system_admin">{roleLabel('system_admin')}</option>
-                                                </select>
-                                            </div>
-                                            <Button type="submit" className="w-full bg-red-600">{t('admin.addButton')}</Button>
-                                        </form>
-                                    </CardContent>
-                                </Card>
-
-                                <Card className="md:col-span-2 border-2">
-                                    <CardHeader>
-                                        <CardTitle>{t('admin.adminsList')}</CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <table className="w-full text-sm">
-                                            <thead>
-                                                <tr className="border-b text-left">
-                                                    <th className="p-4">{t('admin.username')}</th>
-                                                    <th className="p-4">{t('admin.role')}</th>
-                                                    <th className="p-4">{t('admin.actions')}</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {admins.map((adm) => (
-                                                    <tr key={adm.id} className="border-b">
-                                                        <td className="p-4 font-bold">{adm.username}</td>
-                                                        <td className="p-4">
-                                                            <Badge variant="outline">{roleLabel(adm.role)}</Badge>
-                                                        </td>
-                                                        <td className="p-4">
-                                                            {adm.username !== 'admin' && (
-                                                                <Button variant="ghost" size="sm" onClick={() => deleteAdmin(adm.username)} className="text-red-600">
-                                                                    <Trash2 className="w-4 h-4" />
-                                                                </Button>
-                                                            )}
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </CardContent>
-                                </Card>
-                            </div>
+                            <UserManagementPanel
+                                users={admins}
+                                onRefresh={fetchAdminData}
+                                currentUsername={localStorage.getItem('admin_username') || ''}
+                            />
                         </TabsContent>
                     )}
 
-                    {canWrite && (
+                    {canView('announcement') && (
                     <TabsContent value="announcement">
                         <AnnouncementAdmin />
                     </TabsContent>
                     )}
 
-                    {canWrite && (
+                    {canView('video_tutorials') && (
                     <TabsContent value="video-tutorials">
                         <VideoTutorialsAdmin />
                     </TabsContent>
                     )}
 
-                    {canWrite && (
+                    {canView('carousel') && (
                     <TabsContent value="carousel-slides">
                         <CarouselSlidesAdmin />
                     </TabsContent>

@@ -16,9 +16,14 @@ const {
     isValidPersonnelId,
 } = require('./_lib/security');
 const { isAllowedVideoUrl } = require('./_lib/videoValidate');
+const {
+    resolveUserPermissions,
+    normalizePermissions,
+    canView,
+    canWrite,
+} = require('./_lib/permissions');
 
 const ALLOWED_ROLES = ['admin', 'system_admin', 'viewer'];
-const WRITE_ROLES = ['system_admin'];
 
 function getAuthUsername(req) {
     const auth = req.headers.authorization;
@@ -31,40 +36,51 @@ function getAuthUsername(req) {
     }
 }
 
-async function getUserRole(db, username) {
+async function getAuthUser(db, req) {
+    const username = getAuthUsername(req);
     if (!username) return null;
     const user = await db.collection('users').findOne({ username });
-    return user?.role || null;
+    if (!user || !ALLOWED_ROLES.includes(user.role)) return null;
+    return user;
 }
 
 async function requireAdminAccess(db, req, res) {
-    const username = getAuthUsername(req);
-    const role = await getUserRole(db, username);
-    if (!role || !ALLOWED_ROLES.includes(role)) {
+    const user = await getAuthUser(db, req);
+    if (!user) {
         sendError(res, 401, 'Yetkisiz erişim');
         return null;
     }
-    return role;
+    return user;
 }
 
-async function requireWriteAccess(db, req, res) {
-    const role = await requireAdminAccess(db, req, res);
-    if (!role) return null;
-    if (!WRITE_ROLES.includes(role)) {
+async function requireModuleAccess(db, req, res, module, { write = false } = {}) {
+    const user = await requireAdminAccess(db, req, res);
+    if (!user) return null;
+
+    const permissions = resolveUserPermissions(user);
+    if (!canView(permissions, module)) {
+        sendError(res, 403, 'Bu bölüme erişim yetkiniz yok');
+        return null;
+    }
+    if (write && !canWrite(permissions, module)) {
         sendError(res, 403, 'Bu işlem için yetkiniz yok');
         return null;
     }
-    return role;
+    return user;
+}
+
+async function requireWriteAccess(db, req, res, module = 'inventory') {
+    return requireModuleAccess(db, req, res, module, { write: true });
 }
 
 async function requireSystemAdmin(db, req, res) {
-    const role = await requireAdminAccess(db, req, res);
-    if (!role) return null;
-    if (role !== 'system_admin') {
+    const user = await requireAdminAccess(db, req, res);
+    if (!user) return null;
+    if (user.role !== 'system_admin') {
         sendError(res, 403, 'Bu işlem için sistem yöneticisi yetkisi gerekli');
         return null;
     }
-    return role;
+    return user;
 }
 
 function getShipmentPublicStatus(cargo, incomingMatch) {
@@ -762,10 +778,12 @@ module.exports = async (req, res) => {
                 return sendError(res, 401, 'Hatalı kullanıcı adı veya şifre');
             }
             const access_token = createAccessToken(user.username);
+            const permissions = resolveUserPermissions(user);
             return sendJson(res, 200, {
                 access_token,
                 token_type: 'bearer',
                 role: user.role,
+                permissions,
             });
         }
 
@@ -885,7 +903,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'GET' && route === 'admin/stats') {
-            if (!(await requireAdminAccess(db, req, res))) return;
+            if (!(await requireModuleAccess(db, req, res, 'dashboard'))) return;
             const total_assigned = await db.collection('inventory').countDocuments({ status: 'assigned' });
             const total_returned = await db.collection('inventory').countDocuments({ status: 'returned' });
             const personnel_ids = await db.collection('inventory').distinct('personnel_id');
@@ -908,7 +926,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'POST' && route === 'admin/inventory/bulk') {
-            if (!(await requireWriteAccess(db, req, res))) return;
+            if (!(await requireWriteAccess(db, req, res, 'assets'))) return;
             const inputs = Array.isArray(req.body) ? req.body : [];
             const now = new Date().toISOString();
             const itemsToInsert = inputs.map((input) => ({
@@ -940,7 +958,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'POST' && route === 'admin/inventory/import') {
-            if (!(await requireWriteAccess(db, req, res))) return;
+            if (!(await requireWriteAccess(db, req, res, 'inventory'))) return;
             const rows = Array.isArray(req.body?.items) ? req.body.items : [];
             if (!rows.length) {
                 return sendError(res, 400, 'İçe aktarılacak kayıt bulunamadı');
@@ -1031,7 +1049,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'POST' && route === 'admin/inventory/return') {
-            if (!(await requireWriteAccess(db, req, res))) return;
+            if (!(await requireWriteAccess(db, req, res, 'inventory'))) return;
             const item_id = req.query.item_id;
             const note = req.query.note || '';
             const result = await db.collection('inventory').updateOne(
@@ -1045,7 +1063,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'POST' && route === 'admin/inventory/reset-confirmation') {
-            if (!(await requireWriteAccess(db, req, res))) return;
+            if (!(await requireWriteAccess(db, req, res, 'confirmations'))) return;
             const personnel_id = req.query.personnel_id;
             await db.collection('confirmations').updateMany(
                 { personnel_id, status: 'confirmed' },
@@ -1055,7 +1073,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'GET' && route === 'admin/next-personnel-id') {
-            if (!(await requireWriteAccess(db, req, res))) return;
+            if (!(await requireWriteAccess(db, req, res, 'assets'))) return;
             const pIds = await db.collection('inventory').distinct('personnel_id');
             const numericIds = pIds.map((pid) => parseInt(pid, 10)).filter((n) => !Number.isNaN(n));
             if (!numericIds.length) {
@@ -1065,7 +1083,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'GET' && route === 'admin/personnel/search') {
-            if (!(await requireWriteAccess(db, req, res))) return;
+            if (!(await requireWriteAccess(db, req, res, 'assets'))) return;
             const name = req.query.name || '';
             const personnel = await db.collection('inventory').findOne(
                 { personnel_name: { $regex: `^${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' } },
@@ -1075,7 +1093,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'GET' && route === 'admin/random-personnel-id') {
-            if (!(await requireWriteAccess(db, req, res))) return;
+            if (!(await requireWriteAccess(db, req, res, 'assets'))) return;
             for (let i = 0; i < 10; i += 1) {
                 const newId = String(Math.floor(100000 + Math.random() * 900000));
                 const existing = await db.collection('inventory').findOne({ personnel_id: newId });
@@ -1090,7 +1108,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'GET' && route === 'admin/confirmations') {
-            if (!(await requireAdminAccess(db, req, res))) return;
+            if (!(await requireModuleAccess(db, req, res, 'confirmations'))) return;
             const confirmations = await db.collection('confirmations')
                 .find({}, { projection: { _id: 0 } })
                 .toArray();
@@ -1098,7 +1116,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'GET' && route === 'admin/inventory') {
-            if (!(await requireAdminAccess(db, req, res))) return;
+            if (!(await requireModuleAccess(db, req, res, 'inventory'))) return;
             const inventory = await db.collection('inventory')
                 .find({}, { projection: { _id: 0 } })
                 .toArray();
@@ -1106,7 +1124,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'GET' && segments[0] === 'admin' && segments[1] === 'personnel' && segments.length === 3 && segments[2] !== 'search') {
-            if (!(await requireAdminAccess(db, req, res))) return;
+            if (!(await requireModuleAccess(db, req, res, 'inventory'))) return;
             const profile = await buildPersonnelProfile(db, segments[2]);
             if (!profile) {
                 return sendError(res, 404, 'Personel bulunamadı');
@@ -1117,7 +1135,7 @@ module.exports = async (req, res) => {
         if (method === 'PUT' && segments[0] === 'admin' && segments[1] === 'inventory' && segments.length === 3) {
             const reserved = ['bulk', 'import', 'return', 'reset-confirmation'];
             if (!reserved.includes(segments[2])) {
-                if (!(await requireWriteAccess(db, req, res))) return;
+                if (!(await requireWriteAccess(db, req, res, 'inventory'))) return;
                 const it_notes = coerceString(req.body?.it_notes, 2000);
                 const condition = req.body?.condition === 'damaged' ? 'damaged' : 'undamaged';
                 const result = await db.collection('inventory').updateOne(
@@ -1132,7 +1150,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'GET' && route === 'admin/product-names') {
-            if (!(await requireAdminAccess(db, req, res))) return;
+            if (!(await requireModuleAccess(db, req, res, 'assets'))) return;
             const [catalog, inventoryNames] = await Promise.all([
                 db.collection('product_names').find({}, { projection: { _id: 0, name: 1 } }).toArray(),
                 db.collection('inventory').distinct('item_name'),
@@ -1145,11 +1163,12 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'GET' && segments[0] === 'admin' && segments[1] === 'cargo' && segments.length === 3 && !segments[2].includes('.')) {
-            if (!(await requireAdminAccess(db, req, res))) return;
             const direction = segments[2];
             if (!['outgoing', 'incoming'].includes(direction)) {
                 return sendError(res, 400, 'Geçersiz kargo yönü');
             }
+            const cargoModule = direction === 'incoming' ? 'incoming_cargo' : 'outgoing_cargo';
+            if (!(await requireModuleAccess(db, req, res, cargoModule))) return;
 
             const allCargo = await db.collection('cargo')
                 .find({}, { projection: { _id: 0 } })
@@ -1162,11 +1181,12 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'GET' && route === 'admin/cargo') {
-            if (!(await requireAdminAccess(db, req, res))) return;
             const direction = req.query.direction;
             if (!['outgoing', 'incoming'].includes(direction)) {
                 return sendError(res, 400, 'Geçersiz kargo yönü');
             }
+            const cargoModule = direction === 'incoming' ? 'incoming_cargo' : 'outgoing_cargo';
+            if (!(await requireModuleAccess(db, req, res, cargoModule))) return;
 
             const allCargo = await db.collection('cargo')
                 .find({}, { projection: { _id: 0 } })
@@ -1179,20 +1199,21 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'POST' && route === 'admin/cargo/sync-from-inventory') {
-            if (!(await requireWriteAccess(db, req, res))) return;
             const direction = req.body?.direction === 'incoming' ? 'incoming' : 'outgoing';
+            const cargoModule = direction === 'incoming' ? 'incoming_cargo' : 'outgoing_cargo';
+            if (!(await requireWriteAccess(db, req, res, cargoModule))) return;
             const result = await syncInventoryToCargo(db, direction);
             return sendJson(res, 200, { status: 'success', ...result });
         }
 
         if (method === 'POST' && route === 'admin/cargo/import') {
-            if (!(await requireWriteAccess(db, req, res))) return;
             const direction = req.body?.direction;
-            const rows = Array.isArray(req.body?.items) ? req.body.items : [];
-
             if (!['outgoing', 'incoming'].includes(direction)) {
                 return sendError(res, 400, 'Geçersiz kargo yönü');
             }
+            const cargoModule = direction === 'incoming' ? 'incoming_cargo' : 'outgoing_cargo';
+            if (!(await requireWriteAccess(db, req, res, cargoModule))) return;
+            const rows = Array.isArray(req.body?.items) ? req.body.items : [];
             if (!rows.length) {
                 return sendError(res, 400, 'İçe aktarılacak kayıt bulunamadı');
             }
@@ -1273,7 +1294,10 @@ module.exports = async (req, res) => {
             const users = await db.collection('users')
                 .find({}, { projection: { _id: 0, password_hash: 0 } })
                 .toArray();
-            return sendJson(res, 200, users);
+            return sendJson(res, 200, users.map((user) => ({
+                ...user,
+                permissions: resolveUserPermissions(user),
+            })));
         }
 
         if (method === 'POST' && route === 'admin/users') {
@@ -1291,14 +1315,66 @@ module.exports = async (req, res) => {
             if (existing) {
                 return sendError(res, 400, 'Bu kullanıcı adı zaten mevcut');
             }
+            const role = data.role || 'viewer';
+            const permissions = role === 'system_admin'
+                ? null
+                : normalizePermissions(data.permissions, role);
             await db.collection('users').insertOne({
                 id: randomUUID(),
                 username,
                 password_hash: hashPassword(password),
-                role: data.role || 'admin',
+                role,
+                permissions,
                 created_at: new Date().toISOString(),
             });
             return sendJson(res, 200, { status: 'success' });
+        }
+
+        if (method === 'PUT' && segments[0] === 'admin' && segments[1] === 'users' && segments.length === 3) {
+            if (!(await requireSystemAdmin(db, req, res))) return;
+            const username = segments[2];
+            const data = req.body || {};
+            const user = await db.collection('users').findOne({ username });
+            if (!user) {
+                return sendError(res, 404, 'Kullanıcı bulunamadı');
+            }
+            if (username === 'admin' && data.role && data.role !== 'system_admin') {
+                return sendError(res, 400, 'Ana sistem yöneticisinin rolü değiştirilemez');
+            }
+            const nextRole = ALLOWED_ROLES.includes(data.role) ? data.role : user.role;
+            const update = {};
+            if (data.role && ALLOWED_ROLES.includes(data.role)) {
+                update.role = data.role;
+            }
+            if (nextRole === 'system_admin') {
+                update.permissions = null;
+            } else if (data.permissions) {
+                update.permissions = normalizePermissions(data.permissions, nextRole);
+            } else if (data.role) {
+                update.permissions = normalizePermissions(user.permissions, nextRole);
+            }
+            const newPassword = coerceString(data.password, 128);
+            if (newPassword) {
+                if (!isStrongPassword(newPassword)) {
+                    return sendError(res, 400, 'Yeni şifre en az 10 karakter olmalı');
+                }
+                update.password_hash = hashPassword(newPassword);
+            }
+            if (!Object.keys(update).length) {
+                return sendError(res, 400, 'Güncellenecek alan bulunamadı');
+            }
+            await db.collection('users').updateOne({ username }, { $set: update });
+            const updated = await db.collection('users').findOne(
+                { username },
+                { projection: { _id: 0, password_hash: 0 } }
+            );
+            return sendJson(res, 200, {
+                status: 'success',
+                user: {
+                    ...updated,
+                    permissions: resolveUserPermissions(updated),
+                },
+            });
         }
 
         if (method === 'POST' && route === 'admin/change-password') {
@@ -1332,14 +1408,14 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'GET' && route === 'admin/announcement') {
-            if (!(await requireWriteAccess(db, req, res))) return;
+            if (!(await requireModuleAccess(db, req, res, 'announcement'))) return;
             const announcement = await db.collection('announcements')
                 .findOne({ active: true }, { projection: { _id: 0 } });
             return sendJson(res, 200, announcement);
         }
 
         if (method === 'POST' && route === 'admin/announcement/deactivate') {
-            if (!(await requireWriteAccess(db, req, res))) return;
+            if (!(await requireWriteAccess(db, req, res, 'announcement'))) return;
             await db.collection('announcements').updateMany(
                 { active: true },
                 { $set: { active: false, deactivated_at: new Date().toISOString() } }
@@ -1348,7 +1424,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'POST' && route === 'admin/announcement') {
-            if (!(await requireWriteAccess(db, req, res))) return;
+            if (!(await requireWriteAccess(db, req, res, 'announcement'))) return;
             const data = req.body || {};
             const title = String(data.title || '').trim();
             const message = String(data.message || '').trim();
@@ -1388,7 +1464,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'GET' && route === 'admin/troubleshooting-videos') {
-            if (!(await requireWriteAccess(db, req, res))) return;
+            if (!(await requireModuleAccess(db, req, res, 'video_tutorials'))) return;
             const videos = await db.collection('troubleshooting_videos')
                 .find({}, { projection: { _id: 0 } })
                 .sort({ created_at: -1 })
@@ -1397,7 +1473,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'POST' && route === 'admin/troubleshooting-videos') {
-            if (!(await requireWriteAccess(db, req, res))) return;
+            if (!(await requireWriteAccess(db, req, res, 'video_tutorials'))) return;
             const data = req.body || {};
             const titles = parseVideoTitles(data);
             const video_url = String(data.video_url || '').trim();
@@ -1421,7 +1497,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'PUT' && segments[0] === 'admin' && segments[1] === 'troubleshooting-videos' && segments.length === 3) {
-            if (!(await requireWriteAccess(db, req, res))) return;
+            if (!(await requireWriteAccess(db, req, res, 'video_tutorials'))) return;
             const videoId = segments[2];
             const data = req.body || {};
             const titles = parseVideoTitles(data);
@@ -1455,7 +1531,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'DELETE' && segments[0] === 'admin' && segments[1] === 'troubleshooting-videos' && segments.length === 3) {
-            if (!(await requireWriteAccess(db, req, res))) return;
+            if (!(await requireWriteAccess(db, req, res, 'video_tutorials'))) return;
             const videoId = segments[2];
             const result = await db.collection('troubleshooting_videos').deleteOne({ id: videoId });
             if (result.deletedCount === 0) {
@@ -1483,7 +1559,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'GET' && route === 'admin/carousel-slides') {
-            if (!(await requireWriteAccess(db, req, res))) return;
+            if (!(await requireModuleAccess(db, req, res, 'carousel'))) return;
             const slides = await db.collection('carousel_slides')
                 .find({}, { projection: { _id: 0 } })
                 .sort({ sort_order: 1, created_at: 1 })
@@ -1500,7 +1576,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'PUT' && route === 'admin/carousel-slides/settings') {
-            if (!(await requireWriteAccess(db, req, res))) return;
+            if (!(await requireWriteAccess(db, req, res, 'carousel'))) return;
             const allCustom = await db.collection('carousel_slides')
                 .find({}, { projection: { id: 1, _id: 0 } })
                 .toArray();
@@ -1514,7 +1590,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'PUT' && route === 'admin/carousel-slides/reorder') {
-            if (!(await requireWriteAccess(db, req, res))) return;
+            if (!(await requireWriteAccess(db, req, res, 'carousel'))) return;
             const allCustom = await db.collection('carousel_slides')
                 .find({}, { projection: { id: 1, _id: 0 } })
                 .toArray();
@@ -1528,7 +1604,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'POST' && route === 'admin/carousel-slides') {
-            if (!(await requireWriteAccess(db, req, res))) return;
+            if (!(await requireWriteAccess(db, req, res, 'carousel'))) return;
             const validated = validateCarouselPayload(req.body || {});
             if (validated.error) {
                 return sendError(res, 400, validated.error);
@@ -1563,7 +1639,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'PUT' && segments[0] === 'admin' && segments[1] === 'carousel-slides' && segments.length === 3) {
-            if (!(await requireWriteAccess(db, req, res))) return;
+            if (!(await requireWriteAccess(db, req, res, 'carousel'))) return;
             const slideId = segments[2];
             const validated = validateCarouselPayload(req.body || {});
             if (validated.error) {
@@ -1590,7 +1666,7 @@ module.exports = async (req, res) => {
         }
 
         if (method === 'DELETE' && segments[0] === 'admin' && segments[1] === 'carousel-slides' && segments.length === 3) {
-            if (!(await requireWriteAccess(db, req, res))) return;
+            if (!(await requireWriteAccess(db, req, res, 'carousel'))) return;
             const slideId = segments[2];
             const result = await db.collection('carousel_slides').deleteOne({ id: slideId });
             if (result.deletedCount === 0) {

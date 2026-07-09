@@ -7,6 +7,7 @@ import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Lock } from "lucide-react";
 import api from '../lib/api';
+import { storeSessionAuth } from '../lib/adminPermissions';
 
 const LoginPage = () => {
     const { t } = useLanguage();
@@ -22,8 +23,11 @@ const LoginPage = () => {
                 username,
                 password
             });
+            storeSessionAuth({
+                role: response.data.role,
+                permissions: response.data.permissions,
+            });
             localStorage.setItem('admin_token', response.data.access_token);
-            localStorage.setItem('admin_role', response.data.role);
             localStorage.setItem('admin_username', username);
             navigate('/admin');
         } catch (err) {
