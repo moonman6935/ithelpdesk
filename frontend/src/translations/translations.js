@@ -21,16 +21,16 @@ export const translations = {
           message: 'DCS Communication Center IT Departmanı destek portalına hoş geldiniz. Aşağıdaki ipuçlarını takip ederek sık karşılaşılan sorunları hızlıca çözebilirsiniz.',
         },
         {
-          title: 'Windows 11 Güncellemesi Nasıl Yapılır?',
-          message: 'Windows 10 kullanan ve sistem gereksinimlerini karşılayan bilgisayarlarda Microsoft Yükleme Yardımcısı ile adım adım Windows 11\'e geçin.',
-          ctaLink: '/windows-11-upgrade',
-          ctaLabel: 'Güncelleme Rehberine Git',
-        },
-        {
           title: 'Citrix Kurulumu Nasıl Yapılır?',
           message: 'Citrix Workspace uygulamasını offline installer ile adım adım kurun. Kurulum bitince bilgisayarı bir kez yeniden başlatmanız yeterli.',
           ctaLink: '/faq/citrix-kurulum',
           ctaLabel: 'Kurulum Rehberine Git',
+        },
+        {
+          title: 'Windows 11 Güncellemesi Nasıl Yapılır?',
+          message: 'Windows 10 kullanan ve sistem gereksinimlerini karşılayan bilgisayarlarda Microsoft Yükleme Yardımcısı ile adım adım Windows 11\'e geçin.',
+          ctaLink: '/windows-11-upgrade',
+          ctaLabel: 'Güncelleme Rehberine Git',
         },
         {
           title: 'Citrix Girişi',
@@ -820,16 +820,16 @@ export const translations = {
           message: 'Willkommen im Support-Portal der DCS Communication Center IT-Abteilung. Mit den folgenden Tipps lösen Sie häufige Probleme schnell.',
         },
         {
-          title: 'Wie aktualisiere ich auf Windows 11?',
-          message: 'Mit dem Microsoft Installationsassistenten Schritt für Schritt von Windows 10 auf Windows 11 wechseln — nur auf kompatiblen x64-PCs.',
-          ctaLink: '/windows-11-upgrade',
-          ctaLabel: 'Zum Update-Leitfaden',
-        },
-        {
           title: 'Wie installiere ich Citrix?',
           message: 'Installieren Sie Citrix Workspace Schritt für Schritt mit dem Offline-Installer. Nach der Installation einmal neu starten — fertig.',
           ctaLink: '/faq/citrix-kurulum',
           ctaLabel: 'Zur Installationsanleitung',
+        },
+        {
+          title: 'Wie aktualisiere ich auf Windows 11?',
+          message: 'Mit dem Microsoft Installationsassistenten Schritt für Schritt von Windows 10 auf Windows 11 wechseln — nur auf kompatiblen x64-PCs.',
+          ctaLink: '/windows-11-upgrade',
+          ctaLabel: 'Zum Update-Leitfaden',
         },
         {
           title: 'Citrix-Anmeldung',
@@ -1608,16 +1608,16 @@ export const translations = {
           message: 'Welcome to the DCS Communication Center IT Department support portal. Follow the tips below to quickly resolve common issues.',
         },
         {
-          title: 'How to Upgrade to Windows 11',
-          message: 'Step-by-step guide to upgrade from Windows 10 to Windows 11 using Microsoft\'s Installation Assistant — for compatible x64 PCs only.',
-          ctaLink: '/windows-11-upgrade',
-          ctaLabel: 'Open Upgrade Guide',
-        },
-        {
           title: 'How to Install Citrix',
           message: 'Install Citrix Workspace step by step with the offline installer. After installation, restart your computer once — then you are ready.',
           ctaLink: '/faq/citrix-kurulum',
           ctaLabel: 'Open Setup Guide',
+        },
+        {
+          title: 'How to Upgrade to Windows 11',
+          message: 'Step-by-step guide to upgrade from Windows 10 to Windows 11 using Microsoft\'s Installation Assistant — for compatible x64 PCs only.',
+          ctaLink: '/windows-11-upgrade',
+          ctaLabel: 'Open Upgrade Guide',
         },
         {
           title: 'Citrix Login',
