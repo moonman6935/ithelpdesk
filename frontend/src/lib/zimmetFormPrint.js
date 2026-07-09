@@ -25,6 +25,90 @@ function fillZimmetSheet(sheet, { personnelName, items }) {
   }
 }
 
+function buildPrintHtml(tableHtml, overflowNote) {
+  return `<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <title>Zimmet Formu</title>
+  <style>
+    @page { size: A4 portrait; margin: 10mm; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 12px;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #111;
+      background: #fff;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 10.5pt;
+    }
+    td {
+      border: 1px solid #222;
+      padding: 5px 7px;
+      vertical-align: middle;
+      word-wrap: break-word;
+    }
+    tr:first-child td {
+      font-weight: 700;
+      font-size: 14pt;
+      text-align: center;
+      padding: 10px;
+    }
+    @media print {
+      body { padding: 0; }
+    }
+  </style>
+</head>
+<body>
+  ${overflowNote}
+  ${tableHtml}
+</body>
+</html>`;
+}
+
+function printHtmlInFrame(html) {
+  const existing = document.getElementById('zimmet-print-frame');
+  if (existing) existing.remove();
+
+  const iframe = document.createElement('iframe');
+  iframe.id = 'zimmet-print-frame';
+  iframe.setAttribute('title', 'Zimmet Formu');
+  Object.assign(iframe.style, {
+    position: 'fixed',
+    right: '0',
+    bottom: '0',
+    width: '0',
+    height: '0',
+    border: '0',
+    opacity: '0',
+    pointerEvents: 'none',
+  });
+  document.body.appendChild(iframe);
+
+  const frameWindow = iframe.contentWindow;
+  const frameDoc = frameWindow.document;
+  frameDoc.open();
+  frameDoc.write(html);
+  frameDoc.close();
+
+  const runPrint = () => {
+    frameWindow.focus();
+    frameWindow.print();
+    window.setTimeout(() => iframe.remove(), 1500);
+  };
+
+  if (frameDoc.readyState === 'complete') {
+    window.setTimeout(runPrint, 150);
+  } else {
+    iframe.onload = () => window.setTimeout(runPrint, 150);
+  }
+}
+
 function extractTableHtml(sheet) {
   const fullHtml = XLSX.utils.sheet_to_html(sheet);
   const match = fullHtml.match(/<table[\s\S]*<\/table>/i);
@@ -55,71 +139,13 @@ export async function printZimmetForm({ personnelName, items = [] }) {
   fillZimmetSheet(sheet, { personnelName: name, items: filledItems });
 
   const tableHtml = extractTableHtml(sheet);
-  const printWindow = window.open('', '_blank', 'noopener,noreferrer,width=900,height=700');
-  if (!printWindow) {
-    throw new Error('POPUP_BLOCKED');
-  }
 
   const overflowNote =
     filledItems.length > MATERIAL_MAX_ROWS
       ? `<p style="color:#b45309;font-size:12px;margin:0 0 12px;">${filledItems.length - MATERIAL_MAX_ROWS} kalem form satır limiti nedeniyle yazdırılmadı.</p>`
       : '';
 
-  printWindow.document.open();
-  printWindow.document.write(`<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="utf-8" />
-  <title>Zimmet Formu</title>
-  <style>
-    @page { size: A4 portrait; margin: 10mm; }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      padding: 12px;
-      font-family: Arial, Helvetica, sans-serif;
-      color: #111;
-      background: #fff;
-    }
-    h1 { display: none; }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: fixed;
-      font-size: 10.5pt;
-    }
-    td {
-      border: 1px solid #222;
-      padding: 5px 7px;
-      vertical-align: middle;
-      word-wrap: break-word;
-    }
-    tr:first-child td {
-      font-weight: 700;
-      font-size: 14pt;
-      text-align: center;
-      padding: 10px;
-    }
-    @media print {
-      body { padding: 0; }
-    }
-  </style>
-</head>
-<body>
-  ${overflowNote}
-  ${tableHtml}
-  <script>
-    window.addEventListener('load', function () {
-      window.focus();
-      window.print();
-    });
-    window.addEventListener('afterprint', function () {
-      window.close();
-    });
-  </script>
-</body>
-</html>`);
-  printWindow.document.close();
+  printHtmlInFrame(buildPrintHtml(tableHtml, overflowNote));
 }
 
 export async function downloadFilledZimmetForm({ personnelName, items = [] }) {
