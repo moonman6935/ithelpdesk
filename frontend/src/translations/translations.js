@@ -485,6 +485,9 @@ export const translations = {
         writes: 'işlem',
         accessSummary: 'Erişim',
         you: 'Siz',
+        passwordHint: 'En az 10 karakter olmalıdır.',
+        passwordTooShort: 'Şifre en az 10 karakter olmalıdır.',
+        usernameRequired: 'Kullanıcı adı gerekli.',
       },
       stats: {
         totalPersonnel: 'Zimmetli Personel',
@@ -1188,6 +1191,9 @@ export const translations = {
         writes: 'Aktionen',
         accessSummary: 'Zugriff',
         you: 'Sie',
+        passwordHint: 'Mindestens 10 Zeichen.',
+        passwordTooShort: 'Das Passwort muss mindestens 10 Zeichen lang sein.',
+        usernameRequired: 'Benutzername ist erforderlich.',
       },
       stats: {
         totalPersonnel: 'Personal mit Inventar',
@@ -1880,6 +1886,9 @@ export const translations = {
         writes: 'actions',
         accessSummary: 'Access',
         you: 'You',
+        passwordHint: 'Must be at least 10 characters.',
+        passwordTooShort: 'Password must be at least 10 characters.',
+        usernameRequired: 'Username is required.',
       },
       stats: {
         totalPersonnel: 'Personnel with Assets',

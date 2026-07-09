@@ -53,10 +53,14 @@ export function normalizePermissions(input, role = 'viewer') {
   const out = {};
   for (const key of MODULE_KEYS) {
     const mod = input[key];
-    out[key] = {
-      view: Boolean(mod?.view ?? base[key]?.view),
-      write: Boolean(mod?.write ?? base[key]?.write),
-    };
+    if (mod && typeof mod === 'object') {
+      out[key] = {
+        view: Boolean(mod.view),
+        write: Boolean(mod.write),
+      };
+    } else {
+      out[key] = { ...base[key] };
+    }
   }
   return out;
 }

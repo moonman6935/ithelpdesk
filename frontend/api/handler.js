@@ -752,6 +752,16 @@ function parseRoute(req) {
 module.exports = async (req, res) => {
     applySecurityHeaders(res);
 
+    if (typeof req.body === 'string') {
+        try {
+            req.body = JSON.parse(req.body);
+        } catch {
+            req.body = {};
+        }
+    } else if (!req.body || typeof req.body !== 'object') {
+        req.body = {};
+    }
+
     const route = parseRoute(req);
     const segments = route ? route.split('/').filter(Boolean) : [];
     const method = req.method;

@@ -9,6 +9,7 @@ import {
 } from './ui/dialog';
 import { Pencil, Trash2, Shield } from 'lucide-react';
 import api from '../lib/api';
+import { getApiErrorMessage, isStrongPasswordClient } from '../lib/apiErrors';
 import {
   MODULE_KEYS,
   defaultPermissionsForRole,
@@ -90,10 +91,20 @@ const UserManagementPanel = ({ users, onRefresh, currentUsername }) => {
 
   const handleAddUser = async (e) => {
     e.preventDefault();
+    const username = newUser.username.trim();
+    if (!username) {
+      alert(t('admin.userMgmt.usernameRequired'));
+      return;
+    }
+    if (!isStrongPasswordClient(newUser.password)) {
+      alert(t('admin.userMgmt.passwordTooShort'));
+      return;
+    }
+
     setSaving(true);
     try {
       await api.post('/api/admin/users', {
-        username: newUser.username,
+        username,
         password: newUser.password,
         role: newUser.role,
         permissions: newUser.role === 'system_admin' ? undefined : newUser.permissions,
@@ -107,7 +118,8 @@ const UserManagementPanel = ({ users, onRefresh, currentUsername }) => {
       });
       onRefresh();
     } catch (err) {
-      alert(err.response?.data?.detail || t('admin.userMgmt.error'));
+      alert(getApiErrorMessage(err, t('admin.userMgmt.error')));
+      console.error('Add user failed:', err?.response?.status, err?.response?.data || err);
     } finally {
       setSaving(false);
     }
@@ -126,6 +138,11 @@ const UserManagementPanel = ({ users, onRefresh, currentUsername }) => {
 
   const handleSaveEdit = async () => {
     if (!editUser) return;
+    if (editUser.password.trim() && !isStrongPasswordClient(editUser.password)) {
+      alert(t('admin.userMgmt.passwordTooShort'));
+      return;
+    }
+
     setSaving(true);
     try {
       const payload = {
@@ -140,7 +157,8 @@ const UserManagementPanel = ({ users, onRefresh, currentUsername }) => {
       setEditUser(null);
       onRefresh();
     } catch (err) {
-      alert(err.response?.data?.detail || t('admin.userMgmt.error'));
+      alert(getApiErrorMessage(err, t('admin.userMgmt.error')));
+      console.error('Update user failed:', err?.response?.status, err?.response?.data || err);
     } finally {
       setSaving(false);
     }
@@ -152,7 +170,7 @@ const UserManagementPanel = ({ users, onRefresh, currentUsername }) => {
       await api.delete(`/api/admin/users/${encodeURIComponent(username)}`);
       onRefresh();
     } catch (err) {
-      alert(err.response?.data?.detail || t('admin.userMgmt.error'));
+      alert(getApiErrorMessage(err, t('admin.userMgmt.error')));
     }
   };
 
@@ -188,7 +206,9 @@ const UserManagementPanel = ({ users, onRefresh, currentUsername }) => {
                   value={newUser.password}
                   onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
                   required
+                  minLength={10}
                 />
+                <p className="text-xs text-gray-500 mt-1">{t('admin.userMgmt.passwordHint')}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">{t('admin.role')}</label>
