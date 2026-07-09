@@ -9,13 +9,14 @@ import { Alert, AlertDescription } from "../components/ui/alert";
 import {
     User, PlusCircle, CheckCircle2, LayoutDashboard, Package,
     RefreshCcw, Users, Trash2, ArrowLeftRight, LogOut, Dices, KeyRound, Upload,
-    Truck, PackageCheck, Megaphone, Video, Images
+    Truck, PackageCheck, Megaphone, Video, Images, Printer
 } from "lucide-react";
 import {
     Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "../components/ui/dialog";
 import { readExcelFile } from '../lib/excelImport';
 import { batchImport, getImportErrorMessage } from '../lib/batchImport';
+import { printZimmetForm } from '../lib/zimmetFormPrint';
 import api from '../lib/api';
 import CargoPanel from '../components/CargoPanel';
 import AnnouncementAdmin from '../components/AnnouncementAdmin';
@@ -46,6 +47,7 @@ const AdminDashboard = () => {
     });
     const [importPreview, setImportPreview] = useState(null);
     const [importing, setImporting] = useState(false);
+    const [printingForm, setPrintingForm] = useState(false);
     const [productNames, setProductNames] = useState([]);
     const fileInputRef = useRef(null);
 
@@ -258,6 +260,35 @@ const AdminDashboard = () => {
             handleLogout();
         } catch (err) {
             alert(err.response?.data?.detail || 'Şifre değiştirilemedi');
+        }
+    };
+
+    const handlePrintZimmetForm = async () => {
+        const filledItems = items.filter((item) => item.itemName?.trim());
+        if (!personnelName.trim()) {
+            alert(t('admin.printFormMissingName'));
+            return;
+        }
+        if (!filledItems.length) {
+            alert(t('admin.printFormMissingItems'));
+            return;
+        }
+
+        setPrintingForm(true);
+        try {
+            await printZimmetForm({ personnelName, items: filledItems });
+        } catch (err) {
+            const code = err?.message;
+            if (code === 'POPUP_BLOCKED') {
+                alert(t('admin.printFormPopupBlocked'));
+            } else if (code === 'TEMPLATE_NOT_FOUND') {
+                alert(t('admin.printFormTemplateMissing'));
+            } else {
+                alert(t('admin.printFormError'));
+            }
+            console.error(err);
+        } finally {
+            setPrintingForm(false);
         }
     };
 
@@ -512,7 +543,21 @@ const AdminDashboard = () => {
                                         ))}
                                     </div>
 
-                                    <Button type="submit" className="w-full bg-red-600 py-6 text-lg">{t('admin.submit')}</Button>
+                                    <div className="flex flex-col sm:flex-row gap-3">
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            className="flex-1 py-6 text-lg border-gray-300"
+                                            onClick={handlePrintZimmetForm}
+                                            disabled={printingForm}
+                                        >
+                                            <Printer className="w-5 h-5 mr-2" />
+                                            {printingForm ? '...' : t('admin.printForm')}
+                                        </Button>
+                                        <Button type="submit" className="flex-1 bg-red-600 py-6 text-lg">
+                                            {t('admin.submit')}
+                                        </Button>
+                                    </div>
                                 </form>
                             </CardContent>
                         </Card>
