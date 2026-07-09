@@ -344,10 +344,14 @@ export const translations = {
       alertText: 'Bu rehber, Windows 11 sistem gereksinimlerini karşılayan x64 (64 bit) bilgisayarlar içindir. ARM tabanlı cihazlarda Yükleme Yardımcısı çalışmaz. Güncelleme öncesi önemli dosyalarınızı yedeklemenizi öneririz.',
       prereqTitle: 'Başlamadan önce kontrol edin',
       prereq: {
-        license: 'Geçerli bir Windows 10 veya Windows 11 lisansınız olmalıdır.',
-        version: 'Bilgisayarınızda Windows 10 sürüm 2004 veya daha yeni yüklü olmalıdır.',
-        disk: 'Windows 11 indirmesi için en az 9 GB boş disk alanı gerekir.',
-        cpu: 'Yükleme Yardımcısı yalnızca x64 işlemcili bilgisayarlarda çalışır (ARM değil).',
+        cpu: 'İşlemci: En az 1 GHz hızında, 2 veya daha fazla çekirdekli uyumlu 64 bit (x64) işlemci.',
+        ram: 'Bellek (RAM): En az 4 GB.',
+        storage: 'Depolama: En az 64 GB disk alanı; Yükleme Yardımcısı için ek olarak en az 9 GB boş alan.',
+        tpm: 'Güvenlik: TPM 2.0 (Trusted Platform Module) etkin olmalıdır.',
+        secureBoot: 'Firmware: UEFI ve Secure Boot desteği gerekir.',
+        graphics: 'Ekran kartı: DirectX 12 uyumlu, WDDM 2.0 sürücülü GPU.',
+        display: 'Ekran: 9 inç ve üzeri, 720p (HD) çözünürlük.',
+        version: 'Mevcut sistem: Windows 10 sürüm 2004 veya daha yeni (x64, ARM değil).',
       },
       prereqNote: 'Tüm Windows 10 cihazları Windows 11 yükseltmesi almaya uygun değildir. Donanım uyumluluğunu Microsoft teknik özellikler sayfasından kontrol edin.',
       checkRequirements: 'Sistem Gereksinimlerini Kontrol Et',
@@ -362,8 +366,8 @@ export const translations = {
       },
       step2: {
         title: 'İndirilen dosyayı yönetici olarak çalıştırın',
-        desc: 'İndirilen Windows11InstallationAssistant.exe dosyasına çift tıklayın. Tarayıcı veya Windows "Çalıştır" uyarısında Çalıştır\'ı seçin. Bu aracı çalıştırmak için yönetici yetkisi gerekir.',
-        tip: 'Dosya genelde İndirilenler klasöründe bulunur. Kurumsal bilgisayarlarda IT onayı gerekebilir.',
+        desc: 'İndirilen Windows11InstallationAssistant.exe dosyasına çift tıklayın veya sağ tıklayıp Yönetici olarak çalıştır seçin. Kullanıcı Hesabı Denetimi (UAC) penceresinde Evet\'e tıklayın.',
+        tip: 'Dosya genelde İndirilenler klasöründe bulunur. UAC penceresi görünmezse dosyaya sağ tıklayıp yönetici olarak çalıştırmayı deneyin.',
       },
       step3: {
         title: 'Lisans koşullarını kabul edin',
@@ -387,40 +391,8 @@ export const translations = {
       },
       step7: {
         title: 'Windows 11 kurulumunu doğrulayın',
-        desc: 'Kurulum bittikten sonra oturum açın. Başlat > Ayarlar > Sistem > Hakkında yolunu izleyerek "Windows 11" yazdığını doğrulayın.',
+        desc: 'Kurulum bittikten sonra oturum açın. Başlat > Ayarlar > Sistem > Hakkında yolunu izleyerek Windows 11 sürümünüzü doğrulayın; masaüstü ve Başlat menüsü Windows 11 görünümünde olmalıdır.',
         tip: 'Güncelleme sonrası Citrix, VPN veya yazıcı sürücülerinde sorun olursa IT destek ekibine başvurun.',
-      },
-      visual: {
-        cancel: 'İptal',
-        step2: {
-          title: 'Bu uygulamanın bilgisayarınızda değişiklik yapmasına izin veriyor musunuz?',
-          desc: 'Yayımcı: Microsoft Corporation',
-          run: 'Çalıştır',
-        },
-        step3: {
-          windowTitle: 'Windows 11 Yükleme Yardımcısı',
-          title: 'Microsoft Yazılım Lisans Koşulları',
-          accept: 'Kabul et ve Yükle',
-        },
-        step4: {
-          windowTitle: 'Windows 11 Yükleniyor',
-          title: 'Windows 11 indiriliyor…',
-          desc: 'Bu işlem internet hızınıza bağlı olarak birkaç dakika sürebilir.',
-        },
-        step5: {
-          windowTitle: 'Windows 11 Yükleme Yardımcısı',
-          title: 'Yükleme için hazır',
-          restart: 'Şimdi Yeniden Başlat',
-        },
-        step6: {
-          title: 'Çalışılıyor',
-          desc: 'Bilgisayarınız birkaç kez yeniden başlatılacak',
-          warning: 'Bilgisayarınızı kapatmayın',
-        },
-        step7: {
-          windowTitle: 'Ayarlar — Sistem — Hakkında',
-          badge: 'Windows 11 Pro — Güncelleme başarılı',
-        },
       },
     },
     footer: {
@@ -1143,10 +1115,14 @@ export const translations = {
       alertText: 'Diese Anleitung gilt für x64-PCs, die die Windows-11-Anforderungen erfüllen. Der Installationsassistent funktioniert nicht auf ARM-Geräten. Sichern Sie wichtige Dateien vor dem Update.',
       prereqTitle: 'Vor dem Start prüfen',
       prereq: {
-        license: 'Sie benötigen eine gültige Windows-10- oder Windows-11-Lizenz.',
-        version: 'Windows 10 Version 2004 oder neuer muss installiert sein.',
-        disk: 'Mindestens 9 GB freier Speicherplatz für den Windows-11-Download.',
-        cpu: 'Der Installationsassistent läuft nur auf x64-Prozessoren (nicht ARM).',
+        cpu: 'Prozessor: Mindestens 1 GHz mit 2 oder mehr Kernen auf einem kompatiblen 64-Bit-Prozessor (x64).',
+        ram: 'Arbeitsspeicher (RAM): Mindestens 4 GB.',
+        storage: 'Speicher: Mindestens 64 GB Festplatte; zusätzlich mindestens 9 GB frei für den Installationsassistenten.',
+        tpm: 'Sicherheit: TPM 2.0 (Trusted Platform Module) muss aktiviert sein.',
+        secureBoot: 'Firmware: UEFI mit Secure-Boot-Unterstützung erforderlich.',
+        graphics: 'Grafik: DirectX-12-kompatible GPU mit WDDM-2.0-Treiber.',
+        display: 'Display: Mindestens 9 Zoll, 720p (HD) Auflösung.',
+        version: 'Aktuelles System: Windows 10 Version 2004 oder neuer (x64, kein ARM).',
       },
       prereqNote: 'Nicht alle Windows-10-Geräte sind für Windows 11 geeignet. Prüfen Sie die Hardware auf der Microsoft-Spezifikationsseite.',
       checkRequirements: 'Systemanforderungen prüfen',
@@ -1161,8 +1137,8 @@ export const translations = {
       },
       step2: {
         title: 'Heruntergeladene Datei als Administrator ausführen',
-        desc: 'Doppelklicken Sie auf Windows11InstallationAssistant.exe und wählen Sie „Ausführen". Administratorrechte sind erforderlich.',
-        tip: 'Die Datei liegt meist im Download-Ordner. Auf Firmen-PCs ggf. IT-Freigabe nötig.',
+        desc: 'Doppelklicken Sie auf Windows11InstallationAssistant.exe oder wählen Sie „Als Administrator ausführen". Klicken Sie in der UAC-Abfrage auf „Ja".',
+        tip: 'Die Datei liegt meist im Download-Ordner. Wenn keine UAC-Abfrage erscheint, Rechtsklick → Als Administrator ausführen.',
       },
       step3: {
         title: 'Lizenzbedingungen akzeptieren',
@@ -1186,40 +1162,8 @@ export const translations = {
       },
       step7: {
         title: 'Windows-11-Installation bestätigen',
-        desc: 'Nach dem Setup: Start > Einstellungen > System > Info — dort sollte „Windows 11" stehen.',
+        desc: 'Nach dem Setup: Start > Einstellungen > System > Info — dort sollte Windows 11 stehen; Desktop und Startmenü zeigen das Windows-11-Design.',
         tip: 'Bei Citrix-, VPN- oder Druckerproblemen IT-Support kontaktieren.',
-      },
-      visual: {
-        cancel: 'Abbrechen',
-        step2: {
-          title: 'Möchten Sie zulassen, dass diese App Änderungen vornimmt?',
-          desc: 'Herausgeber: Microsoft Corporation',
-          run: 'Ausführen',
-        },
-        step3: {
-          windowTitle: 'Windows 11 Installationsassistent',
-          title: 'Microsoft-Softwarelizenzbedingungen',
-          accept: 'Akzeptieren und installieren',
-        },
-        step4: {
-          windowTitle: 'Windows 11 wird installiert',
-          title: 'Windows 11 wird heruntergeladen…',
-          desc: 'Dies kann je nach Internetgeschwindigkeit einige Minuten dauern.',
-        },
-        step5: {
-          windowTitle: 'Windows 11 Installationsassistent',
-          title: 'Bereit zur Installation',
-          restart: 'Jetzt neu starten',
-        },
-        step6: {
-          title: 'Wird ausgeführt',
-          desc: 'Ihr PC wird mehrmals neu gestartet',
-          warning: 'PC nicht ausschalten',
-        },
-        step7: {
-          windowTitle: 'Einstellungen — System — Info',
-          badge: 'Windows 11 Pro — Update erfolgreich',
-        },
       },
     },
     footer: {
@@ -1931,10 +1875,14 @@ export const translations = {
       alertText: 'This guide is for x64 PCs that meet Windows 11 requirements. The Installation Assistant does not work on ARM devices. Back up important files before upgrading.',
       prereqTitle: 'Check before you start',
       prereq: {
-        license: 'You need a valid Windows 10 or Windows 11 license.',
-        version: 'Windows 10 version 2004 or later must be installed.',
-        disk: 'At least 9 GB of free disk space is required for the Windows 11 download.',
-        cpu: 'The Installation Assistant only runs on x64 processors (not ARM).',
+        cpu: 'Processor: 1 GHz or faster with 2 or more cores on a compatible 64-bit (x64) processor.',
+        ram: 'Memory (RAM): 4 GB or more.',
+        storage: 'Storage: 64 GB or larger disk; plus at least 9 GB free for the Installation Assistant.',
+        tpm: 'Security: TPM 2.0 (Trusted Platform Module) must be enabled.',
+        secureBoot: 'Firmware: UEFI with Secure Boot support required.',
+        graphics: 'Graphics: DirectX 12 compatible GPU with WDDM 2.0 driver.',
+        display: 'Display: 9-inch or larger screen, 720p (HD) resolution.',
+        version: 'Current OS: Windows 10 version 2004 or later (x64, not ARM).',
       },
       prereqNote: 'Not all Windows 10 devices are eligible for Windows 11. Check hardware compatibility on Microsoft\'s specifications page.',
       checkRequirements: 'Check System Requirements',
@@ -1949,8 +1897,8 @@ export const translations = {
       },
       step2: {
         title: 'Run the downloaded file as administrator',
-        desc: 'Double-click Windows11InstallationAssistant.exe. Click Run when prompted. Administrator rights are required.',
-        tip: 'The file is usually in your Downloads folder. Corporate PCs may need IT approval.',
+        desc: 'Double-click Windows11InstallationAssistant.exe or right-click and choose Run as administrator. Click Yes on the User Account Control (UAC) prompt.',
+        tip: 'The file is usually in Downloads. If UAC does not appear, use right-click → Run as administrator.',
       },
       step3: {
         title: 'Accept the license terms',
@@ -1974,40 +1922,8 @@ export const translations = {
       },
       step7: {
         title: 'Verify Windows 11 installation',
-        desc: 'After setup, sign in and go to Start > Settings > System > About to confirm "Windows 11" is shown.',
+        desc: 'After setup, sign in and go to Start > Settings > System > About to confirm Windows 11; the desktop and Start menu should show the Windows 11 layout.',
         tip: 'Contact IT support if Citrix, VPN, or printer drivers have issues after the upgrade.',
-      },
-      visual: {
-        cancel: 'Cancel',
-        step2: {
-          title: 'Do you want to allow this app to make changes to your device?',
-          desc: 'Publisher: Microsoft Corporation',
-          run: 'Run',
-        },
-        step3: {
-          windowTitle: 'Windows 11 Installation Assistant',
-          title: 'Microsoft Software License Terms',
-          accept: 'Accept and install',
-        },
-        step4: {
-          windowTitle: 'Installing Windows 11',
-          title: 'Downloading Windows 11…',
-          desc: 'This may take a few minutes depending on your internet speed.',
-        },
-        step5: {
-          windowTitle: 'Windows 11 Installation Assistant',
-          title: 'Ready to install',
-          restart: 'Restart now',
-        },
-        step6: {
-          title: 'Working on it',
-          desc: 'Your PC will restart several times',
-          warning: 'Do not turn off your PC',
-        },
-        step7: {
-          windowTitle: 'Settings — System — About',
-          badge: 'Windows 11 Pro — Upgrade successful',
-        },
       },
     },
     footer: {

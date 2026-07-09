@@ -7,10 +7,9 @@ import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import ExpandableScreenshot from '../components/ExpandableScreenshot';
-import Windows11StepVisual from '../components/Windows11StepVisual';
 import {
   Download, ExternalLink, CheckCircle2, AlertTriangle, HardDrive,
-  ShieldCheck, RotateCcw, Play, FileCheck, Monitor, ArrowLeft, Laptop,
+  ShieldCheck, RotateCcw, Play, FileCheck, Monitor, ArrowLeft, Laptop, Cpu, MemoryStick,
 } from 'lucide-react';
 
 const MICROSOFT_DOWNLOAD_URL = 'https://www.microsoft.com/tr-tr/software-download/windows11';
@@ -20,6 +19,12 @@ const STEP_COUNT = 7;
 
 const STEP_SCREENS = {
   1: 'step1-download.png',
+  2: 'step2-uac.png',
+  3: 'step3-accept.png',
+  4: 'step4-download.png',
+  5: 'step5-restart.png',
+  6: 'step6-installing.png',
+  7: 'step7-desktop.png',
 };
 
 const STEP_ICONS = [Download, Play, FileCheck, HardDrive, RotateCcw, Monitor, CheckCircle2];
@@ -29,10 +34,14 @@ const Windows11Upgrade = () => {
   const imgSrc = (file) => `${process.env.PUBLIC_URL}/windows11-upgrade/${file}`;
 
   const prerequisites = [
-    { icon: ShieldCheck, text: t('windows11Upgrade.prereq.license') },
+    { icon: Cpu, text: t('windows11Upgrade.prereq.cpu') },
+    { icon: MemoryStick, text: t('windows11Upgrade.prereq.ram') },
+    { icon: HardDrive, text: t('windows11Upgrade.prereq.storage') },
+    { icon: ShieldCheck, text: t('windows11Upgrade.prereq.tpm') },
+    { icon: ShieldCheck, text: t('windows11Upgrade.prereq.secureBoot') },
+    { icon: Monitor, text: t('windows11Upgrade.prereq.graphics') },
+    { icon: Laptop, text: t('windows11Upgrade.prereq.display') },
     { icon: Monitor, text: t('windows11Upgrade.prereq.version') },
-    { icon: HardDrive, text: t('windows11Upgrade.prereq.disk') },
-    { icon: Laptop, text: t('windows11Upgrade.prereq.cpu') },
   ];
 
   return (
@@ -122,14 +131,13 @@ const Windows11Upgrade = () => {
                   </div>
                 </CardHeader>
                 <CardContent className="pt-4 px-4 pb-4 flex-1 flex flex-col gap-3">
-                  {screenshot ? (
+                  {screenshot && (
                     <ExpandableScreenshot
                       src={imgSrc(screenshot)}
                       alt={stepTitle}
                       title={stepTitle}
+                      darkFrame={stepNum === 6}
                     />
-                  ) : (
-                    <Windows11StepVisual step={stepNum} t={t} />
                   )}
 
                   {hasTip && (
