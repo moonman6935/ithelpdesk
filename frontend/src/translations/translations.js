@@ -406,6 +406,7 @@ export const translations = {
       team: 'DCS IT Türkiye Ekibi',
       creator: 'Oluşturan Bayram Can Aslan',
       loading: 'Yükleniyor…',
+      skip: 'Devam et',
     },
     assetConfirmation: {
       title: 'Zimmet Onaylama',
@@ -1177,6 +1178,7 @@ export const translations = {
       team: 'DCS IT Türkei Team',
       creator: 'Erstellt von Bayram Can Aslan',
       loading: 'Wird geladen…',
+      skip: 'Weiter',
     },
     assetConfirmation: {
       title: 'Inventarbestätigung',
@@ -1937,6 +1939,7 @@ export const translations = {
       team: 'DCS IT Turkey Team',
       creator: 'Created by Bayram Can Aslan',
       loading: 'Loading…',
+      skip: 'Continue',
     },
     assetConfirmation: {
       title: 'Asset Confirmation',

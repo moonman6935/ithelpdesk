@@ -413,6 +413,12 @@
   pointer-events: none;
 }
 
+@media (max-width: 767px) {
+  .splash-screen {
+    cursor: pointer;
+  }
+}
+
 @keyframes splash-exit {
   0% {
     opacity: 1;

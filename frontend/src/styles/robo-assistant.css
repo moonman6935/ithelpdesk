@@ -917,3 +917,19 @@
     animation: none !important;
   }
 }
+
+@media (max-width: 767px) {
+  .robo-fab {
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    right: max(1rem, env(safe-area-inset-right));
+  }
+
+  .robo-fab__dog,
+  .robo-dog-wrap--roam .robo-dog,
+  .robo-dog-wrap--roam .robo-dog__tail,
+  .robo-dog-wrap--search .robo-dog__head,
+  .robo-arena .robo-dog-wrap--roam,
+  .robo-arena .robo-dog-wrap--search {
+    animation: none !important;
+  }
+}

@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useIsMobile } from '../hooks/useMediaQuery';
+import { resetBodyInteraction } from '../lib/resetBodyInteraction';
 import { roboTranslations } from '../translations/roboTranslations';
 import { getFlowNode, ROCKET_CHAT_URL } from '../lib/roboFlows';
 import {
@@ -105,6 +107,7 @@ function RoboOverlay({ onClose }) {
     }, 2200);
     return () => {
       document.body.style.overflow = prev;
+      resetBodyInteraction();
       window.clearTimeout(settle);
     };
   }, [syncDogModeForNode]);
@@ -423,10 +426,16 @@ function RoboOverlay({ onClose }) {
 const RoboAssistant = () => {
   const t = useRoboT();
   const location = useLocation();
+  const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
   const [showBubble, setShowBubble] = useState(false);
 
   useEffect(() => {
+    if (isMobile) {
+      setShowBubble(false);
+      return undefined;
+    }
+
     setShowBubble(false);
 
     const showTimer = window.setTimeout(() => setShowBubble(true), 1200);
@@ -436,7 +445,7 @@ const RoboAssistant = () => {
       window.clearTimeout(showTimer);
       window.clearTimeout(hideTimer);
     };
-  }, [location.pathname]);
+  }, [location.pathname, isMobile]);
 
   const dismissBubble = () => {
     setShowBubble(false);
@@ -478,7 +487,10 @@ const RoboAssistant = () => {
 
       {open &&
         createPortal(
-          <RoboOverlay onClose={() => setOpen(false)} />,
+          <RoboOverlay onClose={() => {
+            setOpen(false);
+            resetBodyInteraction();
+          }} />,
           document.body
         )}
     </>

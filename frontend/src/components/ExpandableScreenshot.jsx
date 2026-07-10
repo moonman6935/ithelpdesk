@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, ZoomIn } from 'lucide-react';
+import { resetBodyInteraction } from '../lib/resetBodyInteraction';
 
 function ImageExpandOverlay({ src, alt, title, sourceRect, onClose, darkFrame }) {
   const [phase, setPhase] = useState('start');
@@ -16,6 +17,7 @@ function ImageExpandOverlay({ src, alt, title, sourceRect, onClose, darkFrame })
     return () => {
       cancelAnimationFrame(raf);
       document.body.style.overflow = prevOverflow;
+      resetBodyInteraction();
     };
   }, []);
 

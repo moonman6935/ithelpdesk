@@ -2,9 +2,13 @@ import React, { useEffect, useState } from 'react';
 import BrandLogo from './BrandLogo';
 import { Loader2 } from 'lucide-react';
 import { translations } from '../translations/translations';
+import { useLanguage } from '../contexts/LanguageContext';
 
-const MIN_DISPLAY_MS = 5200;
+const MIN_DISPLAY_MS_DESKTOP = 5200;
+const MIN_DISPLAY_MS_MOBILE = 2200;
 const EXIT_MS = 700;
+
+const SPLASH_DONE_EVENT = 'ithelpdesk:splash-done';
 
 const SPLASH_LANGS = [
   { code: 'tr', flag: '🇹🇷', label: 'Türkçe' },
@@ -13,6 +17,7 @@ const SPLASH_LANGS = [
 ];
 
 const SplashScreen = () => {
+  const { t } = useLanguage();
   const [visible, setVisible] = useState(true);
   const [exiting, setExiting] = useState(false);
 
@@ -20,8 +25,15 @@ const SplashScreen = () => {
     const reducedMotion =
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isMobile =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(max-width: 767px)').matches;
 
-    const minTime = reducedMotion ? 1000 : MIN_DISPLAY_MS;
+    const minTime = reducedMotion
+      ? 800
+      : isMobile
+        ? MIN_DISPLAY_MS_MOBILE
+        : MIN_DISPLAY_MS_DESKTOP;
     const exitTime = reducedMotion ? 250 : EXIT_MS;
     const startedAt = Date.now();
 
@@ -40,10 +52,27 @@ const SplashScreen = () => {
       window.setTimeout(beginExit, minTime + 2000);
     }
 
-    return () => window.removeEventListener('load', beginExit);
+    const skip = () => beginExit();
+    window.addEventListener('ithelpdesk:splash-skip', skip);
+
+    return () => {
+      window.removeEventListener('load', beginExit);
+      window.removeEventListener('ithelpdesk:splash-skip', skip);
+    };
   }, []);
 
+  useEffect(() => {
+    if (!visible) {
+      window.dispatchEvent(new CustomEvent(SPLASH_DONE_EVENT));
+    }
+  }, [visible]);
+
   if (!visible) return null;
+
+  const handleSkip = () => {
+    setExiting(true);
+    window.setTimeout(() => setVisible(false), 250);
+  };
 
   return (
     <div
@@ -51,6 +80,10 @@ const SplashScreen = () => {
       role="dialog"
       aria-modal="true"
       aria-label={translations.tr.splash.title}
+      onClick={handleSkip}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') handleSkip();
+      }}
     >
       <div className="splash-screen__grid" aria-hidden="true" />
       <div className="splash-screen__glow splash-screen__glow--left" aria-hidden="true" />
@@ -102,6 +135,16 @@ const SplashScreen = () => {
 
       <footer className="splash-screen__footer">
         <span>{translations.tr.splash.creator}</span>
+        <button
+          type="button"
+          className="mt-2 text-sm underline text-white/80 hover:text-white touch-manipulation"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleSkip();
+          }}
+        >
+          {t('splash.skip')}
+        </button>
       </footer>
     </div>
   );

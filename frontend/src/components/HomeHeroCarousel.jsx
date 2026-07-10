@@ -37,7 +37,7 @@ function CarouselSlide({ slide, index, slidesLength, isActive, t, direction, sli
 
       <div
         key={slideKey}
-        className={`relative grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 items-center p-8 sm:p-10 md:p-16 min-h-[340px] sm:min-h-[400px] md:min-h-[460px] lg:min-h-[500px] ${isActive ? enterClass : ''}`}
+        className={`relative grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 items-center p-8 sm:p-10 md:p-16 min-h-[300px] sm:min-h-[400px] md:min-h-[460px] lg:min-h-[500px] home-hero-slide ${isActive ? enterClass : ''}`}
       >
         <div className="order-2 md:order-1 space-y-4 sm:space-y-5">
           <span className="inline-block px-3 py-1.5 rounded-full bg-white/20 text-sm font-medium sm:backdrop-blur-sm border border-white/20">
@@ -112,7 +112,7 @@ function CarouselSlide({ slide, index, slidesLength, isActive, t, direction, sli
             {isActive && <span className="ft-energy-ring rounded-full" />}
             <div className="w-44 h-44 sm:w-52 sm:h-52 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-full bg-white/15 sm:backdrop-blur-sm flex items-center justify-center border-4 border-white/30 shadow-inner relative">
               <div
-                className="absolute inset-0 rounded-full opacity-40 animate-spin"
+                className="absolute inset-0 rounded-full opacity-40 animate-spin carousel-icon-spin"
                 style={{
                   background:
                     'conic-gradient(from 0deg, transparent, rgba(0,240,255,0.4), transparent, rgba(255,0,170,0.3), transparent)',
@@ -217,7 +217,7 @@ const HomeHeroCarousel = () => {
   const prev = useCallback(() => goTo(active - 1, 'left'), [active, goTo]);
 
   useEffect(() => {
-    if (!slidesLength) return undefined;
+    if (!slidesLength || isMobile) return undefined;
     const currentSlide = slides[active];
     if (!currentSlide?.slideId) return undefined;
 
@@ -228,7 +228,7 @@ const HomeHeroCarousel = () => {
     }, duration);
 
     return () => window.clearTimeout(timer);
-  }, [active, animating, goTo, slides, slidesLength, carouselTiming]);
+  }, [active, animating, goTo, slides, slidesLength, carouselTiming, isMobile]);
 
   if (!slidesLength) return null;
 

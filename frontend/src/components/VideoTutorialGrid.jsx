@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { X, Play } from 'lucide-react';
 import VideoEmbed from './VideoEmbed';
 import { getVideoThumbnail } from '../lib/videoEmbed';
+import { resetBodyInteraction } from '../lib/resetBodyInteraction';
 
 function VideoExpandPlayer({ video, title, sourceRect, onClose }) {
   const [phase, setPhase] = useState('start');
@@ -20,6 +21,7 @@ function VideoExpandPlayer({ video, title, sourceRect, onClose }) {
       cancelAnimationFrame(raf);
       clearTimeout(playerTimer);
       document.body.style.overflow = prevOverflow;
+      resetBodyInteraction();
     };
   }, []);
 

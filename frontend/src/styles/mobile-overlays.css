@@ -1,0 +1,58 @@
+/* Mobile overlay & dialog fixes */
+
+@media (max-width: 767px) {
+  .announcement-dialog-content {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: min(88dvh, 100%) !important;
+    transform: none !important;
+    translate: none !important;
+    border-radius: 1.25rem 1.25rem 0 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+  }
+
+  .announcement-dialog-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .announcement-dialog-footer {
+    flex-shrink: 0;
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    background: #fff;
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  /* Reduce GPU load on mobile */
+  .ft-glitch-text,
+  .ft-icon-burst,
+  .ft-energy-ring,
+  .ft-dot-active {
+    animation: none !important;
+    filter: none !important;
+  }
+
+  .carousel-icon-spin {
+    display: none !important;
+  }
+
+  .home-hero-slide {
+    min-height: 300px !important;
+  }
+
+  .splash-screen {
+    padding-bottom: max(5rem, env(safe-area-inset-bottom));
+  }
+}
