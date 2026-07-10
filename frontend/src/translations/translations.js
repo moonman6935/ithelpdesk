@@ -769,6 +769,7 @@ export const translations = {
         low: 'Düşük Önemli',
       },
       understood: 'Anladım',
+      close: 'Kapat',
     },
   },
   de: {
@@ -1530,6 +1531,7 @@ export const translations = {
     announcement: {
       priority: { high: 'Hohe Priorität', medium: 'Mittlere Priorität', low: 'Niedrige Priorität' },
       understood: 'Verstanden',
+      close: 'Schließen',
     },
   },
   en: {
@@ -2291,6 +2293,7 @@ export const translations = {
     announcement: {
       priority: { high: 'High Priority', medium: 'Medium Priority', low: 'Low Priority' },
       understood: 'Got it',
+      close: 'Close',
     },
   }
 };

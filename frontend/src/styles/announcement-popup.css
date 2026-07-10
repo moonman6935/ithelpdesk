@@ -1,0 +1,167 @@
+/* Custom announcement modal — avoids Radix Dialog mobile transform bugs */
+
+.announcement-root {
+  position: fixed;
+  inset: 0;
+  z-index: 10060;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+}
+
+@media (min-width: 640px) {
+  .announcement-root {
+    align-items: center;
+    padding: 1.5rem;
+  }
+}
+
+.announcement-root__backdrop {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: rgba(0, 0, 0, 0.72);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.announcement-root__panel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 32rem;
+  max-height: 85dvh;
+  max-height: 85svh;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-radius: 1.25rem 1.25rem 0 0;
+  overflow: hidden;
+  box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.28);
+  animation: announcement-sheet-in 0.32s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+@media (min-width: 640px) {
+  .announcement-root__panel {
+    border-radius: 1rem;
+    max-height: min(85vh, 640px);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.28);
+    animation-name: announcement-modal-in;
+  }
+}
+
+@keyframes announcement-sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes announcement-modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.announcement-root__close {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  z-index: 5;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: none;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.announcement-root__close:active {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.announcement-root__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+.announcement-root__hero {
+  padding: 1.25rem 1.25rem 1.5rem;
+  padding-right: 3.25rem;
+}
+
+.announcement-root__badge-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.announcement-root__title {
+  margin: 0 0 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.3;
+  color: #fff;
+}
+
+@media (min-width: 640px) {
+  .announcement-root__title {
+    font-size: 1.5rem;
+  }
+}
+
+.announcement-root__message {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.92);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.announcement-root__footer {
+  flex: 0 0 auto;
+  padding: 1rem 1.25rem;
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+}
+
+.announcement-root__btn {
+  width: 100%;
+  min-height: 3rem;
+  font-size: 1rem;
+  font-weight: 700;
+  touch-action: manipulation;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .announcement-root__panel {
+    animation: none !important;
+  }
+}

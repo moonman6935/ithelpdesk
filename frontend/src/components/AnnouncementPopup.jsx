@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useLanguage } from '../contexts/LanguageContext';
-import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
-} from './ui/dialog';
 import { Button } from './ui/button';
-import { Megaphone } from 'lucide-react';
+import { Megaphone, X } from 'lucide-react';
 import api from '../lib/api';
 import { getBackgroundGradient, PRIORITY_STYLES } from '../lib/announcementThemes';
 import { resetBodyInteraction } from '../lib/resetBodyInteraction';
+import '../styles/announcement-popup.css';
 
 const SPLASH_DONE_EVENT = 'ithelpdesk:splash-done';
 const SESSION_PREFIX = 'announcement-dismissed:';
@@ -39,6 +38,77 @@ function waitForSplashDone(maxMs = 9000) {
     }, 150);
     const timeout = window.setTimeout(finish, maxMs);
   });
+}
+
+function AnnouncementModal({ announcement, onClose, t }) {
+  const priorityStyle = PRIORITY_STYLES[announcement.priority] || PRIORITY_STYLES.medium;
+  const gradient = getBackgroundGradient(announcement.background);
+
+  useEffect(() => {
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+      resetBodyInteraction();
+    };
+  }, [onClose]);
+
+  const stopPropagation = (e) => e.stopPropagation();
+
+  return createPortal(
+    <div className="announcement-root" role="dialog" aria-modal="true" aria-labelledby="announcement-title">
+      <button
+        type="button"
+        className="announcement-root__backdrop"
+        onClick={onClose}
+        aria-label={t('announcement.close')}
+      />
+
+      <div className="announcement-root__panel" onClick={stopPropagation}>
+        <button
+          type="button"
+          className="announcement-root__close"
+          onClick={onClose}
+          aria-label={t('announcement.close')}
+        >
+          <X className="w-5 h-5" />
+        </button>
+
+        <div className="announcement-root__scroll">
+          <div className={`announcement-root__hero bg-gradient-to-br ${gradient}`}>
+            <div className="announcement-root__badge-row">
+              <Megaphone className="w-5 h-5 shrink-0 text-white" />
+              <span className={`text-xs font-bold uppercase tracking-wide px-2.5 py-1 rounded-full ${priorityStyle.badge}`}>
+                {t(`announcement.priority.${announcement.priority}`)}
+              </span>
+            </div>
+            <h2 id="announcement-title" className="announcement-root__title">
+              {announcement.title}
+            </h2>
+            <p className="announcement-root__message">{announcement.message}</p>
+          </div>
+        </div>
+
+        <div className="announcement-root__footer">
+          <Button
+            type="button"
+            onClick={onClose}
+            className="announcement-root__btn bg-red-600 hover:bg-red-700"
+          >
+            {t('announcement.understood')}
+          </Button>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
 }
 
 const AnnouncementPopup = () => {
@@ -80,7 +150,7 @@ const AnnouncementPopup = () => {
         setAnnouncement(data);
         setOpen(true);
       } catch {
-        // Sessizce geç — duyuru yoksa veya API kapalıysa popup gösterme
+        // Sessizce geç
       }
     };
 
@@ -93,52 +163,7 @@ const AnnouncementPopup = () => {
 
   if (!announcement || !open) return null;
 
-  const priorityStyle = PRIORITY_STYLES[announcement.priority] || PRIORITY_STYLES.medium;
-  const gradient = getBackgroundGradient(announcement.background);
-
-  return (
-    <Dialog
-      open
-      onOpenChange={(next) => {
-        if (!next) handleClose();
-      }}
-    >
-      <DialogContent
-        className={`announcement-dialog-content max-w-lg p-0 overflow-hidden border-0 ring-2 ${priorityStyle.ring}`}
-        onPointerDownOutside={handleClose}
-        onInteractOutside={handleClose}
-        onEscapeKeyDown={handleClose}
-      >
-        <div className="announcement-dialog-body">
-          <div className={`bg-gradient-to-br ${gradient} text-white p-5 sm:p-6`}>
-            <DialogHeader className="text-left space-y-3">
-              <div className="flex items-center gap-2 flex-wrap pr-8">
-                <Megaphone className="w-5 h-5 shrink-0" />
-                <span className={`text-xs font-bold uppercase tracking-wide px-2.5 py-1 rounded-full ${priorityStyle.badge}`}>
-                  {t(`announcement.priority.${announcement.priority}`)}
-                </span>
-              </div>
-              <DialogTitle className="text-lg sm:text-xl md:text-2xl font-bold text-white">
-                {announcement.title}
-              </DialogTitle>
-              <DialogDescription className="text-white/90 text-sm sm:text-base whitespace-pre-wrap leading-relaxed">
-                {announcement.message}
-              </DialogDescription>
-            </DialogHeader>
-          </div>
-        </div>
-        <DialogFooter className="announcement-dialog-footer p-4 bg-white sm:justify-center border-t border-gray-100">
-          <Button
-            type="button"
-            onClick={handleClose}
-            className="bg-red-600 hover:bg-red-700 w-full sm:w-auto px-8 min-h-[48px] text-base touch-manipulation"
-          >
-            {t('announcement.understood')}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
+  return <AnnouncementModal announcement={announcement} onClose={handleClose} t={t} />;
 };
 
 export default AnnouncementPopup;
