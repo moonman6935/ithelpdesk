@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from "../components/ui/alert";
 import {
     User, PlusCircle, CheckCircle2, LayoutDashboard, Package,
     RefreshCcw, Users, ArrowLeftRight, LogOut, Dices, KeyRound, Upload,
-    Truck, PackageCheck, Megaphone, Video, Images, Printer
+    Truck, PackageCheck, Megaphone, Video, Images, Printer, Clock,
 } from "lucide-react";
 import {
     Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
@@ -23,6 +23,7 @@ import AnnouncementAdmin from '../components/AnnouncementAdmin';
 import VideoTutorialsAdmin from '../components/VideoTutorialsAdmin';
 import CarouselSlidesAdmin from '../components/CarouselSlidesAdmin';
 import PersonnelInventoryPanel from '../components/PersonnelInventoryPanel';
+import PendingConfirmationsPanel from '../components/PendingConfirmationsPanel';
 import UserManagementPanel from '../components/UserManagementPanel';
 import {
     loadStoredPermissions,
@@ -40,6 +41,7 @@ const TAB_MODULE_MAP = {
     inventory: 'inventory',
     'outgoing-cargo': 'outgoing_cargo',
     'incoming-cargo': 'incoming_cargo',
+    'pending-confirmations': 'confirmations',
     confirmations: 'confirmations',
     announcement: 'announcement',
     'video-tutorials': 'video_tutorials',
@@ -48,7 +50,7 @@ const TAB_MODULE_MAP = {
 
 const TAB_ORDER = [
     'dashboard', 'add', 'inventory', 'outgoing-cargo', 'incoming-cargo',
-    'confirmations', 'users', 'announcement', 'video-tutorials', 'carousel-slides', 'account',
+    'pending-confirmations', 'confirmations', 'users', 'announcement', 'video-tutorials', 'carousel-slides', 'account',
 ];
 
 function canViewTab(tab, perms, sysAdmin) {
@@ -455,6 +457,11 @@ const AdminDashboard = () => {
                         </TabsTrigger>
                         )}
                         {canView('confirmations') && (
+                        <TabsTrigger value="pending-confirmations" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white px-6 transition-all">
+                            <Clock className="w-4 h-4 mr-2" /> {t('admin.pendingConfirmations')}
+                        </TabsTrigger>
+                        )}
+                        {canView('confirmations') && (
                         <TabsTrigger value="confirmations" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                             <CheckCircle2 className="w-4 h-4 mr-2" /> {t('admin.confirmations')}
                         </TabsTrigger>
@@ -522,7 +529,7 @@ const AdminDashboard = () => {
                             </Card>
                             <Card
                                 className="border-l-4 border-l-orange-500 cursor-pointer transition-shadow hover:shadow-md"
-                                onClick={() => setActiveTab('confirmations')}
+                                onClick={() => setActiveTab('pending-confirmations')}
                             >
                                 <CardHeader className="pb-2">
                                     <CardTitle className="text-sm text-gray-500">{t('admin.stats.pending')}</CardTitle>
@@ -668,6 +675,13 @@ const AdminDashboard = () => {
 
                     <TabsContent value="incoming-cargo">
                         <CargoPanel direction="incoming" canWrite={canWrite('incoming_cargo')} />
+                    </TabsContent>
+
+                    <TabsContent value="pending-confirmations">
+                        <PendingConfirmationsPanel
+                            inventory={inventory}
+                            confirmations={confirmations}
+                        />
                     </TabsContent>
 
                     <TabsContent value="confirmations">
