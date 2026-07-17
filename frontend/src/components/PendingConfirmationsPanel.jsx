@@ -7,60 +7,29 @@ import { Badge } from './ui/badge';
 import {
     Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
 } from './ui/dialog';
-import { Search, X, ChevronRight, Package, Clock, AlertCircle } from 'lucide-react';
-
-function buildPendingGroups(inventory, confirmations) {
-    const confirmedIds = new Set(
-        confirmations
-            .filter((c) => c.status === 'confirmed')
-            .map((c) => String(c.personnel_id))
-    );
-
-    const map = new Map();
-
-    inventory.forEach((item) => {
-        if (item.status !== 'assigned') return;
-
-        const pid = String(item.personnel_id);
-        if (confirmedIds.has(pid)) return;
-
-        if (!map.has(pid)) {
-            map.set(pid, {
-                personnel_id: pid,
-                personnel_name: item.personnel_name,
-                items: [],
-                latest_assigned_at: null,
-            });
-        }
-
-        const group = map.get(pid);
-        group.items.push(item);
-
-        const created = item.created_at ? new Date(item.created_at).getTime() : 0;
-        if (!group.latest_assigned_at || created > group.latest_assigned_at) {
-            group.latest_assigned_at = created;
-        }
-    });
-
-    return [...map.values()].sort((a, b) =>
-        String(a.personnel_name).localeCompare(String(b.personnel_name), 'tr')
-    );
-}
+import { Search, X, ChevronRight, Package, Clock, AlertCircle, Download } from 'lucide-react';
+import { buildPendingGroups, exportPendingConfirmationsToExcel } from '../lib/pendingConfirmations';
 
 const PendingConfirmationsPanel = ({ inventory, confirmations }) => {
     const { t } = useLanguage();
     const [search, setSearch] = useState('');
     const [selected, setSelected] = useState(null);
+    const [exporting, setExporting] = useState(false);
+
+    const allPendingGroups = useMemo(
+        () => buildPendingGroups(inventory, confirmations),
+        [inventory, confirmations]
+    );
 
     const pendingGroups = useMemo(() => {
         const query = search.trim().toLowerCase();
-        return buildPendingGroups(inventory, confirmations).filter((person) => {
+        return allPendingGroups.filter((person) => {
             if (!query) return true;
             const name = String(person.personnel_name || '').toLowerCase();
             const id = String(person.personnel_id || '').toLowerCase();
             return name.includes(query) || id.includes(query);
         });
-    }, [inventory, confirmations, search]);
+    }, [allPendingGroups, search]);
 
     const formatDate = (ts) => {
         if (!ts) return '—';
@@ -69,6 +38,33 @@ const PendingConfirmationsPanel = ({ inventory, confirmations }) => {
             month: '2-digit',
             year: 'numeric',
         });
+    };
+
+    const handleExportExcel = async () => {
+        const source = search.trim() ? pendingGroups : allPendingGroups;
+        if (!source.length) return;
+
+        setExporting(true);
+        try {
+            exportPendingConfirmationsToExcel(source, {
+                personnelId: t('admin.personnelId'),
+                personnelName: t('admin.personnelName'),
+                itemName: t('admin.itemName'),
+                serialNo: t('admin.serialNo'),
+                assignedAt: t('admin.assignedAt'),
+                activeItems: t('admin.activeItems'),
+                pendingSince: t('admin.pendingSince'),
+                status: t('admin.confirmationStatus'),
+                pendingStatus: t('admin.confirmationPending'),
+                summarySheet: t('admin.pendingExportSummarySheet'),
+                detailSheet: t('admin.pendingExportDetailSheet'),
+                filePrefix: t('admin.pendingExportFilePrefix'),
+            });
+        } catch {
+            alert(t('admin.pendingExportError'));
+        } finally {
+            setExporting(false);
+        }
     };
 
     return (
@@ -83,24 +79,36 @@ const PendingConfirmationsPanel = ({ inventory, confirmations }) => {
                             </CardTitle>
                             <CardDescription>{t('admin.pendingConfirmationsDesc')}</CardDescription>
                         </div>
-                        <div className="relative w-full sm:w-72 shrink-0">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                            <Input
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                placeholder={t('admin.searchByName')}
-                                className="pl-9 pr-9 rounded-xl border-gray-200"
-                            />
-                            {search && (
-                                <button
-                                    type="button"
-                                    onClick={() => setSearch('')}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                    aria-label={t('admin.clearSearch')}
-                                >
-                                    <X className="w-4 h-4" />
-                                </button>
-                            )}
+                        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto shrink-0">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                className="border-green-300 text-green-700 hover:bg-green-50 rounded-xl"
+                                onClick={handleExportExcel}
+                                disabled={exporting || !(search.trim() ? pendingGroups : allPendingGroups).length}
+                            >
+                                <Download className="w-4 h-4 mr-2" />
+                                {exporting ? '...' : t('admin.exportPendingExcel')}
+                            </Button>
+                            <div className="relative w-full sm:w-72">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                                <Input
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    placeholder={t('admin.searchByName')}
+                                    className="pl-9 pr-9 rounded-xl border-gray-200"
+                                />
+                                {search && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setSearch('')}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                        aria-label={t('admin.clearSearch')}
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
                     <div className="pt-2">
