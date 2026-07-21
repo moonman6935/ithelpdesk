@@ -571,7 +571,7 @@ function validateCarouselPayload(data) {
     };
 }
 
-const DEFAULT_CAROUSEL_COUNT = 12;
+const DEFAULT_CAROUSEL_COUNT = 13;
 const DEFAULT_CAROUSEL_DURATION_MS = 7000;
 const MIN_CAROUSEL_DURATION_MS = 3000;
 const MAX_CAROUSEL_DURATION_MS = 60000;

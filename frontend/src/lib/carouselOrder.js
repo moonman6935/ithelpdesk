@@ -1,12 +1,13 @@
 import { buildSlideMeta } from './carouselThemes';
 import { slideToDisplay } from './carouselSlideContent';
 
-export const DEFAULT_CAROUSEL_COUNT = 12;
+export const DEFAULT_CAROUSEL_COUNT = 13;
 
 export const DEFAULT_SLIDE_META = [
   { template: 'red', icon: 'sparkles' },
   { template: 'indigo', icon: 'download' },
   { template: 'blue', icon: 'laptop' },
+  { template: 'slate', icon: 'laptop' },
   { template: 'blue', icon: 'monitor' },
   { template: 'emerald', icon: 'refresh' },
   { template: 'violet', icon: 'message' },

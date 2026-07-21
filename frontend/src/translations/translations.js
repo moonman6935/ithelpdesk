@@ -33,6 +33,12 @@ export const translations = {
           ctaLabel: 'Güncelleme Rehberine Git',
         },
         {
+          title: 'macOS için AnyDesk ve Citrix Kurulumu',
+          message: 'Mac bilgisayarınıza AnyDesk ve Citrix Workspace uygulamalarını adım adım indirin ve kurun. Görsel rehberle kolayca tamamlayın.',
+          ctaLink: '/faq/mac-kurulum',
+          ctaLabel: 'macOS Rehberine Git',
+        },
+        {
           title: 'Citrix Girişi',
           message: "Citrix'e giriş yaparken mail adresinizi değil kullanıcı adı ve şifrenizi giriniz.",
         },
@@ -875,6 +881,12 @@ export const translations = {
           ctaLabel: 'Zum Update-Leitfaden',
         },
         {
+          title: 'AnyDesk & Citrix für macOS installieren',
+          message: 'Laden Sie AnyDesk und Citrix Workspace Schritt für Schritt auf Ihren Mac herunter und installieren Sie sie. Einfach mit der Bildanleitung.',
+          ctaLink: '/faq/mac-kurulum',
+          ctaLabel: 'Zur macOS-Anleitung',
+        },
+        {
           title: 'Citrix-Anmeldung',
           message: 'Beim Citrix-Login geben Sie bitte Benutzername und Passwort ein – nicht Ihre E-Mail-Adresse.',
         },
@@ -1704,6 +1716,12 @@ export const translations = {
           message: 'Step-by-step guide to upgrade from Windows 10 to Windows 11 using Microsoft\'s Installation Assistant — for compatible x64 PCs only.',
           ctaLink: '/windows-11-upgrade',
           ctaLabel: 'Open Upgrade Guide',
+        },
+        {
+          title: 'Install AnyDesk & Citrix on macOS',
+          message: 'Download and install AnyDesk and Citrix Workspace on your Mac step by step. Follow the visual guide to complete it easily.',
+          ctaLink: '/faq/mac-kurulum',
+          ctaLabel: 'Open macOS Guide',
         },
         {
           title: 'Citrix Login',
