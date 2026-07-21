@@ -7,6 +7,7 @@ import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import ExpandableScreenshot from '../components/ExpandableScreenshot';
+import CitrixInstallToolCard from '../components/CitrixInstallToolCard';
 import {
   Download, Monitor, CheckCircle2, RotateCcw, ExternalLink,
   FileDown, MousePointerClick, ShieldCheck, Play, ArrowLeft,
@@ -55,6 +56,8 @@ const CitrixSetup = () => {
           <p>{t('citrixSetup.alertText')}</p>
         </AlertDescription>
       </Alert>
+
+      <CitrixInstallToolCard className="mb-6" />
 
       <div className="mb-6 text-center">
         <a href={CITRIX_DOWNLOAD_URL} target="_blank" rel="noopener noreferrer">
