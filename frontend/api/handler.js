@@ -733,6 +733,38 @@ function validateCarouselReorder(order, customIds) {
     return { order };
 }
 
+// ---------- İndirilebilir araç dosyaları ----------
+const TOOL_FILES = {
+    headset: {
+        default_filename: 'DCS-Kulaklik-Onarim.cmd',
+        static_path: '/tools/DCS-Kulaklik-Onarim.cmd',
+    },
+    citrix: {
+        default_filename: 'DCS-Citrix-Kurulum.cmd',
+        static_path: '/tools/DCS-Citrix-Kurulum.cmd',
+    },
+};
+
+const MAX_TOOL_BYTES = 8 * 1024 * 1024; // 8 MB
+
+function sanitizeToolFilename(name, fallback) {
+    const base = String(name || '').split(/[\\/]/).pop().trim();
+    const cleaned = base.replace(/[^A-Za-z0-9._ -]/g, '').replace(/\s+/g, ' ').slice(0, 100).trim();
+    if (!cleaned || !/\.[A-Za-z0-9]{1,10}$/.test(cleaned)) return fallback;
+    return cleaned;
+}
+
+function decodeToolBase64(value) {
+    const raw = String(value || '').replace(/^data:[^;]+;base64,/, '').replace(/\s+/g, '');
+    if (!raw || !/^[A-Za-z0-9+/]+={0,2}$/.test(raw)) return null;
+    try {
+        const buf = Buffer.from(raw, 'base64');
+        return buf.length ? buf : null;
+    } catch {
+        return null;
+    }
+}
+
 function sendJson(res, status, data) {
     res.status(status).json(data);
 }
@@ -772,6 +804,32 @@ module.exports = async (req, res) => {
 
         if (method === 'GET' && route === '') {
             return sendJson(res, 200, { message: 'DCS IT IT Assets API' });
+        }
+
+        if (method === 'GET' && segments[0] === 'tools' && segments.length === 2) {
+            const key = segments[1];
+            const meta = TOOL_FILES[key];
+            if (!meta) return sendError(res, 404, 'Araç bulunamadı');
+            if (!requireRateLimit(req, res, 'tool-download', { max: 40, windowMs: 60_000 })) return;
+
+            const doc = await db.collection('tool_files').findOne({ key });
+            if (!doc || !doc.content_base64) {
+                res.statusCode = 302;
+                res.setHeader('Location', meta.static_path);
+                res.setHeader('Cache-Control', 'no-store');
+                res.end();
+                return;
+            }
+
+            const buffer = Buffer.from(doc.content_base64, 'base64');
+            const filename = (doc.filename || meta.default_filename).replace(/"/g, '');
+            res.setHeader('Content-Type', doc.content_type || 'application/octet-stream');
+            res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+            res.setHeader('Content-Length', buffer.length);
+            res.setHeader('Cache-Control', 'no-store');
+            res.statusCode = 200;
+            res.end(buffer);
+            return;
         }
 
         if (method === 'POST' && route === 'auth/login') {
@@ -1307,6 +1365,85 @@ module.exports = async (req, res) => {
                 imported: itemsToInsert.length,
                 skipped,
             });
+        }
+
+        if (method === 'GET' && route === 'admin/tools') {
+            if (!(await requireModuleAccess(db, req, res, 'tools'))) return;
+            const docs = await db.collection('tool_files')
+                .find({}, { projection: { _id: 0, content_base64: 0 } })
+                .toArray();
+            const byKey = {};
+            docs.forEach((d) => { byKey[d.key] = d; });
+            const tools = Object.entries(TOOL_FILES).map(([key, meta]) => {
+                const d = byKey[key];
+                return {
+                    key,
+                    default_filename: meta.default_filename,
+                    filename: d?.filename || meta.default_filename,
+                    content_type: d?.content_type || 'application/octet-stream',
+                    size: d?.size ?? null,
+                    overridden: Boolean(d),
+                    updated_at: d?.updated_at || null,
+                    updated_by: d?.updated_by || null,
+                };
+            });
+            return sendJson(res, 200, tools);
+        }
+
+        if (method === 'POST' && segments[0] === 'admin' && segments[1] === 'tools' && segments.length === 3) {
+            if (!(await requireWriteAccess(db, req, res, 'tools'))) return;
+            const key = segments[2];
+            const meta = TOOL_FILES[key];
+            if (!meta) return sendError(res, 404, 'Araç bulunamadı');
+
+            const buffer = decodeToolBase64(req.body?.content_base64);
+            if (!buffer) return sendError(res, 400, 'Geçersiz dosya içeriği');
+            if (buffer.length > MAX_TOOL_BYTES) {
+                return sendError(res, 400, `Dosya çok büyük (en fazla ${Math.round(MAX_TOOL_BYTES / (1024 * 1024))} MB)`);
+            }
+
+            const filename = sanitizeToolFilename(req.body?.filename, meta.default_filename);
+            const content_type = coerceString(req.body?.content_type, 120) || 'application/octet-stream';
+            const now = new Date().toISOString();
+            const updated_by = getAuthUsername(req) || 'admin';
+
+            await db.collection('tool_files').updateOne(
+                { key },
+                {
+                    $set: {
+                        key,
+                        filename,
+                        content_type,
+                        content_base64: buffer.toString('base64'),
+                        size: buffer.length,
+                        updated_at: now,
+                        updated_by,
+                    },
+                },
+                { upsert: true }
+            );
+
+            return sendJson(res, 200, {
+                status: 'success',
+                tool: {
+                    key,
+                    default_filename: meta.default_filename,
+                    filename,
+                    content_type,
+                    size: buffer.length,
+                    overridden: true,
+                    updated_at: now,
+                    updated_by,
+                },
+            });
+        }
+
+        if (method === 'DELETE' && segments[0] === 'admin' && segments[1] === 'tools' && segments.length === 3) {
+            if (!(await requireWriteAccess(db, req, res, 'tools'))) return;
+            const key = segments[2];
+            if (!TOOL_FILES[key]) return sendError(res, 404, 'Araç bulunamadı');
+            await db.collection('tool_files').deleteOne({ key });
+            return sendJson(res, 200, { status: 'success' });
         }
 
         if (method === 'GET' && route === 'admin/users') {

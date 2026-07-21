@@ -8,6 +8,7 @@ const MODULE_KEYS = [
   'announcement',
   'video_tutorials',
   'carousel',
+  'tools',
 ];
 
 function moduleEntry(view = false, write = false) {
@@ -39,6 +40,7 @@ export function defaultPermissionsForRole(role) {
       announcement: { view: false, write: false },
       video_tutorials: { view: false, write: false },
       carousel: { view: false, write: false },
+      tools: { view: true, write: true },
     });
   }
   return buildPermissions(

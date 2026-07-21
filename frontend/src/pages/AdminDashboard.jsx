@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from "../components/ui/alert";
 import {
     User, PlusCircle, CheckCircle2, LayoutDashboard, Package,
     RefreshCcw, Users, ArrowLeftRight, LogOut, Dices, KeyRound, Upload,
-    Truck, PackageCheck, Megaphone, Video, Images, Printer, Clock,
+    Truck, PackageCheck, Megaphone, Video, Images, Printer, Clock, FileCog,
 } from "lucide-react";
 import {
     Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
@@ -24,6 +24,7 @@ import VideoTutorialsAdmin from '../components/VideoTutorialsAdmin';
 import CarouselSlidesAdmin from '../components/CarouselSlidesAdmin';
 import PersonnelInventoryPanel from '../components/PersonnelInventoryPanel';
 import PendingConfirmationsPanel from '../components/PendingConfirmationsPanel';
+import ToolFilesPanel from '../components/ToolFilesPanel';
 import UserManagementPanel from '../components/UserManagementPanel';
 import {
     loadStoredPermissions,
@@ -46,11 +47,12 @@ const TAB_MODULE_MAP = {
     announcement: 'announcement',
     'video-tutorials': 'video_tutorials',
     'carousel-slides': 'carousel',
+    'tool-files': 'tools',
 };
 
 const TAB_ORDER = [
     'dashboard', 'add', 'inventory', 'outgoing-cargo', 'incoming-cargo',
-    'pending-confirmations', 'confirmations', 'users', 'announcement', 'video-tutorials', 'carousel-slides', 'account',
+    'pending-confirmations', 'confirmations', 'users', 'announcement', 'video-tutorials', 'carousel-slides', 'tool-files', 'account',
 ];
 
 function canViewTab(tab, perms, sysAdmin) {
@@ -486,6 +488,11 @@ const AdminDashboard = () => {
                                 <Images className="w-4 h-4 mr-2" /> {t('admin.carousel.tab')}
                             </TabsTrigger>
                         )}
+                        {canView('tools') && (
+                            <TabsTrigger value="tool-files" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
+                                <FileCog className="w-4 h-4 mr-2" /> {t('admin.toolFiles.tab')}
+                            </TabsTrigger>
+                        )}
                         <TabsTrigger value="account" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-orange-500 data-[state=active]:text-white px-6 transition-all">
                             <KeyRound className="w-4 h-4 mr-2" /> {t('admin.passwordTab')}
                         </TabsTrigger>
@@ -754,6 +761,12 @@ const AdminDashboard = () => {
                     {canView('carousel') && (
                     <TabsContent value="carousel-slides">
                         <CarouselSlidesAdmin />
+                    </TabsContent>
+                    )}
+
+                    {canView('tools') && (
+                    <TabsContent value="tool-files">
+                        <ToolFilesPanel canWrite={canWrite('tools')} />
                     </TabsContent>
                     )}
 

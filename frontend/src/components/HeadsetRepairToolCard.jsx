@@ -4,8 +4,9 @@ import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Download, Wrench, ShieldCheck, Cpu, CheckCircle2 } from 'lucide-react';
+import api from '../lib/api';
 
-const TOOL_URL = `${process.env.PUBLIC_URL}/tools/DCS-Kulaklik-Onarim.cmd`;
+const TOOL_URL = `${api.defaults.baseURL || ''}/api/tools/headset`;
 
 const HeadsetRepairToolCard = ({ className = '' }) => {
   const { t } = useLanguage();
