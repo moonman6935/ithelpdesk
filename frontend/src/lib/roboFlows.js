@@ -15,6 +15,9 @@ export const ROBO_FLOW = {
       { id: 'network', labelKey: 'robo.topics.network', icon: 'wifi', next: 'network_check' },
       { id: 'cargo', labelKey: 'robo.topics.cargo', icon: 'truck', next: 'cargo_check' },
       { id: 'asset', labelKey: 'robo.topics.asset', icon: 'clipboard', next: 'asset_check' },
+      { id: 'mac', labelKey: 'robo.topics.mac', icon: 'apple', next: 'mac_menu' },
+      { id: 'windows', labelKey: 'robo.topics.windows', icon: 'refresh', next: 'windows_check' },
+      { id: 'search', labelKey: 'robo.topics.search', icon: 'search', next: 'search_help' },
     ],
   },
 
@@ -171,6 +174,49 @@ export const ROBO_FLOW = {
     itemKeys: ['robo.asset.c1', 'robo.asset.c2', 'robo.asset.c3'],
     guideLink: '/asset-confirmation',
     guideLabelKey: 'robo.openAsset',
+    parent: 'root',
+  },
+
+  mac_menu: {
+    type: 'choices',
+    messageKey: 'robo.mac.question',
+    parent: 'root',
+    options: [
+      { id: 'anydesk', labelKey: 'robo.mac.anydesk.label', icon: 'download', next: 'mac_anydesk' },
+      { id: 'citrix', labelKey: 'robo.mac.citrix.label', icon: 'monitor', next: 'mac_citrix' },
+      { id: 'guide', labelKey: 'robo.mac.guide.label', icon: 'laptop', link: '/faq/mac-kurulum' },
+    ],
+  },
+  mac_anydesk: {
+    type: 'checklist',
+    titleKey: 'robo.mac.anydesk.title',
+    itemKeys: ['robo.mac.anydesk.c1', 'robo.mac.anydesk.c2', 'robo.mac.anydesk.c3', 'robo.mac.anydesk.c4'],
+    guideLink: '/faq/mac-kurulum',
+    guideLabelKey: 'robo.openMacGuide',
+    parent: 'mac_menu',
+  },
+  mac_citrix: {
+    type: 'checklist',
+    titleKey: 'robo.mac.citrix.title',
+    itemKeys: ['robo.mac.citrix.c1', 'robo.mac.citrix.c2', 'robo.mac.citrix.c3', 'robo.mac.citrix.c4'],
+    guideLink: '/faq/mac-kurulum',
+    guideLabelKey: 'robo.openMacGuide',
+    parent: 'mac_menu',
+  },
+
+  windows_check: {
+    type: 'checklist',
+    titleKey: 'robo.windows.title',
+    itemKeys: ['robo.windows.c1', 'robo.windows.c2', 'robo.windows.c3', 'robo.windows.c4'],
+    guideLink: '/windows-11-upgrade',
+    guideLabelKey: 'robo.openWindows',
+    parent: 'root',
+  },
+
+  search_help: {
+    type: 'checklist',
+    titleKey: 'robo.search.title',
+    itemKeys: ['robo.search.c1', 'robo.search.c2', 'robo.search.c3'],
     parent: 'root',
   },
 

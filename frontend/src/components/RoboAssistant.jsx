@@ -29,6 +29,8 @@ import {
   Play,
   Layers,
   RotateCcw,
+  Search,
+  Apple,
 } from 'lucide-react';
 import RoboDog, { RoboDogArena } from './RoboDog';
 
@@ -51,6 +53,8 @@ const ICON_MAP = {
   play: Play,
   display: Monitor,
   layers: Layers,
+  search: Search,
+  apple: Apple,
 };
 
 function useRoboT() {
