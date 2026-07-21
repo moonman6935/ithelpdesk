@@ -88,11 +88,11 @@ const SiteSearch = () => {
       onClick={() => setOpen(true)}
       title={t('search.button')}
       aria-label={t('search.button')}
-      className="site-search-trigger group flex items-center gap-2 rounded-xl border-2 border-white/30 bg-white/10 px-3 py-2 text-white/90 transition-all duration-300 hover:bg-white/20 hover:border-white/60"
+      className="site-search-trigger group flex items-center gap-2 rounded-xl border-2 border-white/30 bg-white/10 px-3 py-2 text-white/90 transition-all duration-300 hover:bg-white/20 hover:border-white/60 md:min-w-[280px] lg:min-w-[340px]"
     >
       <Search className="w-4 h-4 shrink-0" />
       <span className="hidden md:inline text-sm font-medium whitespace-nowrap">{t('search.button')}</span>
-      <span className="hidden md:inline text-[10px] font-semibold rounded-md bg-white/20 px-1.5 py-0.5 ml-1">Ctrl K</span>
+      <span className="hidden md:inline text-[10px] font-semibold rounded-md bg-white/20 px-1.5 py-0.5 ml-auto">Ctrl K</span>
     </button>
   );
 
