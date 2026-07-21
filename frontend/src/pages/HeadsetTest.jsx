@@ -8,6 +8,7 @@ import { Badge } from '../components/ui/badge';
 import { Progress } from '../components/ui/progress';
 import { Headphones, Mic, Volume2, CheckCircle, XCircle, AlertCircle, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import HeadsetRepairToolCard from '../components/HeadsetRepairToolCard';
 
 const HeadsetTest = () => {
   const { t } = useLanguage();
@@ -254,6 +255,8 @@ const HeadsetTest = () => {
               </AlertDescription>
             </Alert>
           )}
+
+          <HeadsetRepairToolCard className="mb-8" />
 
           {/* Speaker Test */}
           <Card className="mb-8 glass-panel border-0 hover:shadow-xl transition-shadow">

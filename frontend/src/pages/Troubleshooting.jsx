@@ -6,12 +6,15 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '..
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { Badge } from '../components/ui/badge';
 import { Volume2, Mic, Monitor, Settings, AlertTriangle } from 'lucide-react';
+import HeadsetRepairToolCard from '../components/HeadsetRepairToolCard';
 
 const Troubleshooting = () => {
   const { t } = useLanguage();
 
   return (
     <PageShell theme="orange" icon={AlertTriangle} title={t('troubleshooting.title')} subtitle={t('troubleshooting.subtitle')}>
+          <HeadsetRepairToolCard className="mb-8" />
+
           <Card className="mb-8 glass-panel border-0">
             <CardHeader className="bg-gradient-to-r from-orange-50/80 to-white/50 rounded-t-2xl">
               <CardTitle className="text-2xl">Common Issues</CardTitle>
