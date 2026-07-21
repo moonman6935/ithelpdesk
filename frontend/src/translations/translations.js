@@ -29,8 +29,8 @@ export const translations = {
       f3: 'Sesi açar, sessize alınmışsa düzeltir',
       f4: 'Mikrofon gizlilik izinlerini açar',
       safe: 'Sadece ses ayarlarına dokunur',
-      download: 'Aracı İndir (.exe)',
-      hint: 'İndirdikten sonra çift tıklayın, "Evet" deyin.',
+      download: 'Aracı İndir',
+      hint: 'İndirin, çift tıklayın; çıkan "Evet / Çalıştır" onayına tıklayın.',
     },
     home: {
       welcome: 'DCS Communication Center IT Departmanı',
@@ -900,8 +900,8 @@ export const translations = {
       f3: 'Aktiviert den Ton und hebt die Stummschaltung auf',
       f4: 'Aktiviert die Mikrofon-Datenschutzberechtigungen',
       safe: 'Ändert nur Audioeinstellungen',
-      download: 'Tool herunterladen (.exe)',
-      hint: 'Nach dem Download doppelklicken und "Ja" wählen.',
+      download: 'Tool herunterladen',
+      hint: 'Herunterladen, doppelklicken und die Abfrage "Ja / Ausführen" bestätigen.',
     },
     home: {
       welcome: 'DCS Communication Center IT-Abteilung',
@@ -1760,8 +1760,8 @@ export const translations = {
       f3: 'Turns on the volume and unmutes if muted',
       f4: 'Enables microphone privacy permissions',
       safe: 'Only touches audio settings',
-      download: 'Download Tool (.exe)',
-      hint: 'After downloading, double-click and choose "Yes".',
+      download: 'Download Tool',
+      hint: 'Download, double-click, and confirm the "Yes / Run" prompt.',
     },
     home: {
       welcome: 'DCS Communication Center IT Department',
