@@ -9,6 +9,17 @@ export const translations = {
       faq: 'SSS',
       videoTutorials: 'Sorun Giderme Videolu Anlatım'
     },
+    search: {
+      button: 'Ara',
+      placeholder: 'Ne aramıştınız? (örn: kulaklık, citrix, kargo...)',
+      close: 'Kapat',
+      suggested: 'Önerilen sayfalar',
+      noResults: 'Sonuç bulunamadı',
+      noResultsHint: 'Farklı bir kelime deneyin.',
+      hintNavigate: 'gezin',
+      hintOpen: 'aç',
+      hintClose: 'kapat',
+    },
     home: {
       welcome: 'DCS Communication Center IT Departmanı',
       subtitle: 'Bilgisayar Kurulum ve Destek Rehberi',
@@ -857,6 +868,17 @@ export const translations = {
       faq: 'FAQ',
       videoTutorials: 'Video-Fehlerbehebung'
     },
+    search: {
+      button: 'Suche',
+      placeholder: 'Wonach suchen Sie? (z. B. Headset, Citrix, Sendung...)',
+      close: 'Schließen',
+      suggested: 'Vorgeschlagene Seiten',
+      noResults: 'Keine Ergebnisse gefunden',
+      noResultsHint: 'Versuchen Sie einen anderen Begriff.',
+      hintNavigate: 'navigieren',
+      hintOpen: 'öffnen',
+      hintClose: 'schließen',
+    },
     home: {
       welcome: 'DCS Communication Center IT-Abteilung',
       subtitle: 'Computer-Installations- und Support-Handbuch',
@@ -1693,6 +1715,17 @@ export const translations = {
       troubleshooting: 'Troubleshooting',
       faq: 'FAQ',
       videoTutorials: 'Video Troubleshooting'
+    },
+    search: {
+      button: 'Search',
+      placeholder: 'What are you looking for? (e.g. headset, citrix, cargo...)',
+      close: 'Close',
+      suggested: 'Suggested pages',
+      noResults: 'No results found',
+      noResultsHint: 'Try a different keyword.',
+      hintNavigate: 'navigate',
+      hintOpen: 'open',
+      hintClose: 'close',
     },
     home: {
       welcome: 'DCS Communication Center IT Department',

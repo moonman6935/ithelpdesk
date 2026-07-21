@@ -4,6 +4,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useAppOpenTransition } from '../contexts/AppOpenTransitionContext';
 import { Button } from './ui/button';
 import BrandLogo from './BrandLogo';
+import SiteSearch from './SiteSearch';
 import {
   Home,
   Monitor,
@@ -170,6 +171,7 @@ const Header = () => {
               </Link>
 
               <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                <SiteSearch />
                 {LANGUAGES.map((lang) => (
                   <button
                     key={lang.code}
