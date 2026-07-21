@@ -11,6 +11,7 @@ import CargoStatus from '../pages/CargoStatus';
 import AdminDashboard from '../pages/AdminDashboard';
 import FAQ from '../pages/FAQ';
 import CitrixSetup from '../pages/CitrixSetup';
+import MacSetup from '../pages/MacSetup';
 import Windows11Upgrade from '../pages/Windows11Upgrade';
 import VideoTutorials from '../pages/VideoTutorials';
 import LoginPage from '../pages/LoginPage';
@@ -63,6 +64,7 @@ const AnimatedRoutes = () => {
           <Route path="/troubleshooting" element={<Troubleshooting />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/faq/citrix-kurulum" element={<CitrixSetup />} />
+          <Route path="/faq/mac-kurulum" element={<MacSetup />} />
           <Route path="/windows-11-upgrade" element={<Windows11Upgrade />} />
           <Route path="/video-tutorials" element={<VideoTutorials />} />
           <Route path="/asset-confirmation" element={<AssetConfirmation />} />

@@ -232,6 +232,11 @@ export const translations = {
       subtitle: 'Ajan iş birliği ve eğitim konularında sık sorulan sorular',
       introTitle: 'Önemli: Önce kendiniz kontrol edin!',
       introText: 'Mikrofon sorunları çoğu zaman IT desteği gerektirmez. Birini aramadan veya yazmadan önce aşağıdaki kontrolleri mutlaka yapın. Basit bir kulaklık bağlantısı sorunu bile herkesin saatlerce beklemesine neden olabilir.',
+      macSetup: {
+        featuredTitle: 'macOS Kurulum Rehberi (AnyDesk & Citrix)',
+        featuredDesc: 'Mac bilgisayarlar için AnyDesk ve Citrix Workspace indirme ve kurulumunu görsel rehberle takip edin.',
+        openGuide: 'macOS Rehberine Git',
+      },
       citrixInstall: {
         featuredTitle: 'Citrix Workspace Kurulum Rehberi',
         featuredDesc: 'Offline installer indirme, kurulum ve yeniden başlatma adımlarını görsel rehberle takip edin.',
@@ -335,6 +340,56 @@ export const translations = {
         desc: '"Installation successful" ekranında "Reboot" butonuna tıklayarak bilgisayarınızı yeniden başlatın. Yeniden başlatma sonrası Citrix Workspace kullanıma hazır olacaktır.',
         tip: 'Yeniden başlatmadan sonra Başlat menüsünden Citrix Workspace\'i açıp kullanıcı adı ve şifrenizle giriş yapın. E-posta değil, kullanıcı adınızı kullanın.',
       },
+    },
+    macSetup: {
+      title: 'macOS Kurulum Rehberi (AnyDesk & Citrix)',
+      subtitle: 'Mac bilgisayarınıza AnyDesk ve Citrix Workspace uygulamalarını adım adım indirin ve kurun',
+      backToFaq: 'SSS sayfasına dön',
+      alertTitle: 'Bu rehber macOS içindir',
+      alertText: 'Aşağıdaki adımlar Mac (macOS) bilgisayarlar içindir. Uygulamaları yalnızca resmi indirme sayfalarından indirin. Kurulum sırasında macOS güvenlik izni isterse "Aç" / "İzin ver" seçeneğini onaylayın.',
+      tipLabel: 'İpucu',
+      anydesk: {
+        title: 'AnyDesk (Uzak Masaüstü)',
+        subtitle: 'IT ekibinin uzaktan destek verebilmesi için AnyDesk',
+        download: 'AnyDesk (Mac) İndir',
+        step1: {
+          title: 'AnyDesk indirme sayfasını açın',
+          desc: 'Safari veya tarayıcınızdan anydesk.com/en/downloads/mac-os adresine gidin ve kırmızı "Download Now" butonuna tıklayarak macOS sürümünü indirin.',
+          tip: 'İndirilen dosya .dmg uzantılıdır ve yaklaşık 8 MB boyutundadır.',
+        },
+        step2: {
+          title: 'Uygulamayı Applications klasörüne sürükleyin',
+          desc: 'İnen .dmg dosyasına çift tıklayın. Açılan pencerede AnyDesk simgesini "Applications" (Uygulamalar) klasörünün üzerine sürükleyip bırakın.',
+          tip: 'Kurulum bu kadar; AnyDesk artık Launchpad ve Uygulamalar klasöründe görünür.',
+        },
+        step3: {
+          title: 'AnyDesk\'i açın ve adresinizi paylaşın',
+          desc: 'Uygulamalar\'dan AnyDesk\'i açın. "This Desk" altında görünen 9 haneli adresi (örn. 123 456 789) IT ekibiyle paylaşın; bağlantı isteği geldiğinde "Kabul Et" deyin.',
+          tip: 'İlk açılışta macOS ekran kaydı ve erişilebilirlik izni isteyebilir. Sistem Ayarları > Gizlilik ve Güvenlik bölümünden AnyDesk\'e izin verin.',
+        },
+      },
+      citrix: {
+        title: 'Citrix Workspace',
+        subtitle: 'Şirket uygulamalarına ve masaüstüne erişim için Citrix Workspace',
+        download: 'Citrix Workspace (Mac) İndir',
+        step1: {
+          title: 'Citrix indirme sayfasını açın',
+          desc: 'citrix.com üzerindeki "Citrix Workspace app for Mac" sayfasına gidin ve mavi "Download Citrix Workspace app for Mac" butonuna tıklayın.',
+          tip: 'İnen dosya .dmg içinde bir .pkg yükleyicisidir.',
+        },
+        step2: {
+          title: 'Yükleyiciyi çalıştırın',
+          desc: '.dmg dosyasını açıp "Install Citrix Workspace" (.pkg) dosyasına çift tıklayın. Karşılama ekranında "Continue" (Devam) ve ardından lisans adımlarında "Continue / Agree" ile ilerleyip "Install" butonuna basın.',
+          tip: 'Kurulum için Mac şifrenizi girmeniz gerekebilir.',
+        },
+        step3: {
+          title: 'Kurulumu tamamlayın',
+          desc: '"The installation was successful" (Kurulum başarılı) ekranını gördüğünüzde "Close" (Kapat) butonuna tıklayın. Hesap eklemeniz istenirse IT ekibinin verdiği Store/Sunucu adresini girin.',
+          tip: 'Hesap adresi veya kullanıcı bilgisi için IT departmanıyla iletişime geçin.',
+        },
+      },
+      footerTitle: 'Kurulum tamamlandı',
+      footerText: 'AnyDesk ve Citrix Workspace artık Mac\'inizde kullanıma hazır. Sorun yaşarsanız IT departmanıyla iletişime geçin.',
     },
     windows11Upgrade: {
       title: 'Windows 11 Güncelleme Rehberi',
@@ -1019,6 +1074,11 @@ export const translations = {
       subtitle: 'Agentenmitarbeit und Schulung – häufige Fragen und Antworten',
       introTitle: 'Wichtig: Zuerst selbst prüfen!',
       introText: 'Mikrofonprobleme erfordern oft keinen IT-Support. Bitte führen Sie die folgenden Prüfungen durch, bevor Sie jemanden kontaktieren. Allein weil ein Headset nicht angeschlossen ist, kann es locker eine Stunde oder mehr dauern, bis alle wieder weiterarbeiten können.',
+      macSetup: {
+        featuredTitle: 'macOS Installationsanleitung (AnyDesk & Citrix)',
+        featuredDesc: 'AnyDesk und Citrix Workspace für Mac herunterladen und installieren — Schritt für Schritt mit Bildern.',
+        openGuide: 'Zur macOS-Anleitung',
+      },
       citrixInstall: {
         featuredTitle: 'Citrix Workspace Installationsanleitung',
         featuredDesc: 'Offline-Installer herunterladen, installieren und neu starten — Schritt für Schritt mit Bildern.',
@@ -1122,6 +1182,56 @@ export const translations = {
         desc: 'Bei „Installation successful" auf „Reboot" klicken. Nach dem Neustart ist Citrix Workspace einsatzbereit.',
         tip: 'Citrix Workspace über das Startmenü öffnen und mit Benutzername (nicht E-Mail) anmelden.',
       },
+    },
+    macSetup: {
+      title: 'macOS Installationsanleitung (AnyDesk & Citrix)',
+      subtitle: 'AnyDesk und Citrix Workspace Schritt für Schritt auf Ihrem Mac herunterladen und installieren',
+      backToFaq: 'Zurück zu den FAQ',
+      alertTitle: 'Diese Anleitung gilt für macOS',
+      alertText: 'Die folgenden Schritte gelten für Mac-Computer (macOS). Laden Sie die Apps nur von den offiziellen Download-Seiten herunter. Falls macOS eine Sicherheitsfreigabe verlangt, bestätigen Sie „Öffnen" / „Erlauben".',
+      tipLabel: 'Tipp',
+      anydesk: {
+        title: 'AnyDesk (Remote-Desktop)',
+        subtitle: 'AnyDesk, damit das IT-Team Fernsupport leisten kann',
+        download: 'AnyDesk (Mac) herunterladen',
+        step1: {
+          title: 'AnyDesk-Download-Seite öffnen',
+          desc: 'Öffnen Sie in Safari oder Ihrem Browser anydesk.com/en/downloads/mac-os und klicken Sie auf die rote Schaltfläche „Download Now", um die macOS-Version herunterzuladen.',
+          tip: 'Die heruntergeladene Datei hat die Endung .dmg und ist etwa 8 MB groß.',
+        },
+        step2: {
+          title: 'App in den Ordner „Programme" ziehen',
+          desc: 'Doppelklicken Sie auf die .dmg-Datei. Ziehen Sie im geöffneten Fenster das AnyDesk-Symbol auf den Ordner „Applications" (Programme).',
+          tip: 'Fertig – AnyDesk erscheint nun im Launchpad und im Programme-Ordner.',
+        },
+        step3: {
+          title: 'AnyDesk öffnen und Adresse teilen',
+          desc: 'Öffnen Sie AnyDesk aus den Programmen. Teilen Sie die unter „This Desk" angezeigte 9-stellige Adresse (z. B. 123 456 789) mit dem IT-Team und bestätigen Sie eingehende Anfragen mit „Akzeptieren".',
+          tip: 'Beim ersten Start fragt macOS ggf. nach Bildschirmaufnahme- und Bedienungshilfen-Rechten. Erlauben Sie AnyDesk unter Systemeinstellungen > Datenschutz & Sicherheit.',
+        },
+      },
+      citrix: {
+        title: 'Citrix Workspace',
+        subtitle: 'Citrix Workspace für den Zugriff auf Unternehmens-Apps und -Desktops',
+        download: 'Citrix Workspace (Mac) herunterladen',
+        step1: {
+          title: 'Citrix-Download-Seite öffnen',
+          desc: 'Gehen Sie auf citrix.com zur Seite „Citrix Workspace app for Mac" und klicken Sie auf die blaue Schaltfläche „Download Citrix Workspace app for Mac".',
+          tip: 'Die heruntergeladene Datei ist ein .pkg-Installer innerhalb einer .dmg.',
+        },
+        step2: {
+          title: 'Installer ausführen',
+          desc: 'Öffnen Sie die .dmg und doppelklicken Sie auf „Install Citrix Workspace" (.pkg). Klicken Sie im Willkommensfenster auf „Continue", akzeptieren Sie die Lizenz und klicken Sie auf „Install".',
+          tip: 'Für die Installation müssen Sie ggf. Ihr Mac-Passwort eingeben.',
+        },
+        step3: {
+          title: 'Installation abschließen',
+          desc: 'Wenn „The installation was successful" erscheint, klicken Sie auf „Close". Falls ein Konto gefragt wird, geben Sie die vom IT-Team bereitgestellte Store-/Serveradresse ein.',
+          tip: 'Für Kontoadresse oder Zugangsdaten wenden Sie sich an die IT-Abteilung.',
+        },
+      },
+      footerTitle: 'Installation abgeschlossen',
+      footerText: 'AnyDesk und Citrix Workspace sind jetzt auf Ihrem Mac einsatzbereit. Bei Problemen wenden Sie sich an die IT-Abteilung.',
     },
     windows11Upgrade: {
       title: 'Windows 11 Update-Anleitung',
@@ -1795,6 +1905,11 @@ export const translations = {
       subtitle: 'Agent cooperation and training – common questions and answers',
       introTitle: 'Important: Check yourself first!',
       introText: 'Microphone issues often do not require IT support. Please complete the checks below before contacting anyone. A simple unplugged headset can easily cause everyone to wait an hour or more.',
+      macSetup: {
+        featuredTitle: 'macOS Setup Guide (AnyDesk & Citrix)',
+        featuredDesc: 'Download and install AnyDesk and Citrix Workspace for Mac — follow our visual step-by-step guide.',
+        openGuide: 'Open macOS Guide',
+      },
       citrixInstall: {
         featuredTitle: 'Citrix Workspace Setup Guide',
         featuredDesc: 'Download the offline installer, install, and restart — follow our visual step-by-step guide.',
@@ -1898,6 +2013,56 @@ export const translations = {
         desc: 'On "Installation successful", click "Reboot" to restart your computer. After restart, Citrix Workspace is ready to use.',
         tip: 'Open Citrix Workspace from the Start menu and sign in with your username — not your email address.',
       },
+    },
+    macSetup: {
+      title: 'macOS Setup Guide (AnyDesk & Citrix)',
+      subtitle: 'Download and install AnyDesk and Citrix Workspace on your Mac, step by step',
+      backToFaq: 'Back to FAQ',
+      alertTitle: 'This guide is for macOS',
+      alertText: 'The steps below are for Mac (macOS) computers. Only download the apps from the official download pages. If macOS asks for a security approval, confirm "Open" / "Allow".',
+      tipLabel: 'Tip',
+      anydesk: {
+        title: 'AnyDesk (Remote Desktop)',
+        subtitle: 'AnyDesk so the IT team can provide remote support',
+        download: 'Download AnyDesk (Mac)',
+        step1: {
+          title: 'Open the AnyDesk download page',
+          desc: 'In Safari or your browser, go to anydesk.com/en/downloads/mac-os and click the red "Download Now" button to download the macOS version.',
+          tip: 'The downloaded file has a .dmg extension and is about 8 MB.',
+        },
+        step2: {
+          title: 'Drag the app to the Applications folder',
+          desc: 'Double-click the .dmg file. In the window that opens, drag the AnyDesk icon onto the "Applications" folder.',
+          tip: 'That\'s it — AnyDesk now appears in Launchpad and the Applications folder.',
+        },
+        step3: {
+          title: 'Open AnyDesk and share your address',
+          desc: 'Open AnyDesk from Applications. Share the 9-digit address shown under "This Desk" (e.g. 123 456 789) with the IT team, and click "Accept" when a connection request arrives.',
+          tip: 'On first launch, macOS may request screen recording and accessibility permissions. Allow AnyDesk under System Settings > Privacy & Security.',
+        },
+      },
+      citrix: {
+        title: 'Citrix Workspace',
+        subtitle: 'Citrix Workspace for access to company apps and desktops',
+        download: 'Download Citrix Workspace (Mac)',
+        step1: {
+          title: 'Open the Citrix download page',
+          desc: 'On citrix.com, go to the "Citrix Workspace app for Mac" page and click the blue "Download Citrix Workspace app for Mac" button.',
+          tip: 'The downloaded file is a .pkg installer inside a .dmg.',
+        },
+        step2: {
+          title: 'Run the installer',
+          desc: 'Open the .dmg and double-click "Install Citrix Workspace" (.pkg). Click "Continue" on the welcome screen, accept the license, then click "Install".',
+          tip: 'You may need to enter your Mac password to install.',
+        },
+        step3: {
+          title: 'Finish the installation',
+          desc: 'When "The installation was successful" appears, click "Close". If prompted to add an account, enter the Store/server address provided by the IT team.',
+          tip: 'For the account address or credentials, contact the IT department.',
+        },
+      },
+      footerTitle: 'Setup complete',
+      footerText: 'AnyDesk and Citrix Workspace are now ready to use on your Mac. If you run into issues, contact the IT department.',
     },
     windows11Upgrade: {
       title: 'Windows 11 Upgrade Guide',

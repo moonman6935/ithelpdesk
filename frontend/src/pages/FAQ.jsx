@@ -7,7 +7,7 @@ import { Button } from '../components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { Badge } from '../components/ui/badge';
-import { HelpCircle, Mic, ListChecks, Headphones, Settings, Globe, Monitor, Chrome, AlertTriangle, Download, ArrowRight } from 'lucide-react';
+import { HelpCircle, Mic, ListChecks, Headphones, Settings, Globe, Monitor, Chrome, AlertTriangle, Download, ArrowRight, Laptop } from 'lucide-react';
 
 const faqItems = [
   { id: 'citrixInstall', icon: Download, isGuide: true },
@@ -112,6 +112,24 @@ const FAQ = () => {
               <Link to="/faq/citrix-kurulum" className="shrink-0">
                 <Button size="lg" className="bg-indigo-600 hover:bg-indigo-700">
                   {t('faq.citrixInstall.openGuide')}
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card className="mb-8 border-2 border-slate-300 bg-gradient-to-r from-slate-50 to-gray-100 shadow-md overflow-hidden">
+            <CardContent className="p-6 flex flex-col sm:flex-row items-center gap-6">
+              <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center shrink-0">
+                <Laptop className="w-8 h-8 text-white" />
+              </div>
+              <div className="flex-1 text-center sm:text-left">
+                <h3 className="text-xl font-bold text-gray-900 mb-1">{t('faq.macSetup.featuredTitle')}</h3>
+                <p className="text-gray-600 text-sm">{t('faq.macSetup.featuredDesc')}</p>
+              </div>
+              <Link to="/faq/mac-kurulum" className="shrink-0">
+                <Button size="lg" className="bg-slate-800 hover:bg-slate-900">
+                  {t('faq.macSetup.openGuide')}
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>

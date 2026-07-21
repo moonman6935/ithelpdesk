@@ -36,6 +36,11 @@ export const PAGE_THEMES = {
     blob: 'bg-sky-300/20',
     accent: 'bg-blue-300/15',
   },
+  slate: {
+    gradient: 'from-slate-700 via-slate-800 to-gray-900',
+    blob: 'bg-slate-300/20',
+    accent: 'bg-slate-400/15',
+  },
 };
 
 const PageShell = ({
