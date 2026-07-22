@@ -10,63 +10,53 @@ import { Headphones, Mic, Volume2, CheckCircle, XCircle, AlertCircle, ArrowRight
 import { Link } from 'react-router-dom';
 import HeadsetRepairToolCard from '../components/HeadsetRepairToolCard';
 
-/** @typedef {'checking' | 'granted' | 'prompt' | 'denied'} MicAccessState */
+const MIC_BANNER_DISMISSED_KEY = 'ithelpdesk:mic-banner-dismissed';
 
-/**
- * Gerçek mikrofon erişimini doğrular.
- * Permissions API (özellikle Edge) site ayarı açık olsa bile "prompt" döndürebilir;
- * cihaz etiketleri asıl göstergedir. Gerekirse getUserMedia ile sessiz doğrulama yapılır.
- */
-async function detectMicAccess({ allowGetUserMedia = false } = {}) {
-  if (!navigator.mediaDevices?.getUserMedia) return 'denied';
+function wasBannerDismissed() {
+  try {
+    return sessionStorage.getItem(MIC_BANNER_DISMISSED_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
 
+function rememberBannerDismissed() {
+  try {
+    sessionStorage.setItem(MIC_BANNER_DISMISSED_KEY, '1');
+  } catch {
+    // ignore
+  }
+}
+
+async function hasSilentMicAccess() {
+  if (!navigator.mediaDevices) return false;
   try {
     const devices = await navigator.mediaDevices.enumerateDevices();
-    if (devices.some((d) => d.kind === 'audioinput' && d.label)) {
-      return 'granted';
+    if (devices.some((d) => d.kind === 'audioinput' && d.label)) return true;
+  } catch {
+    // ignore
+  }
+  try {
+    if (navigator.permissions?.query) {
+      const status = await navigator.permissions.query({ name: 'microphone' });
+      if (status.state === 'granted') return true;
     }
   } catch {
     // ignore
   }
-
-  let permissionState = null;
-  try {
-    if (navigator.permissions?.query) {
-      const status = await navigator.permissions.query({ name: 'microphone' });
-      permissionState = status.state;
-      if (status.state === 'granted') return 'granted';
-      if (status.state === 'denied') return 'denied';
-    }
-  } catch {
-    // Permissions API desteklenmeyebilir
-  }
-
-  if (!allowGetUserMedia) {
-    return permissionState === 'denied' ? 'denied' : 'prompt';
-  }
-
-  // Site ayarından izin verilmişse diyalog açılmaz; stream hemen gelir (Edge fix)
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    stream.getTracks().forEach((track) => track.stop());
-    return 'granted';
-  } catch (error) {
-    if (error?.name === 'NotAllowedError' || error?.name === 'PermissionDeniedError') {
-      return 'denied';
-    }
-    return 'prompt';
-  }
+  return false;
 }
 
 const HeadsetTest = () => {
   const { t } = useLanguage();
-  /** @type {[MicAccessState, Function]} */
-  const [micAccess, setMicAccess] = useState('checking');
+  // Banner sadece "henüz gizlenmediyse" görünür; izin başarılı olunca kalıcı kapanır
+  const [showMicBanner, setShowMicBanner] = useState(() => !wasBannerDismissed());
   const [isTesting, setIsTesting] = useState(false);
   const [micLevel, setMicLevel] = useState(0);
   const [speakerTested, setSpeakerTested] = useState(false);
   const [micTested, setMicTested] = useState(false);
   const [isPlayingSound, setIsPlayingSound] = useState(false);
+  const [requestingPermission, setRequestingPermission] = useState(false);
   
   const audioContextRef = useRef(null);
   const analyserRef = useRef(null);
@@ -74,89 +64,63 @@ const HeadsetTest = () => {
   const animationFrameRef = useRef(null);
   const oscillatorRef = useRef(null);
   const isTestingRef = useRef(false);
-  const micAccessRef = useRef('checking');
+  const bannerHiddenRef = useRef(wasBannerDismissed());
 
-  const setAccess = useCallback((state) => {
-    micAccessRef.current = state;
-    setMicAccess(state);
+  const hideMicBanner = useCallback(() => {
+    bannerHiddenRef.current = true;
+    rememberBannerDismissed();
+    setShowMicBanner(false);
   }, []);
-
-  const refreshMicAccess = useCallback(async ({ allowGetUserMedia = false } = {}) => {
-    const state = await detectMicAccess({ allowGetUserMedia });
-    // granted iken yanlışlıkla prompt'a düşürme (etiketler geç gelebilir)
-    if (state !== 'granted' && micAccessRef.current === 'granted' && state !== 'denied') {
-      return micAccessRef.current;
-    }
-    setAccess(state);
-    return state;
-  }, [setAccess]);
 
   useEffect(() => {
     let cancelled = false;
-    /** @type {PermissionStatus | null} */
-    let permissionStatus = null;
 
-    const syncPermission = async () => {
-      // İlk yüklemede getUserMedia ile doğrula: Edge site izni açıkken Permissions API yalan söyler
-      const state = await detectMicAccess({ allowGetUserMedia: true });
-      if (!cancelled) setAccess(state);
-
-      try {
-        if (navigator.permissions?.query) {
-          permissionStatus = await navigator.permissions.query({ name: 'microphone' });
-          permissionStatus.onchange = () => {
-            if (!cancelled) {
-              refreshMicAccess({ allowGetUserMedia: true });
-            }
-          };
-        }
-      } catch {
-        // ignore
+    const checkSilent = async () => {
+      if (bannerHiddenRef.current) {
+        if (!cancelled) setShowMicBanner(false);
+        return;
+      }
+      // Sayfa açılışında getUserMedia ÇAĞIRMA — sadece sessiz kontrol
+      if (await hasSilentMicAccess()) {
+        if (!cancelled) hideMicBanner();
       }
     };
+
+    checkSilent();
 
     const onVisibilityChange = () => {
       if (document.hidden && isTestingRef.current) {
         stopMicTest();
       }
-      // Sekmeye dönüşte sadece sessiz kontrol (diyalog açma)
-      if (!document.hidden) {
-        refreshMicAccess({ allowGetUserMedia: false });
-      }
     };
 
-    const onDeviceChange = () => {
-      refreshMicAccess({ allowGetUserMedia: false });
-    };
-
-    syncPermission();
     document.addEventListener('visibilitychange', onVisibilityChange);
-    navigator.mediaDevices?.addEventListener?.('devicechange', onDeviceChange);
-
     return () => {
       cancelled = true;
-      if (permissionStatus) {
-        permissionStatus.onchange = null;
-      }
       document.removeEventListener('visibilitychange', onVisibilityChange);
-      navigator.mediaDevices?.removeEventListener?.('devicechange', onDeviceChange);
       stopMicTest();
       stopTestSound();
     };
-  }, [refreshMicAccess, setAccess]);
+  }, [hideMicBanner]);
 
   const requestMicPermission = async () => {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setShowMicBanner(true);
+      return;
+    }
+    setRequestingPermission(true);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       stream.getTracks().forEach((track) => track.stop());
-      setAccess('granted');
+      // İzin alındı → yazıyı hemen ve kalıcı kapat
+      hideMicBanner();
     } catch (error) {
       console.error('Microphone permission denied:', error);
-      if (error?.name === 'NotAllowedError' || error?.name === 'PermissionDeniedError') {
-        setAccess('denied');
-      } else {
-        await refreshMicAccess({ allowGetUserMedia: true });
-      }
+      bannerHiddenRef.current = false;
+      try { sessionStorage.removeItem(MIC_BANNER_DISMISSED_KEY); } catch { /* ignore */ }
+      setShowMicBanner(true);
+    } finally {
+      setRequestingPermission(false);
     }
   };
 
@@ -212,7 +176,7 @@ const HeadsetTest = () => {
         },
       });
       micStreamRef.current = stream;
-      setAccess('granted');
+      hideMicBanner();
 
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
       audioContextRef.current = audioContext;
@@ -236,7 +200,9 @@ const HeadsetTest = () => {
     } catch (error) {
       console.error('Error accessing microphone:', error);
       if (error?.name === 'NotAllowedError' || error?.name === 'PermissionDeniedError') {
-        setAccess('denied');
+        bannerHiddenRef.current = false;
+        try { sessionStorage.removeItem(MIC_BANNER_DISMISSED_KEY); } catch { /* ignore */ }
+        setShowMicBanner(true);
       }
       stopMicTest();
     }
@@ -323,16 +289,22 @@ const HeadsetTest = () => {
 
   return (
     <PageShell theme="emerald" icon={Headphones} title={t('headsetTest.title')} subtitle={t('headsetTest.subtitle')}>
-          {(micAccess === 'prompt' || micAccess === 'denied') && (
+          {showMicBanner && (
             <Alert className="mb-8 border-2 border-red-300/80 bg-red-50/90 glass-panel">
               <AlertCircle className="w-5 h-5 text-red-600" />
               <AlertDescription className="ml-2">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
                     <p className="font-semibold text-red-800">{t('headsetTest.permission')}</p>
                     <p className="text-red-700">{t('headsetTest.permissionDesc')}</p>
                   </div>
-                  <Button onClick={requestMicPermission} variant="brand" className="ml-4">
+                  <Button
+                    type="button"
+                    onClick={requestMicPermission}
+                    variant="brand"
+                    className="shrink-0"
+                    disabled={requestingPermission}
+                  >
                     {t('headsetTest.requestPermission')}
                   </Button>
                 </div>
