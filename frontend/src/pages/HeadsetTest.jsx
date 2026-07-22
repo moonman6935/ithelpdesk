@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import PageShell from '../components/PageShell';
 import { Button } from '../components/ui/button';
@@ -10,9 +10,14 @@ import { Headphones, Mic, Volume2, CheckCircle, XCircle, AlertCircle, ArrowRight
 import { Link } from 'react-router-dom';
 import HeadsetRepairToolCard from '../components/HeadsetRepairToolCard';
 
+const MIC_GRANTED_KEY = 'ithelpdesk:mic-granted';
+
+/** @typedef {'checking' | 'granted' | 'prompt' | 'denied'} MicAccessState */
+
 const HeadsetTest = () => {
   const { t } = useLanguage();
-  const [micPermission, setMicPermission] = useState(null);
+  /** @type {[MicAccessState, Function]} */
+  const [micAccess, setMicAccess] = useState('checking');
   const [isTesting, setIsTesting] = useState(false);
   const [micLevel, setMicLevel] = useState(0);
   const [speakerTested, setSpeakerTested] = useState(false);
@@ -25,26 +30,89 @@ const HeadsetTest = () => {
   const animationFrameRef = useRef(null);
   const oscillatorRef = useRef(null);
   const isTestingRef = useRef(false);
+  const micAccessRef = useRef('checking');
+
+  const markMicGranted = useCallback(() => {
+    micAccessRef.current = 'granted';
+    setMicAccess('granted');
+    try {
+      sessionStorage.setItem(MIC_GRANTED_KEY, '1');
+    } catch {
+      // sessionStorage kapalı olabilir
+    }
+  }, []);
+
+  const markMicDenied = useCallback(() => {
+    micAccessRef.current = 'denied';
+    setMicAccess('denied');
+    try {
+      sessionStorage.removeItem(MIC_GRANTED_KEY);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const applyPermissionState = useCallback((state) => {
+    if (state === 'granted') {
+      markMicGranted();
+      return;
+    }
+    if (micAccessRef.current === 'granted') return;
+
+    if (state === 'denied') {
+      markMicDenied();
+      return;
+    }
+
+    // Chrome/Edge bazen izin verildikten sonra da "prompt" döndürür
+    try {
+      if (sessionStorage.getItem(MIC_GRANTED_KEY) === '1') {
+        markMicGranted();
+        return;
+      }
+    } catch {
+      // ignore
+    }
+
+    micAccessRef.current = 'prompt';
+    setMicAccess('prompt');
+  }, [markMicGranted, markMicDenied]);
 
   useEffect(() => {
+    let cancelled = false;
+    /** @type {PermissionStatus | null} */
     let permissionStatus = null;
 
     const syncPermission = async () => {
       if (!navigator.mediaDevices?.getUserMedia) {
-        setMicPermission(false);
+        if (!cancelled) markMicDenied();
         return;
       }
 
       try {
         if (navigator.permissions?.query) {
           permissionStatus = await navigator.permissions.query({ name: 'microphone' });
-          setMicPermission(permissionStatus.state === 'granted');
+          if (!cancelled) applyPermissionState(permissionStatus.state);
           permissionStatus.onchange = () => {
-            setMicPermission(permissionStatus.state === 'granted');
+            if (!cancelled) applyPermissionState(permissionStatus.state);
           };
+          return;
         }
       } catch {
-        // Permissions API desteklenmiyorsa startMicTest sırasında izin istenir
+        // Permissions API desteklenmiyorsa kullanıcı teste başlayınca izin istenir
+      }
+
+      if (!cancelled) {
+        try {
+          if (sessionStorage.getItem(MIC_GRANTED_KEY) === '1') {
+            markMicGranted();
+            return;
+          }
+        } catch {
+          // ignore
+        }
+        micAccessRef.current = 'prompt';
+        setMicAccess('prompt');
       }
     };
 
@@ -58,6 +126,7 @@ const HeadsetTest = () => {
     document.addEventListener('visibilitychange', onVisibilityChange);
 
     return () => {
+      cancelled = true;
       if (permissionStatus) {
         permissionStatus.onchange = null;
       }
@@ -65,16 +134,18 @@ const HeadsetTest = () => {
       stopMicTest();
       stopTestSound();
     };
-  }, []);
+  }, [applyPermissionState, markMicDenied, markMicGranted]);
 
   const requestMicPermission = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      setMicPermission(true);
+      markMicGranted();
       stream.getTracks().forEach((track) => track.stop());
     } catch (error) {
       console.error('Microphone permission denied:', error);
-      setMicPermission(false);
+      if (error?.name === 'NotAllowedError' || error?.name === 'PermissionDeniedError') {
+        markMicDenied();
+      }
     }
   };
 
@@ -130,7 +201,7 @@ const HeadsetTest = () => {
         },
       });
       micStreamRef.current = stream;
-      setMicPermission(true);
+      markMicGranted();
 
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
       audioContextRef.current = audioContext;
@@ -153,7 +224,9 @@ const HeadsetTest = () => {
       analyzeMicLevel();
     } catch (error) {
       console.error('Error accessing microphone:', error);
-      setMicPermission(false);
+      if (error?.name === 'NotAllowedError' || error?.name === 'PermissionDeniedError') {
+        markMicDenied();
+      }
       stopMicTest();
     }
   };
@@ -239,7 +312,7 @@ const HeadsetTest = () => {
 
   return (
     <PageShell theme="emerald" icon={Headphones} title={t('headsetTest.title')} subtitle={t('headsetTest.subtitle')}>
-          {micPermission === false && (
+          {(micAccess === 'prompt' || micAccess === 'denied') && (
             <Alert className="mb-8 border-2 border-red-300/80 bg-red-50/90 glass-panel">
               <AlertCircle className="w-5 h-5 text-red-600" />
               <AlertDescription className="ml-2">
