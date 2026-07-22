@@ -1,62 +1,21 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import PageShell from '../components/PageShell';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Alert, AlertDescription } from '../components/ui/alert';
 import { Badge } from '../components/ui/badge';
 import { Progress } from '../components/ui/progress';
 import { Headphones, Mic, Volume2, CheckCircle, XCircle, AlertCircle, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import HeadsetRepairToolCard from '../components/HeadsetRepairToolCard';
 
-const MIC_BANNER_DISMISSED_KEY = 'ithelpdesk:mic-banner-dismissed';
-
-function wasBannerDismissed() {
-  try {
-    return sessionStorage.getItem(MIC_BANNER_DISMISSED_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
-
-function rememberBannerDismissed() {
-  try {
-    sessionStorage.setItem(MIC_BANNER_DISMISSED_KEY, '1');
-  } catch {
-    // ignore
-  }
-}
-
-async function hasSilentMicAccess() {
-  if (!navigator.mediaDevices) return false;
-  try {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    if (devices.some((d) => d.kind === 'audioinput' && d.label)) return true;
-  } catch {
-    // ignore
-  }
-  try {
-    if (navigator.permissions?.query) {
-      const status = await navigator.permissions.query({ name: 'microphone' });
-      if (status.state === 'granted') return true;
-    }
-  } catch {
-    // ignore
-  }
-  return false;
-}
-
 const HeadsetTest = () => {
   const { t } = useLanguage();
-  // Banner sadece "henüz gizlenmediyse" görünür; izin başarılı olunca kalıcı kapanır
-  const [showMicBanner, setShowMicBanner] = useState(() => !wasBannerDismissed());
   const [isTesting, setIsTesting] = useState(false);
   const [micLevel, setMicLevel] = useState(0);
   const [speakerTested, setSpeakerTested] = useState(false);
   const [micTested, setMicTested] = useState(false);
   const [isPlayingSound, setIsPlayingSound] = useState(false);
-  const [requestingPermission, setRequestingPermission] = useState(false);
   
   const audioContextRef = useRef(null);
   const analyserRef = useRef(null);
@@ -64,30 +23,8 @@ const HeadsetTest = () => {
   const animationFrameRef = useRef(null);
   const oscillatorRef = useRef(null);
   const isTestingRef = useRef(false);
-  const bannerHiddenRef = useRef(wasBannerDismissed());
-
-  const hideMicBanner = useCallback(() => {
-    bannerHiddenRef.current = true;
-    rememberBannerDismissed();
-    setShowMicBanner(false);
-  }, []);
 
   useEffect(() => {
-    let cancelled = false;
-
-    const checkSilent = async () => {
-      if (bannerHiddenRef.current) {
-        if (!cancelled) setShowMicBanner(false);
-        return;
-      }
-      // Sayfa açılışında getUserMedia ÇAĞIRMA — sadece sessiz kontrol
-      if (await hasSilentMicAccess()) {
-        if (!cancelled) hideMicBanner();
-      }
-    };
-
-    checkSilent();
-
     const onVisibilityChange = () => {
       if (document.hidden && isTestingRef.current) {
         stopMicTest();
@@ -96,33 +33,11 @@ const HeadsetTest = () => {
 
     document.addEventListener('visibilitychange', onVisibilityChange);
     return () => {
-      cancelled = true;
       document.removeEventListener('visibilitychange', onVisibilityChange);
       stopMicTest();
       stopTestSound();
     };
-  }, [hideMicBanner]);
-
-  const requestMicPermission = async () => {
-    if (!navigator.mediaDevices?.getUserMedia) {
-      setShowMicBanner(true);
-      return;
-    }
-    setRequestingPermission(true);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach((track) => track.stop());
-      // İzin alındı → yazıyı hemen ve kalıcı kapat
-      hideMicBanner();
-    } catch (error) {
-      console.error('Microphone permission denied:', error);
-      bannerHiddenRef.current = false;
-      try { sessionStorage.removeItem(MIC_BANNER_DISMISSED_KEY); } catch { /* ignore */ }
-      setShowMicBanner(true);
-    } finally {
-      setRequestingPermission(false);
-    }
-  };
+  }, []);
 
   const playTestSound = async () => {
     try {
@@ -176,7 +91,6 @@ const HeadsetTest = () => {
         },
       });
       micStreamRef.current = stream;
-      hideMicBanner();
 
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
       audioContextRef.current = audioContext;
@@ -199,11 +113,6 @@ const HeadsetTest = () => {
       analyzeMicLevel();
     } catch (error) {
       console.error('Error accessing microphone:', error);
-      if (error?.name === 'NotAllowedError' || error?.name === 'PermissionDeniedError') {
-        bannerHiddenRef.current = false;
-        try { sessionStorage.removeItem(MIC_BANNER_DISMISSED_KEY); } catch { /* ignore */ }
-        setShowMicBanner(true);
-      }
       stopMicTest();
     }
   };
@@ -289,29 +198,6 @@ const HeadsetTest = () => {
 
   return (
     <PageShell theme="emerald" icon={Headphones} title={t('headsetTest.title')} subtitle={t('headsetTest.subtitle')}>
-          {showMicBanner && (
-            <Alert className="mb-8 border-2 border-red-300/80 bg-red-50/90 glass-panel">
-              <AlertCircle className="w-5 h-5 text-red-600" />
-              <AlertDescription className="ml-2">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div>
-                    <p className="font-semibold text-red-800">{t('headsetTest.permission')}</p>
-                    <p className="text-red-700">{t('headsetTest.permissionDesc')}</p>
-                  </div>
-                  <Button
-                    type="button"
-                    onClick={requestMicPermission}
-                    variant="brand"
-                    className="shrink-0"
-                    disabled={requestingPermission}
-                  >
-                    {t('headsetTest.requestPermission')}
-                  </Button>
-                </div>
-              </AlertDescription>
-            </Alert>
-          )}
-
           <HeadsetRepairToolCard className="mb-8" />
 
           {/* Speaker Test */}
