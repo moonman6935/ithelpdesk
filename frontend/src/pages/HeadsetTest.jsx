@@ -12,14 +12,17 @@ import HeadsetRepairToolCard from '../components/HeadsetRepairToolCard';
 const HeadsetTest = () => {
   const { t } = useLanguage();
   const [isTesting, setIsTesting] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
   const [micLevel, setMicLevel] = useState(0);
   const [speakerTested, setSpeakerTested] = useState(false);
   const [micTested, setMicTested] = useState(false);
   const [isPlayingSound, setIsPlayingSound] = useState(false);
-  
+  const [micError, setMicError] = useState('');
+
   const audioContextRef = useRef(null);
   const analyserRef = useRef(null);
   const micStreamRef = useRef(null);
+  const micSourceRef = useRef(null);
   const animationFrameRef = useRef(null);
   const oscillatorRef = useRef(null);
   const isTestingRef = useRef(false);
@@ -79,20 +82,53 @@ const HeadsetTest = () => {
     setIsPlayingSound(false);
   };
 
+  const resolveMicError = (error) => {
+    const name = error?.name || '';
+    if (name === 'NotAllowedError' || name === 'PermissionDeniedError' || name === 'SecurityError') {
+      return t('headsetTest.micDenied');
+    }
+    if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+      return t('headsetTest.micUnavailable');
+    }
+    if (name === 'NotReadableError' || name === 'TrackStartError' || name === 'AbortError') {
+      return t('headsetTest.micUnavailable');
+    }
+    return t('headsetTest.micUnavailable');
+  };
+
   const startMicTest = async () => {
-    if (isTestingRef.current) return;
+    if (isTestingRef.current || isStarting) return;
+
+    setMicError('');
+    setIsStarting(true);
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-        },
-      });
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setMicError(t('headsetTest.micUnsupported'));
+        return;
+      }
+
+      // Önce basit istek; bazı cihazlar gelişmiş kısıtlamaları reddeder
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      } catch (firstError) {
+        // İkinci deneme: açık kısıtlamalarla
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+          },
+        }).catch(() => {
+          throw firstError;
+        });
+      }
+
       micStreamRef.current = stream;
 
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      const audioContext = new AudioCtx();
       audioContextRef.current = audioContext;
 
       if (audioContext.state === 'suspended') {
@@ -105,6 +141,7 @@ const HeadsetTest = () => {
       analyserRef.current = analyser;
 
       const microphone = audioContext.createMediaStreamSource(stream);
+      micSourceRef.current = microphone;
       microphone.connect(analyser);
 
       isTestingRef.current = true;
@@ -113,7 +150,10 @@ const HeadsetTest = () => {
       analyzeMicLevel();
     } catch (error) {
       console.error('Error accessing microphone:', error);
+      setMicError(resolveMicError(error));
       stopMicTest();
+    } finally {
+      setIsStarting(false);
     }
   };
 
@@ -156,8 +196,10 @@ const HeadsetTest = () => {
       micStreamRef.current = null;
     }
 
+    micSourceRef.current = null;
+
     if (audioContextRef.current) {
-      audioContextRef.current.close();
+      audioContextRef.current.close().catch(() => {});
       audioContextRef.current = null;
     }
 
@@ -217,6 +259,7 @@ const HeadsetTest = () => {
               <div className="flex flex-col sm:flex-row gap-4">
                 {!isPlayingSound ? (
                   <Button 
+                    type="button"
                     onClick={playTestSound}
                     variant="brand"
                     className="flex-1"
@@ -227,6 +270,7 @@ const HeadsetTest = () => {
                   </Button>
                 ) : (
                   <Button 
+                    type="button"
                     onClick={stopTestSound}
                     variant="brandOutline"
                     className="flex-1"
@@ -264,16 +308,19 @@ const HeadsetTest = () => {
               <div className="flex flex-col sm:flex-row gap-4 mb-6">
                 {!isTesting ? (
                   <Button
+                    type="button"
                     onClick={startMicTest}
                     variant="brand"
                     className="flex-1"
                     size="lg"
+                    disabled={isStarting}
                   >
                     <Mic className="mr-2 w-5 h-5" />
-                    {t('headsetTest.startTest')}
+                    {isStarting ? t('headsetTest.starting') : t('headsetTest.startTest')}
                   </Button>
                 ) : (
                   <Button 
+                    type="button"
                     onClick={stopMicTest}
                     variant="brandOutline"
                     className="flex-1"
@@ -284,11 +331,18 @@ const HeadsetTest = () => {
                 )}
               </div>
 
+              {micError && (
+                <div className="mb-4 p-4 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm flex items-start gap-2">
+                  <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                  <span>{micError}</span>
+                </div>
+              )}
+
               {isTesting && (
                 <div className="space-y-4">
                   <div>
                     <div className="flex justify-between mb-2">
-                      <span className="text-sm font-semibold text-gray-700">Microphone Level</span>
+                      <span className="text-sm font-semibold text-gray-700">{t('headsetTest.results.microphone')}</span>
                       <Badge className={micLevel > 5 ? 'bg-green-600' : 'bg-gray-400'}>
                         {Math.round(micLevel)}%
                       </Badge>
@@ -311,7 +365,7 @@ const HeadsetTest = () => {
                 </div>
               )}
 
-              {micTested && (
+              {micTested && !micError && (
                 <div className={`mt-4 p-4 rounded-lg ${micStatus.bgColor} flex items-center space-x-3`}>
                   <MicIcon className={`w-6 h-6 ${micStatus.color}`} />
                   <span className={`font-semibold ${micStatus.color}`}>
@@ -357,7 +411,7 @@ const HeadsetTest = () => {
                     {t('headsetTest.troubleshoot')}
                   </p>
                   <Link to="/troubleshooting">
-                    <Button variant="ghost" className="text-blue-600 hover:text-blue-700 hover:bg-blue-100 mt-2">
+                    <Button type="button" variant="ghost" className="text-blue-600 hover:text-blue-700 hover:bg-blue-100 mt-2">
                       {t('header.troubleshooting')} <ArrowRight className="ml-2 w-4 h-4" />
                     </Button>
                   </Link>

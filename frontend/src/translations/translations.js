@@ -229,6 +229,10 @@ export const translations = {
       permission: 'Mikrofon İzni Gerekli',
       permissionDesc: 'Lütfen tarayıcıdan mikrofon izni verin',
       requestPermission: 'İzin İste',
+      starting: 'Mikrofon açılıyor...',
+      micDenied: 'Mikrofon izni reddedildi. Tarayıcı adres çubuğundaki kilit/mikrofon ikonundan izin verip tekrar deneyin.',
+      micUnavailable: 'Mikrofon açılamadı. Kulaklığın takılı olduğundan ve başka bir uygulamada kullanılmadığından emin olun.',
+      micUnsupported: 'Bu tarayıcı mikrofon erişimini desteklemiyor. Chrome veya Edge kullanın.',
       results: {
         title: 'Test Sonuçları',
         speaker: 'Hoparlör',
@@ -1137,6 +1141,10 @@ export const translations = {
       permission: 'Mikrofonberechtigung erforderlich',
       permissionDesc: 'Bitte erlauben Sie den Mikrofonzugriff im Browser',
       requestPermission: 'Berechtigung anfordern',
+      starting: 'Mikrofon wird geöffnet...',
+      micDenied: 'Mikrofonzugriff verweigert. Erlauben Sie den Zugriff über das Schloss-/Mikrofonsymbol in der Adressleiste und versuchen Sie es erneut.',
+      micUnavailable: 'Mikrofon konnte nicht geöffnet werden. Stellen Sie sicher, dass das Headset angeschlossen ist und von keiner anderen App verwendet wird.',
+      micUnsupported: 'Dieser Browser unterstützt keinen Mikrofonzugriff. Bitte Chrome oder Edge verwenden.',
       results: {
         title: 'Testergebnisse',
         speaker: 'Lautsprecher',
@@ -2034,6 +2042,10 @@ export const translations = {
       permission: 'Microphone Permission Required',
       permissionDesc: 'Please allow microphone access in the browser',
       requestPermission: 'Request Permission',
+      starting: 'Opening microphone...',
+      micDenied: 'Microphone permission was denied. Allow access from the lock/mic icon in the address bar and try again.',
+      micUnavailable: 'Could not open the microphone. Make sure the headset is plugged in and not used by another app.',
+      micUnsupported: 'This browser does not support microphone access. Please use Chrome or Edge.',
       results: {
         title: 'Test Results',
         speaker: 'Speaker',
