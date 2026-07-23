@@ -41,6 +41,7 @@ const LANG_FIELDS = [
   { titleKey: 'title', messageKey: 'message', ctaKey: 'cta_label', flag: '🇹🇷', suffix: 'tr' },
   { titleKey: 'title', messageKey: 'message', ctaKey: 'cta_label', flag: '🇩🇪', suffix: 'de' },
   { titleKey: 'title', messageKey: 'message', ctaKey: 'cta_label', flag: '🇺🇸', suffix: 'en' },
+  { titleKey: 'title', messageKey: 'message', ctaKey: 'cta_label', flag: '🇬🇪', suffix: 'ka' },
 ];
 
 function SlidePreview({ form, language, t }) {
@@ -192,7 +193,7 @@ const CarouselSlidesAdmin = () => {
       alert(t('admin.carousel.ctaLinkInvalid'));
       return null;
     }
-    if (payload.cta_link && !payload.cta_labels.tr && !payload.cta_labels.de && !payload.cta_labels.en) {
+    if (payload.cta_link && !payload.cta_labels.tr && !payload.cta_labels.de && !payload.cta_labels.en && !payload.cta_labels.ka) {
       alert(t('admin.carousel.ctaLabelRequired'));
       return null;
     }

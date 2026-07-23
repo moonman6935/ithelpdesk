@@ -14,6 +14,7 @@ const SPLASH_LANGS = [
   { code: 'tr', flag: '🇹🇷', label: 'Türkçe' },
   { code: 'de', flag: '🇩🇪', label: 'Deutsch' },
   { code: 'en', flag: '🇺🇸', label: 'English' },
+  { code: 'ka', flag: '🇬🇪', label: 'ქართული' },
 ];
 
 const SplashScreen = () => {
@@ -125,7 +126,7 @@ const SplashScreen = () => {
         <div className="splash-screen__loader" aria-hidden="true">
           <Loader2 className="w-6 h-6 animate-spin text-white/90" />
           <span>
-            {translations.tr.splash.loading} · {translations.de.splash.loading} · {translations.en.splash.loading}
+            {SPLASH_LANGS.map(({ code }) => translations[code].splash.loading).join(' · ')}
           </span>
           <div className="splash-screen__progress">
             <div className="splash-screen__progress-bar splash-screen__progress-bar--long" />

@@ -444,11 +444,13 @@ function parseVideoTitles(data) {
         tr: String(data.titles?.tr ?? data.title_tr ?? data.title ?? '').trim(),
         de: String(data.titles?.de ?? data.title_de ?? '').trim(),
         en: String(data.titles?.en ?? data.title_en ?? '').trim(),
+        ka: String(data.titles?.ka ?? data.title_ka ?? '').trim(),
     };
-    if (!titles.tr && !titles.de && !titles.en) return null;
-    if (!titles.tr) titles.tr = titles.de || titles.en;
+    if (!titles.tr && !titles.de && !titles.en && !titles.ka) return null;
+    if (!titles.tr) titles.tr = titles.de || titles.en || titles.ka;
     if (!titles.de) titles.de = titles.tr;
     if (!titles.en) titles.en = titles.tr;
+    if (!titles.ka) titles.ka = titles.tr;
     return titles;
 }
 
@@ -458,7 +460,7 @@ function normalizeVideoDoc(video) {
     const legacy = String(video.title || '').trim();
     return {
         ...video,
-        titles: { tr: legacy, de: legacy, en: legacy },
+        titles: { tr: legacy, de: legacy, en: legacy, ka: legacy },
     };
 }
 
@@ -478,39 +480,42 @@ function parseCarouselLangField(data, field) {
             tr: String(nested.tr ?? '').trim(),
             de: String(nested.de ?? '').trim(),
             en: String(nested.en ?? '').trim(),
+            ka: String(nested.ka ?? '').trim(),
         };
     }
     return {
         tr: String(data[`${field}_tr`] ?? '').trim(),
         de: String(data[`${field}_de`] ?? '').trim(),
         en: String(data[`${field}_en`] ?? '').trim(),
+        ka: String(data[`${field}_ka`] ?? '').trim(),
     };
 }
 
 function fillCarouselLangs(obj) {
-    const fallback = obj.tr || obj.de || obj.en || '';
+    const fallback = obj.tr || obj.de || obj.en || obj.ka || '';
     return {
         tr: obj.tr || fallback,
         de: obj.de || fallback,
         en: obj.en || fallback,
+        ka: obj.ka || fallback,
     };
 }
 
 function parseCarouselTitles(data) {
     const raw = parseCarouselLangField(data, 'titles');
-    if (!raw.tr && !raw.de && !raw.en) return null;
+    if (!raw.tr && !raw.de && !raw.en && !raw.ka) return null;
     return fillCarouselLangs(raw);
 }
 
 function parseCarouselMessages(data) {
     const raw = parseCarouselLangField(data, 'messages');
-    if (!raw.tr && !raw.de && !raw.en) return null;
+    if (!raw.tr && !raw.de && !raw.en && !raw.ka) return null;
     return fillCarouselLangs(raw);
 }
 
 function parseCarouselCtaLabels(data) {
     const raw = parseCarouselLangField(data, 'cta_labels');
-    if (!raw.tr && !raw.de && !raw.en) return { tr: '', de: '', en: '' };
+    if (!raw.tr && !raw.de && !raw.en && !raw.ka) return { tr: '', de: '', en: '', ka: '' };
     return fillCarouselLangs(raw);
 }
 
@@ -523,13 +528,13 @@ function normalizeCarouselDoc(slide) {
     if (!slide) return slide;
     const titles = slide.titles
         ? fillCarouselLangs(slide.titles)
-        : { tr: String(slide.title || '').trim(), de: '', en: '' };
+        : { tr: String(slide.title || '').trim(), de: '', en: '', ka: '' };
     const messages = slide.messages
         ? fillCarouselLangs(slide.messages)
-        : { tr: String(slide.message || '').trim(), de: '', en: '' };
+        : { tr: String(slide.message || '').trim(), de: '', en: '', ka: '' };
     const cta_labels = slide.cta_labels
         ? fillCarouselLangs(slide.cta_labels)
-        : { tr: String(slide.cta_label || '').trim(), de: '', en: '' };
+        : { tr: String(slide.cta_label || '').trim(), de: '', en: '', ka: '' };
     return {
         ...slide,
         titles,
@@ -557,7 +562,7 @@ function validateCarouselPayload(data) {
         return { error: 'Bağlantı / ile başlamalıdır' };
     }
     const cta_labels = parseCarouselCtaLabels(data);
-    if (cta_link && !cta_labels.tr && !cta_labels.de && !cta_labels.en) {
+    if (cta_link && !cta_labels.tr && !cta_labels.de && !cta_labels.en && !cta_labels.ka) {
         return { error: 'Bağlantı için en az bir dilde buton metni gerekli' };
     }
     return {

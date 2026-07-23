@@ -19,6 +19,7 @@ const LANG_FIELDS = [
   { key: 'title_tr', labelKey: 'admin.videoTutorials.titleTr', flag: '🇹🇷' },
   { key: 'title_de', labelKey: 'admin.videoTutorials.titleDe', flag: '🇩🇪' },
   { key: 'title_en', labelKey: 'admin.videoTutorials.titleEn', flag: '🇺🇸' },
+  { key: 'title_ka', labelKey: 'admin.videoTutorials.titleKa', flag: '🇬🇪' },
 ];
 
 const TitleFields = ({ form, setForm, t }) => (
@@ -206,6 +207,7 @@ const VideoTutorialsAdmin = () => {
                           {titles.tr && <p>🇹🇷 {titles.tr}</p>}
                           {titles.de && titles.de !== titles.tr && <p>🇩🇪 {titles.de}</p>}
                           {titles.en && titles.en !== titles.tr && <p>🇺🇸 {titles.en}</p>}
+                          {titles.ka && titles.ka !== titles.tr && <p>🇬🇪 {titles.ka}</p>}
                         </div>
                       </div>
                       <div className="flex gap-1 shrink-0">

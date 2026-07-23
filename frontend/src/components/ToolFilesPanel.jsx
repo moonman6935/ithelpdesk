@@ -57,7 +57,9 @@ const ToolFilesPanel = ({ canWrite = false }) => {
   const formatDate = (ts) => {
     if (!ts) return '-';
     try {
-      return new Date(ts).toLocaleString(language === 'en' ? 'en-GB' : language === 'de' ? 'de-DE' : 'tr-TR');
+      return new Date(ts).toLocaleString(
+        language === 'en' ? 'en-GB' : language === 'de' ? 'de-DE' : language === 'ka' ? 'ka-GE' : 'tr-TR'
+      );
     } catch {
       return ts;
     }

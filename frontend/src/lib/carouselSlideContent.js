@@ -1,4 +1,4 @@
-const LANGS = ['tr', 'de', 'en'];
+const LANGS = ['tr', 'de', 'en', 'ka'];
 
 function parseLangField(data, field) {
   const nested = data[field];
@@ -7,39 +7,42 @@ function parseLangField(data, field) {
       tr: String(nested.tr ?? '').trim(),
       de: String(nested.de ?? '').trim(),
       en: String(nested.en ?? '').trim(),
+      ka: String(nested.ka ?? '').trim(),
     };
   }
   return {
     tr: String(data[`${field}_tr`] ?? '').trim(),
     de: String(data[`${field}_de`] ?? '').trim(),
     en: String(data[`${field}_en`] ?? '').trim(),
+    ka: String(data[`${field}_ka`] ?? '').trim(),
   };
 }
 
 function fillMissingLangs(obj) {
-  const fallback = obj.tr || obj.de || obj.en || '';
+  const fallback = obj.tr || obj.de || obj.en || obj.ka || '';
   return {
     tr: obj.tr || fallback,
     de: obj.de || fallback,
     en: obj.en || fallback,
+    ka: obj.ka || fallback,
   };
 }
 
 export function parseCarouselTitles(data) {
   const raw = parseLangField(data, 'titles');
-  if (!raw.tr && !raw.de && !raw.en) return null;
+  if (!raw.tr && !raw.de && !raw.en && !raw.ka) return null;
   return fillMissingLangs(raw);
 }
 
 export function parseCarouselMessages(data) {
   const raw = parseLangField(data, 'messages');
-  if (!raw.tr && !raw.de && !raw.en) return null;
+  if (!raw.tr && !raw.de && !raw.en && !raw.ka) return null;
   return fillMissingLangs(raw);
 }
 
 export function parseCarouselCtaLabels(data) {
   const raw = parseLangField(data, 'cta_labels');
-  if (!raw.tr && !raw.de && !raw.en) return { tr: '', de: '', en: '' };
+  if (!raw.tr && !raw.de && !raw.en && !raw.ka) return { tr: '', de: '', en: '', ka: '' };
   return fillMissingLangs(raw);
 }
 
@@ -47,13 +50,13 @@ export function normalizeCarouselSlide(slide) {
   if (!slide) return slide;
   const titles = slide.titles
     ? fillMissingLangs(slide.titles)
-    : { tr: String(slide.title || '').trim(), de: '', en: '' };
+    : { tr: String(slide.title || '').trim(), de: '', en: '', ka: '' };
   const messages = slide.messages
     ? fillMissingLangs(slide.messages)
-    : { tr: String(slide.message || '').trim(), de: '', en: '' };
+    : { tr: String(slide.message || '').trim(), de: '', en: '', ka: '' };
   const cta_labels = slide.cta_labels
     ? fillMissingLangs(slide.cta_labels)
-    : { tr: String(slide.cta_label || '').trim(), de: '', en: '' };
+    : { tr: String(slide.cta_label || '').trim(), de: '', en: '', ka: '' };
 
   return {
     ...slide,
@@ -65,7 +68,7 @@ export function normalizeCarouselSlide(slide) {
 
 export function getCarouselText(fields, language = 'tr') {
   const lang = LANGS.includes(language) ? language : 'tr';
-  return fields[lang] || fields.tr || fields.de || fields.en || '';
+  return fields[lang] || fields.tr || fields.de || fields.en || fields.ka || '';
 }
 
 export function slideToDisplay(slide, language = 'tr') {
@@ -86,13 +89,16 @@ export const EMPTY_CAROUSEL_FORM = {
   title_tr: '',
   title_de: '',
   title_en: '',
+  title_ka: '',
   message_tr: '',
   message_de: '',
   message_en: '',
+  message_ka: '',
   cta_link: '',
   cta_label_tr: '',
   cta_label_de: '',
   cta_label_en: '',
+  cta_label_ka: '',
   template: 'red',
   icon: 'sparkles',
   active: true,
@@ -104,13 +110,16 @@ export function slideToForm(slide) {
     title_tr: normalized.titles.tr,
     title_de: normalized.titles.de,
     title_en: normalized.titles.en,
+    title_ka: normalized.titles.ka,
     message_tr: normalized.messages.tr,
     message_de: normalized.messages.de,
     message_en: normalized.messages.en,
+    message_ka: normalized.messages.ka,
     cta_link: normalized.cta_link || '',
     cta_label_tr: normalized.cta_labels.tr,
     cta_label_de: normalized.cta_labels.de,
     cta_label_en: normalized.cta_labels.en,
+    cta_label_ka: normalized.cta_labels.ka,
     template: normalized.template || 'red',
     icon: normalized.icon || 'sparkles',
     active: normalized.active !== false,
@@ -123,17 +132,20 @@ export function formToPayload(form) {
       tr: String(form.title_tr || '').trim(),
       de: String(form.title_de || '').trim(),
       en: String(form.title_en || '').trim(),
+      ka: String(form.title_ka || '').trim(),
     },
     messages: {
       tr: String(form.message_tr || '').trim(),
       de: String(form.message_de || '').trim(),
       en: String(form.message_en || '').trim(),
+      ka: String(form.message_ka || '').trim(),
     },
     cta_link: String(form.cta_link || '').trim(),
     cta_labels: {
       tr: String(form.cta_label_tr || '').trim(),
       de: String(form.cta_label_de || '').trim(),
       en: String(form.cta_label_en || '').trim(),
+      ka: String(form.cta_label_ka || '').trim(),
     },
     template: form.template || 'red',
     icon: form.icon || 'sparkles',
@@ -142,9 +154,11 @@ export function formToPayload(form) {
 }
 
 export function hasAnyCarouselTitle(titles) {
-  return Boolean(titles?.tr || titles?.de || titles?.en);
+  return Boolean(titles?.tr || titles?.de || titles?.en || titles?.ka);
 }
 
 export function hasAnyCarouselMessage(messages) {
-  return Boolean(messages?.tr || messages?.de || messages?.en);
+  return Boolean(messages?.tr || messages?.de || messages?.en || messages?.ka);
 }
+
+export { LANGS };
