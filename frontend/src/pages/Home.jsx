@@ -10,10 +10,11 @@ import {
   ArrowRight,
   HelpCircle,
   ClipboardCheck,
-  Sparkles,
   MessageSquare,
   Ticket,
   Truck,
+  RefreshCw,
+  Laptop,
 } from 'lucide-react';
 import HomeHeroCarousel from '../components/HomeHeroCarousel';
 import { StaggerChildren } from '../components/PageShell';
@@ -148,13 +149,31 @@ function ColorCard({ gradient, blob, accent, Icon, title, description, cta, to, 
 
 const QUICK_LINKS = [
   {
-    key: 'guide',
-    labelKey: 'home.subtitle',
-    Icon: Sparkles,
-    gradient: 'from-red-500 to-orange-500',
-    blob: 'bg-orange-300/30',
-    accent: 'bg-red-300/20',
-    to: '/pc-setup',
+    key: 'citrix',
+    labelKey: 'home.quickLinks.citrix',
+    Icon: Monitor,
+    gradient: 'from-cyan-500 to-blue-600',
+    blob: 'bg-cyan-300/30',
+    accent: 'bg-blue-300/20',
+    to: '/faq/citrix-kurulum',
+  },
+  {
+    key: 'windows11',
+    labelKey: 'home.quickLinks.windows11',
+    Icon: RefreshCw,
+    gradient: 'from-indigo-500 to-blue-600',
+    blob: 'bg-indigo-300/30',
+    accent: 'bg-blue-300/20',
+    to: '/windows-11-upgrade',
+  },
+  {
+    key: 'mac',
+    labelKey: 'home.quickLinks.mac',
+    Icon: Laptop,
+    gradient: 'from-slate-600 to-gray-800',
+    blob: 'bg-slate-300/30',
+    accent: 'bg-gray-400/20',
+    to: '/faq/mac-kurulum',
   },
   {
     key: 'faq',

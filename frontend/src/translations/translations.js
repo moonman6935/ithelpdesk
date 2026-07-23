@@ -132,6 +132,9 @@ export const translations = {
       trackCargo: 'Kargo Takibine Git',
       learnMore: 'İncele',
       quickLinks: {
+        citrix: 'Citrix Kurulum Rehberi',
+        windows11: 'Windows 11 Kurulum Rehberi',
+        mac: 'macOS Kurulum Rehberi',
         faq: 'Sıkça Sorulan Sorular',
         rocketchat: 'Rocket.Chat Destek Masası',
         ticket: 'Ticket Açma Sayfası',
@@ -1044,6 +1047,9 @@ export const translations = {
       trackCargo: 'Zur Sendungsverfolgung',
       learnMore: 'Mehr erfahren',
       quickLinks: {
+        citrix: 'Citrix-Installationsanleitung',
+        windows11: 'Windows-11-Installationsanleitung',
+        mac: 'macOS-Installationsanleitung',
         faq: 'Häufig gestellte Fragen',
         rocketchat: 'Rocket.Chat Support',
         ticket: 'Ticket erstellen',
@@ -1945,6 +1951,9 @@ export const translations = {
       trackCargo: 'Open Shipment Tracking',
       learnMore: 'Learn more',
       quickLinks: {
+        citrix: 'Citrix Setup Guide',
+        windows11: 'Windows 11 Setup Guide',
+        mac: 'macOS Setup Guide',
         faq: 'Frequently Asked Questions',
         rocketchat: 'Rocket.Chat Support Desk',
         ticket: 'Open a Ticket',
