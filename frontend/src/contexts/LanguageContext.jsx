@@ -12,7 +12,7 @@ export const useLanguage = () => {
 };
 
 export const LanguageProvider = ({ children }) => {
-  const [language, setLanguage] = useState('tr');
+  const [language, setLanguage] = useState('de');
 
   const t = (key) => {
     const keys = key.split('.');
