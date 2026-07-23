@@ -914,7 +914,7 @@ export const translations = {
   },
   "de": {
     "header": {
-      "title": "DCS IT-Support",
+      "title": "DCS IT Support Portal",
       "home": "Startseite",
       "pcSetup": "PC-Einrichtung",
       "headsetTest": "Headset-Test",
