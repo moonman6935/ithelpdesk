@@ -54,7 +54,7 @@ try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
 try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls11 -bor [Net.SecurityProtocolType]::Tls } catch {}
 
 $script:AppName    = 'DCS IT - Citrix Kurulum Araci'
-$script:Version    = '1.1.0'
+$script:Version    = '1.1.1'
 $script:Author     = 'Bayram Can Aslan'
 $script:RocketChat = 'https://rocket.dmc-rz.com'
 $script:LogLines   = New-Object System.Collections.Generic.List[string]
@@ -154,17 +154,39 @@ function Test-InstallerFile {
 function Get-InstallExitMeaning {
     param([int]$Code)
     switch ($Code) {
-        0    { 'Basarili' }
-        3010 { 'Basarili - yeniden baslatma gerekli' }
-        1602 { 'Kullanici kurulumu iptal etti' }
-        1603 { 'Kurulum sirasinda kritik hata' }
-        1618 { 'Baska bir kurulum devam ediyor - bekleyip tekrar deneyin' }
-        1619 { 'Kurulum paketi acilamadi (bozuk indirme olabilir)' }
-        1620 { 'Kurulum paketi gecersiz' }
-        1633 { 'Bu platform desteklenmiyor' }
-        1638 { 'Daha yeni bir surum zaten kurulu' }
+        0     { 'Basarili' }
+        3010  { 'Basarili - yeniden baslatma gerekli' }
+        1602  { 'Kullanici kurulumu iptal etti' }
+        1603  { 'Kurulum sirasinda kritik hata' }
+        1618  { 'Baska bir kurulum devam ediyor - bekleyip tekrar deneyin' }
+        1619  { 'Kurulum paketi acilamadi (bozuk indirme olabilir)' }
+        1620  { 'Kurulum paketi gecersiz' }
+        1633  { 'Bu platform desteklenmiyor' }
+        1638  { 'Daha yeni / ayni surum zaten kurulu' }
+        40001 { 'Citrix daha once yonetici tarafindan kurulmus' }
+        40002 { 'Onceki kurulum kalintisi var - once kaldirin' }
+        40004 { 'Kurulum iptal edildi' }
+        40007 { 'Isletim sistemi desteklenmiyor' }
+        40008 { 'Daha yeni bir surum mevcut (onerilen)' }
+        40017 { 'Kurulum iptal edildi' }
+        40026 { 'Surec/surucu durdurulamadi - yeniden baslatin' }
+        40027 { 'Citrix guncellemesi devam ediyor - bekleyin' }
+        40028 { 'Yonetici izni gerekli' }
+        40032 { 'Citrix zaten guncel (yeniden kurulum gerekmedi)' }
+        40034 { 'Windows Installer hatasi' }
+        40036 { 'Once Citrix HDX RealTime Media Engine kaldirilmali' }
+        40037 { 'Kismi basari - zorunlu bilesenler kuruldu' }
+        50001 { 'Mevcut kurulum yalnizca yonetici ile guncellenebilir' }
+        50002 { 'Desteklenmeyen yukseltme yolu' }
         default { "Bilinmeyen kod ($Code)" }
     }
+}
+
+function Test-InstallSuccessCode {
+    param([int]$Code)
+    # 40032 = ayni surum zaten guncel (Citrix bunu hata gibi dondurur ama basari sayilmali)
+    # 40037 = zorunlu bilesenler tamam
+    return @(0, 3010, 1638, 40008, 40032, 40037) -contains $Code
 }
 #endregion
 
@@ -359,6 +381,7 @@ Write-Log "$script:AppName v$script:Version basladi. Admin=$(Test-Admin) CheckOn
 
 $skip = $false
 $installOk = $false
+$reinstall = $false
 
 #region 1) Mevcut kurulum
 Write-Head '1) Mevcut Citrix Kurulumu'
@@ -371,7 +394,11 @@ try {
             if (-not (Confirm-Step 'Citrix zaten kurulu. Yine de yeniden kurmak/guncellemek ister misiniz?')) {
                 Write-Host "`n  Islem iptal edildi. Mevcut kurulum korunuyor." -ForegroundColor Cyan
                 $skip = $true
+            } else {
+                $reinstall = $true
             }
+        } elseif ($Force -and -not $CheckOnly) {
+            $reinstall = $true
         }
     } else {
         Write-Warn2 'Citrix Workspace kurulu degil.'
@@ -401,6 +428,8 @@ if (-not $skip) {
     }
     $localCandidates += (Join-Path $env:USERPROFILE 'Downloads\CitrixWorkspaceApp.exe')
     $localCandidates += (Join-Path ([Environment]::GetFolderPath('Desktop')) 'CitrixWorkspaceApp.exe')
+    $localCandidates += (Join-Path $env:TEMP 'CitrixWorkspaceApp.exe')
+    $localCandidates += (Join-Path $env:TEMP 'DCS-CitrixWorkspaceApp.exe')
 
     foreach ($cand in $localCandidates) {
         if (Test-InstallerFile -Path $cand) {
@@ -423,6 +452,11 @@ if (-not $skip) {
         Write-Head '3) Sessiz Kurulum'
         Write-Step 'Citrix Workspace kuruluyor... (5-15 dakika surebilir, pencereyi kapatmayin)'
         $argLine = '/silent /noreboot /AutoUpdateCheck=disabled /EnableCEIP=false /FORCE_LITE_MODE=no'
+        # Ayni surumde yeniden kurulum: Citrix 40032 doner; /forceinstall ile temiz yeniden kurulum dener
+        if ($reinstall) {
+            $argLine += ' /forceinstall'
+            Write-Step 'Mevcut kurulum uzerine /forceinstall ile yeniden kuruluyor...'
+        }
         Write-Log "Kurulum: `"$installer`" $argLine"
 
         try {
@@ -439,12 +473,16 @@ if (-not $skip) {
             $meaning = Get-InstallExitMeaning -Code $code
             Write-Log "Kurulum cikis kodu: $code ($meaning)"
 
-            if ($code -eq 0 -or $code -eq 3010 -or $code -eq 1638) {
+            if (Test-InstallSuccessCode -Code $code) {
                 Write-Ok "Kurulum sonucu: $meaning"
                 if ($code -eq 3010) {
                     Write-Warn2 'Yeniden baslatma gerekli. Bilgisayari yeniden baslatin.'
                 }
+                if ($code -eq 40032) {
+                    Write-Ok 'Citrix zaten guncel - ek kurulum yapilmadi (bu bir hata degil).'
+                }
                 $installOk = $true
+                $script:FatalError = $null
             } else {
                 Write-Err2 "Kurulum basarisiz: $meaning"
                 Write-Host '  Cozum onerileri:' -ForegroundColor Yellow
