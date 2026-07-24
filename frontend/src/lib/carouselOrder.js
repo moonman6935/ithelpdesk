@@ -1,7 +1,7 @@
 import { buildSlideMeta } from './carouselThemes';
 import { slideToDisplay } from './carouselSlideContent';
 
-export const DEFAULT_CAROUSEL_COUNT = 13;
+export const DEFAULT_CAROUSEL_COUNT = 14;
 
 export const DEFAULT_SLIDE_META = [
   { template: 'red', icon: 'sparkles' },
@@ -17,6 +17,7 @@ export const DEFAULT_SLIDE_META = [
   { template: 'teal', icon: 'cable' },
   { template: 'amber', icon: 'truck' },
   { template: 'rose', icon: 'clipboard' },
+  { template: 'teal', icon: 'userCog' },
 ];
 
 export function defaultSlideId(index) {

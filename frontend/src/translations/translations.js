@@ -124,10 +124,18 @@ export const translations = {
           "message": "Size zimmetlenen ekipmanları görüntüleyin ve zimmet formunuzu doldurarak dijital onayınızı verin.",
           "ctaLink": "/asset-confirmation",
           "ctaLabel": "Zimmet Formunu Doldur"
+        },
+        {
+          "title": "Personel İlk Kurulum",
+          "message": "Yeni agent bilgisayarında AnyDesk, Rocket.Chat ve Citrix'i tek araçla otomatik kurun; ses ayarları yapılsın, CAG ve Rocket.Chat açılsın.",
+          "ctaLink": "/agent-ilk-kurulum",
+          "ctaLabel": "İlk Kuruluma Git"
         }
       ],
       "features": {
         "title": "Hizmetlerimiz",
+        "agentSetup": "Personel İlk Kurulum",
+        "agentSetupDesc": "AnyDesk, Rocket.Chat ve Citrix'i tek tıkla otomatik kurun",
         "setup": "PC Kurulumu",
         "setupDesc": "Detaylı görsellerle bilgisayar kurulum rehberi",
         "test": "Kulaklık Testi",
@@ -143,6 +151,7 @@ export const translations = {
       "fillAssetForm": "Zimmet Formunu Doldur",
       "trackCargo": "Kargo Takibine Git",
       "learnMore": "İncele",
+      "startAgentSetup": "Kuruluma Başla",
       "quickLinks": {
         "agentSetup": "Personel İlk Kurulum",
         "citrix": "Citrix Kurulum Rehberi",
@@ -1093,10 +1102,18 @@ export const translations = {
           "message": "Zeigen Sie Ihre zugewiesenen Geräte an und füllen Sie das Inventarformular aus, um digital zu bestätigen.",
           "ctaLink": "/asset-confirmation",
           "ctaLabel": "Inventarformular ausfüllen"
+        },
+        {
+          "title": "Personal-Ersteinrichtung",
+          "message": "Installieren Sie AnyDesk, Rocket.Chat und Citrix auf dem neuen Agenten-PC automatisch mit einem Tool; Audio wird eingerichtet, CAG und Rocket.Chat werden geöffnet.",
+          "ctaLink": "/agent-ilk-kurulum",
+          "ctaLabel": "Zur Ersteinrichtung"
         }
       ],
       "features": {
         "title": "Unsere Dienstleistungen",
+        "agentSetup": "Personal-Ersteinrichtung",
+        "agentSetupDesc": "AnyDesk, Rocket.Chat und Citrix mit einem Klick automatisch installieren",
         "setup": "PC-Einrichtung",
         "setupDesc": "Detaillierte Anleitung zur Computerinstallation mit Bildern",
         "test": "Headset-Test",
@@ -1112,6 +1129,7 @@ export const translations = {
       "fillAssetForm": "Inventarformular ausfüllen",
       "trackCargo": "Zur Sendungsverfolgung",
       "learnMore": "Mehr erfahren",
+      "startAgentSetup": "Einrichtung starten",
       "quickLinks": {
         "agentSetup": "Personal-Ersteinrichtung",
         "citrix": "Citrix-Installationsanleitung",
@@ -2062,10 +2080,18 @@ export const translations = {
           "message": "View equipment assigned to you and fill out the asset form to provide your digital confirmation.",
           "ctaLink": "/asset-confirmation",
           "ctaLabel": "Fill Asset Form"
+        },
+        {
+          "title": "Personnel First Setup",
+          "message": "On a new agent PC, install AnyDesk, Rocket.Chat and Citrix automatically with one tool; audio is configured and CAG plus Rocket.Chat open.",
+          "ctaLink": "/agent-ilk-kurulum",
+          "ctaLabel": "Open First Setup"
         }
       ],
       "features": {
         "title": "Our Services",
+        "agentSetup": "Personnel First Setup",
+        "agentSetupDesc": "Install AnyDesk, Rocket.Chat and Citrix automatically in one click",
         "setup": "PC Setup",
         "setupDesc": "Detailed computer installation guide with images",
         "test": "Headset Test",
@@ -2081,6 +2107,7 @@ export const translations = {
       "fillAssetForm": "Fill Asset Form",
       "trackCargo": "Open Shipment Tracking",
       "learnMore": "Learn more",
+      "startAgentSetup": "Start Setup",
       "quickLinks": {
         "agentSetup": "Personnel First Setup",
         "citrix": "Citrix Setup Guide",
@@ -3031,10 +3058,18 @@ export const translations = {
           "message": "Consultez le matériel qui vous est attribué et remplissez le formulaire de matériel pour donner votre confirmation numérique.",
           "ctaLink": "/asset-confirmation",
           "ctaLabel": "Remplir le formulaire de matériel"
+        },
+        {
+          "title": "Première installation du personnel",
+          "message": "Sur un nouveau PC agent, installez AnyDesk, Rocket.Chat et Citrix automatiquement avec un seul outil ; l'audio est configuré et CAG ainsi que Rocket.Chat s'ouvrent.",
+          "ctaLink": "/agent-ilk-kurulum",
+          "ctaLabel": "Ouvrir la première installation"
         }
       ],
       "features": {
         "title": "Nos services",
+        "agentSetup": "Première installation du personnel",
+        "agentSetupDesc": "Installez AnyDesk, Rocket.Chat et Citrix automatiquement en un clic",
         "setup": "Installation du PC",
         "setupDesc": "Guide détaillé d'installation de l'ordinateur avec images",
         "test": "Test du casque",
@@ -3050,6 +3085,7 @@ export const translations = {
       "fillAssetForm": "Remplir le formulaire de matériel",
       "trackCargo": "Ouvrir le suivi d'expédition",
       "learnMore": "En savoir plus",
+      "startAgentSetup": "Démarrer l'installation",
       "quickLinks": {
         "agentSetup": "Première installation du personnel",
         "citrix": "Guide d'installation de Citrix",
@@ -4000,10 +4036,18 @@ export const translations = {
           "message": "იხილეთ თქვენთვის მინიჭებული აღჭურვილობა და შეავსეთ აქტივების ფორმა თქვენი ციფრული დადასტურების მისაღებად.",
           "ctaLink": "/asset-confirmation",
           "ctaLabel": "შეავსეთ აქტივების ფორმა"
+        },
+        {
+          "title": "პერსონალის პირველი დაყენება",
+          "message": "ახალ აგენტის კომპიუტერზე AnyDesk, Rocket.Chat და Citrix ერთი ხელსაწყოთი ავტომატურად დააყენეთ; აუდიო კონფიგურდება და CAG/Rocket.Chat გაიხსნება.",
+          "ctaLink": "/agent-ilk-kurulum",
+          "ctaLabel": "პირველ დაყენებაზე გადასვლა"
         }
       ],
       "features": {
         "title": "ჩვენი სერვისები",
+        "agentSetup": "პერსონალის პირველი დაყენება",
+        "agentSetupDesc": "AnyDesk, Rocket.Chat და Citrix ერთი დაწკაპუნებით ავტომატურად დააყენეთ",
         "setup": "PC დაყენება",
         "setupDesc": "კომპიუტერის ინსტალაციის დეტალური სახელმძღვანელო სურათებით",
         "test": "ყურსასმენის ტესტი",
@@ -4019,6 +4063,7 @@ export const translations = {
       "fillAssetForm": "შეავსეთ აქტივების ფორმა",
       "trackCargo": "გახსენით მიწოდების თვალყურის დევნება",
       "learnMore": "შეიტყვეთ მეტი",
+      "startAgentSetup": "დაყენების დაწყება",
       "quickLinks": {
         "agentSetup": "პერსონალის პირველი დაყენება",
         "citrix": "Citrix დაყენების სახელმძღვანელო",

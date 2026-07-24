@@ -23,6 +23,7 @@ import {
   Star,
   Zap,
   Globe,
+  UserCog,
 } from 'lucide-react';
 
 export const CAROUSEL_TEMPLATES = [
@@ -64,6 +65,7 @@ export const CAROUSEL_ICON_MAP = {
   star: Star,
   zap: Zap,
   globe: Globe,
+  userCog: UserCog,
 };
 
 export const CAROUSEL_ICONS = Object.keys(CAROUSEL_ICON_MAP);

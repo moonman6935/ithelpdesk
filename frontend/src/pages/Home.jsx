@@ -22,6 +22,17 @@ import { StaggerChildren } from '../components/PageShell';
 
 const FEATURE_CARDS = [
   {
+    key: 'agentSetup',
+    to: '/agent-ilk-kurulum',
+    Icon: UserCog,
+    gradient: 'from-teal-600 via-emerald-600 to-cyan-800',
+    blob: 'bg-teal-300/25',
+    accent: 'bg-emerald-400/20',
+    titleKey: 'home.features.agentSetup',
+    descKey: 'home.features.agentSetupDesc',
+    ctaKey: 'home.startAgentSetup',
+  },
+  {
     key: 'setup',
     to: '/pc-setup',
     Icon: Monitor,
@@ -322,7 +333,7 @@ const Home = () => {
             </div>
           </div>
 
-          <StaggerChildren className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <StaggerChildren className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
             {FEATURE_CARDS.map((card) => (
               <ColorCard
                 key={card.key}
