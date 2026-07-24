@@ -30,9 +30,20 @@ if %errorlevel% neq 0 (
 
 set "PS1=%TEMP%\DCS-Agent-Ilk-Kurulum.ps1"
 powershell -NoProfile -ExecutionPolicy Bypass -Command "$m='###AGENT'+'_SETUP_PAYLOAD###'; $raw=Get-Content -LiteralPath '%~f0' -Raw; $i=$raw.IndexOf($m); if($i -ge 0){ Set-Content -LiteralPath (Join-Path $env:TEMP 'DCS-Agent-Ilk-Kurulum.ps1') -Value $raw.Substring($i+$m.Length) -Encoding UTF8 }"
+if not exist "%PS1%" (
+    echo [X] Kurulum betigi ayiklanamadi.
+    pause
+    exit /b 1
+)
 powershell -NoProfile -ExecutionPolicy Bypass -File "%PS1%"
+set "ERR=%ERRORLEVEL%"
 del "%PS1%" >nul 2>&1
-exit /b
+if not "%ERR%"=="0" (
+    echo.
+    echo [X] Kurulum hata ile sonlandi. Kod: %ERR%
+    pause
+)
+exit /b %ERR%
 ###AGENT_SETUP_PAYLOAD###
 '@
 

@@ -469,7 +469,7 @@ if ($SkipAudio) {
                 Write-Ok "$svcName zaten calisiyor."
             }
         } catch {
-            Write-Warn2 "$svcName: $($_.Exception.Message)"
+            Write-Warn2 ("{0}: {1}" -f $svcName, $_.Exception.Message)
             $audioOk = $false
         }
     }
