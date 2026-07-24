@@ -14,6 +14,7 @@ const SPLASH_LANGS = [
   { code: 'tr', flag: '🇹🇷', label: 'Türkçe' },
   { code: 'de', flag: '🇩🇪', label: 'Deutsch' },
   { code: 'en', flag: '🇺🇸', label: 'English' },
+  { code: 'fr', flag: '🇫🇷', label: 'Français' },
   { code: 'ka', flag: '🇬🇪', label: 'ქართული' },
 ];
 

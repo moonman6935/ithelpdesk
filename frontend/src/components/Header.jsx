@@ -95,6 +95,7 @@ const LANGUAGES = [
   { code: 'tr', name: 'Türkçe', flag: 'https://flagcdn.com/w80/tr.png' },
   { code: 'de', name: 'Deutsch', flag: 'https://flagcdn.com/w80/de.png' },
   { code: 'en', name: 'English', flag: 'https://flagcdn.com/w80/us.png' },
+  { code: 'fr', name: 'Français', flag: 'https://flagcdn.com/w80/fr.png' },
   { code: 'ka', name: 'ქართული', flag: 'https://flagcdn.com/w80/ge.png' },
 ];
 

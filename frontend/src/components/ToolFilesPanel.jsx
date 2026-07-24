@@ -58,7 +58,7 @@ const ToolFilesPanel = ({ canWrite = false }) => {
     if (!ts) return '-';
     try {
       return new Date(ts).toLocaleString(
-        language === 'en' ? 'en-GB' : language === 'de' ? 'de-DE' : language === 'ka' ? 'ka-GE' : 'tr-TR'
+        language === 'en' ? 'en-GB' : language === 'de' ? 'de-DE' : language === 'fr' ? 'fr-FR' : language === 'ka' ? 'ka-GE' : 'tr-TR'
       );
     } catch {
       return ts;

@@ -593,6 +593,204 @@ export const roboTranslations = {
       "c3": "Clicked a suggestion to go to the relevant page."
     }
   },
+  "fr": {
+    "fabLabel": "Assistant Robo",
+    "fabBubble": "Bonjour, je suis Robo ! Je suis là pour tout problème que vous pourriez avoir.",
+    "greeting": "Bonjour, je suis Robo !",
+    "greetingSub": "Comment puis-je vous aider ?",
+    "back": "Retour",
+    "close": "Fermer",
+    "restart": "Recommencer",
+    "progress": "Étape",
+    "openGuide": "Ouvrir le guide d'installation",
+    "openTroubleshooting": "Ouvrir le dépannage",
+    "openFaq": "Ouvrir la FAQ",
+    "openPcSetup": "Guide d'installation du PC",
+    "openCargo": "Suivi de colis",
+    "openAsset": "Formulaire de matériel",
+    "openMacGuide": "Ouvrir le guide macOS",
+    "openWindows": "Guide Windows 11",
+    "checklistHint": "Vérifiez chaque élément dans l'ordre et marquez-le comme terminé.",
+    "allChecked": "Toutes les vérifications sont terminées !",
+    "resolvedQuestion": "Votre problème a-t-il été résolu ?",
+    "resolvedYes": "Oui, résolu ✓",
+    "resolvedNo": "Non, j'ai toujours des problèmes",
+    "resolvedTitle": "Génial ! 🎉",
+    "resolvedMessage": "Si votre problème est résolu, vous pouvez continuer à travailler. Je suis là si vous avez besoin d'aide supplémentaire.",
+    "escalateTitle": "Contacter l'équipe informatique",
+    "escalateMessage": "Envoyez un message au canal IT_Helpdesk sur Rocket.Chat. Indiquez votre nom, votre identifiant AnyDesk et une description détaillée.",
+    "escalateTip": "Exemple : « Bonjour, [Nom] — AnyDesk : [ID] — le problème audio Citrix persiste, liste de vérification terminée. »",
+    "openRocketChat": "Ouvrir Rocket.Chat",
+    "searching": "Recherche d'une solution, un instant…",
+    "searchingTitle": "Robo recherche",
+    "typing": "Robo écrit…",
+    "topics": {
+      "citrix": "Citrix",
+      "headset": "Casque",
+      "pc": "PC / Moniteur",
+      "network": "Connexion Internet",
+      "cargo": "Suivi de colis",
+      "asset": "Confirmation du matériel",
+      "mac": "macOS (AnyDesk et Citrix)",
+      "windows": "Mise à niveau Windows 11",
+      "search": "Rechercher sur le site"
+    },
+    "citrix": {
+      "question": "Quel problème Citrix rencontrez-vous ?",
+      "install": {
+        "label": "Problème d'installation",
+        "title": "Liste de vérification de l'installation de Citrix",
+        "c1": "Téléchargé le programme d'installation hors ligne (x64, ~883 Mo) depuis le site de Citrix.",
+        "c2": "Accepté la licence avec « Oui, j'accepte ».",
+        "c3": "Terminé l'assistant d'installation et redémarré le PC.",
+        "c4": "Citrix Workspace se lance correctement."
+      },
+      "login": {
+        "label": "Problème de connexion",
+        "title": "Liste de vérification de la connexion à Citrix",
+        "c1": "Connexion avec le nom d'utilisateur et le mot de passe — pas l'e-mail.",
+        "c2": "Verr. Maj désactivé, disposition du clavier correcte.",
+        "c3": "Connexion réseau active et stable."
+      },
+      "sound": {
+        "label": "Problème audio",
+        "title": "Liste de vérification audio de Citrix",
+        "c1": "Casque USB branché sur un port USB arrière.",
+        "c2": "Casque sélectionné comme sortie par défaut dans Windows.",
+        "c3": "Le son de la session Citrix n'est pas coupé.",
+        "c4": "Le son de test est joué dans le casque."
+      },
+      "mic": {
+        "label": "Problème de microphone",
+        "title": "Liste de vérification du microphone de Citrix",
+        "c1": "Accordé l'autorisation du micro à Citrix en « Se connecter automatiquement ».",
+        "c2": "Connexions Citrix réglées sur « Se connecter automatiquement ».",
+        "c3": "Autorisation du microphone du navigateur accordée.",
+        "c4": "Déconnecté puis reconnecté à Citrix."
+      },
+      "connection": {
+        "label": "Problème de connexion",
+        "title": "Liste de vérification de la connexion Citrix",
+        "c1": "Internet actif (de préférence Ethernet filaire).",
+        "c2": "Le client Citrix est à jour.",
+        "c3": "Le pare-feu/antivirus ne bloque pas Citrix."
+      },
+      "update": {
+        "label": "Mise à jour",
+        "title": "Liste de vérification de la mise à jour de Citrix",
+        "c1": "Vérifié les mises à jour dans Citrix Workspace.",
+        "c2": "Installé la mise à jour en attente et redémarré.",
+        "c3": "Peut se connecter après la mise à jour."
+      }
+    },
+    "headset": {
+      "question": "Quel problème de casque avez-vous ?",
+      "noSound": {
+        "label": "Aucun son",
+        "title": "Liste de vérification audio du casque",
+        "c1": "Casque sur un port USB arrière (pas à l'avant/sur un hub).",
+        "c2": "Pas de croix rouge sur l'icône du haut-parleur de la barre des tâches.",
+        "c3": "Le casque USB est la sortie par défaut dans Windows.",
+        "c4": "Le volume n'est pas à 0 / le son n'est pas coupé."
+      },
+      "noMic": {
+        "label": "Le microphone ne fonctionne pas",
+        "title": "Liste de vérification du microphone",
+        "c1": "Accès au microphone activé dans la confidentialité de Windows.",
+        "c2": "Micro USB défini comme périphérique d'enregistrement par défaut.",
+        "c3": "Niveau du micro suffisant, non coupé.",
+        "c4": "Exécuté le test du micro sur la page de test du casque."
+      },
+      "notDetected": {
+        "label": "Casque non détecté",
+        "title": "Liste de vérification de la connexion du casque",
+        "c1": "Essayé un autre port USB.",
+        "c2": "Redémarré l'ordinateur.",
+        "c3": "Utilisation uniquement d'un casque USB approuvé (pas de jack/Bluetooth)."
+      },
+      "test": {
+        "label": "Lancer le test du casque"
+      }
+    },
+    "pc": {
+      "question": "Quel problème de PC ou de moniteur avez-vous ?",
+      "setup": {
+        "label": "Installation du PC",
+        "title": "Liste de vérification de l'installation du PC",
+        "c1": "Câbles du moniteur (HDMI/VGA) connectés aux bons ports.",
+        "c2": "Périphériques USB (casque, clavier, souris) sur le panneau arrière.",
+        "c3": "Le moniteur affiche la bonne source d'entrée.",
+        "c4": "Terminé toutes les étapes du guide d'installation du PC."
+      },
+      "display": {
+        "label": "Aucun affichage sur le moniteur",
+        "title": "Liste de vérification de l'affichage du moniteur",
+        "c1": "Moniteur et PC allumés, câbles bien branchés.",
+        "c2": "Entrée/source du moniteur correcte (HDMI/VGA).",
+        "c3": "Essayé WINDOWS + P → « Étendre »."
+      },
+      "dual": {
+        "label": "Configuration à deux moniteurs",
+        "title": "Liste de vérification des deux moniteurs",
+        "c1": "Les deux moniteurs sont connectés et allumés.",
+        "c2": "WINDOWS + P → « Étendre » sélectionné.",
+        "c3": "Deux moniteurs visibles dans les paramètres d'affichage."
+      }
+    },
+    "network": {
+      "title": "Liste de vérification de la connexion Internet",
+      "c1": "Ethernet ou Wi-Fi connecté.",
+      "c2": "Peut accéder à d'autres sites web.",
+      "c3": "Utilisation d'une connexion filaire lorsque c'est possible."
+    },
+    "cargo": {
+      "title": "Liste de vérification du suivi de colis",
+      "c1": "Je connais mon nom et mon numéro de personnel à 6 chiffres.",
+      "c2": "Recherche effectuée sur la page de suivi de colis.",
+      "c3": "Vérifié le statut de livraison à l'écran."
+    },
+    "asset": {
+      "title": "Liste de vérification de la confirmation du matériel",
+      "c1": "Ouvert la page de confirmation du matériel.",
+      "c2": "Consulté le matériel qui m'est attribué.",
+      "c3": "Donné la confirmation numérique ou noté les écarts."
+    },
+    "mac": {
+      "question": "Quelle installation souhaitez-vous effectuer sur votre Mac ?",
+      "guide": {
+        "label": "Ouvrir le guide macOS"
+      },
+      "anydesk": {
+        "label": "Installation d'AnyDesk",
+        "title": "Liste de vérification de l'installation d'AnyDesk sur macOS",
+        "c1": "Téléchargé la version macOS depuis la page de téléchargement officielle d'AnyDesk.",
+        "c2": "Ouvert le fichier .dmg et glissé AnyDesk dans le dossier Applications.",
+        "c3": "Confirmé avec « Ouvrir » au premier lancement et accordé les autorisations requises.",
+        "c4": "AnyDesk est ouvert et je peux voir mon adresse AnyDesk à 9 chiffres (ID)."
+      },
+      "citrix": {
+        "label": "Installation de Citrix",
+        "title": "Liste de vérification de l'installation de Citrix sur macOS",
+        "c1": "Téléchargé Citrix Workspace pour Mac.",
+        "c2": "Exécuté Install Citrix Workspace depuis le fichier .dmg.",
+        "c3": "Terminé l'assistant d'installation et accordé les autorisations.",
+        "c4": "Citrix Workspace se lance et je peux me connecter."
+      }
+    },
+    "windows": {
+      "title": "Liste de vérification de la mise à niveau vers Windows 11",
+      "c1": "Mon PC est sous Windows 10 (x64) et répond à la configuration système requise.",
+      "c2": "Téléchargé l'Assistant d'installation de Microsoft.",
+      "c3": "Exécuté l'application, accepté la licence et démarré l'installation.",
+      "c4": "Redémarré le PC après l'installation."
+    },
+    "search": {
+      "title": "Comment rechercher sur le site",
+      "c1": "Cliqué sur le bouton « Rechercher » en haut (ou utilisé Ctrl + K).",
+      "c2": "Saisi ce que je cherchais — des suggestions apparaissent même avec des fautes de frappe.",
+      "c3": "Cliqué sur une suggestion pour accéder à la page pertinente."
+    }
+  },
   "ka": {
     "fabLabel": "Robo ასისტენტი",
     "fabBubble": "გამარჯობა, მე ვარ რობო! მე აქ ვარ ნებისმიერი პრობლემისთვის, რაც შეიძლება გქონდეთ.",

@@ -838,6 +838,7 @@ export const translations = {
         "titleTr": "Başlık (Türkçe)",
         "titleDe": "Başlık (Almanca)",
         "titleEn": "Başlık (İngilizce)",
+        "titleFr": "Başlık (Fransızca)",
         "titleKa": "Başlık (Gürcüce)",
         "heading": "Video Başlığı",
         "headingPlaceholder": "Örn: Citrix Bağlantı Sorunu",
@@ -1751,6 +1752,7 @@ export const translations = {
         "titleTr": "Titel (Türkisch)",
         "titleDe": "Titel (Deutsch)",
         "titleEn": "Titel (Englisch)",
+        "titleFr": "Titel (Französisch)",
         "titleKa": "Titel (Georgisch)",
         "heading": "Videotitel",
         "headingPlaceholder": "z. B. Citrix-Verbindungsproblem",
@@ -2664,6 +2666,7 @@ export const translations = {
         "titleTr": "Title (Turkish)",
         "titleDe": "Title (German)",
         "titleEn": "Title (English)",
+        "titleFr": "Title (French)",
         "titleKa": "Title (Georgian)",
         "heading": "Video Title",
         "headingPlaceholder": "e.g. Citrix Connection Issue",
@@ -2736,6 +2739,920 @@ export const translations = {
       },
       "understood": "Got it",
       "close": "Close"
+    }
+  },
+  "fr": {
+    "header": {
+      "title": "DCS IT Support Portal",
+      "home": "Accueil",
+      "pcSetup": "Installation du PC",
+      "headsetTest": "Test du casque",
+      "troubleshooting": "Dépannage",
+      "faq": "FAQ",
+      "videoTutorials": "Dépannage vidéo"
+    },
+    "search": {
+      "button": "Rechercher",
+      "placeholder": "Que recherchez-vous ? (ex. casque, citrix, colis...)",
+      "close": "Fermer",
+      "suggested": "Pages suggérées",
+      "noResults": "Aucun résultat trouvé",
+      "noResultsHint": "Essayez un autre mot-clé.",
+      "hintNavigate": "naviguer",
+      "hintOpen": "ouvrir",
+      "hintClose": "fermer"
+    },
+    "headsetRepairTool": {
+      "title": "Outil de réparation automatique du casque",
+      "badge": "Nouveau",
+      "subtitle": "Téléchargez un petit programme qui détecte et corrige automatiquement les problèmes de casque.",
+      "f1": "Vérifie et démarre les services audio de Windows",
+      "f2": "Définit votre casque comme périphérique audio et microphone par défaut",
+      "f3": "Active le volume et rétablit le son s'il est coupé",
+      "f4": "Active les autorisations de confidentialité du microphone",
+      "safe": "Ne modifie que les paramètres audio",
+      "download": "Télécharger l'outil",
+      "hint": "Téléchargez, double-cliquez et confirmez l'invite « Oui / Exécuter »."
+    },
+    "citrixInstallTool": {
+      "title": "Outil d'installation automatique de Citrix",
+      "badge": "Nouveau",
+      "subtitle": "Téléchargez un petit programme qui installe Citrix Workspace tout seul.",
+      "f1": "Vérifie si Citrix est déjà installé",
+      "f2": "Télécharge le dernier programme d'installation de Citrix Workspace",
+      "f3": "S'installe automatiquement en arrière-plan et en silence",
+      "f4": "Vérifie l'installation et laisse un rapport sur le bureau",
+      "safe": "N'installe que Citrix Workspace",
+      "download": "Télécharger l'outil",
+      "hint": "Téléchargez, double-cliquez et confirmez l'invite « Oui / Exécuter »."
+    },
+    "home": {
+      "welcome": "Service informatique du DCS Communication Center",
+      "subtitle": "Guide d'installation et d'assistance informatique",
+      "description": "Utilisez nos guides étape par étape pour configurer votre nouvel ordinateur et tester votre casque USB.",
+      "getStarted": "Commencer",
+      "testHeadset": "Tester le casque",
+      "carouselSlides": [
+        {
+          "title": "Bienvenue au centre d'aide informatique DCS",
+          "message": "Bienvenue sur le portail d'assistance du service informatique du DCS Communication Center. Suivez les conseils ci-dessous pour résoudre rapidement les problèmes courants."
+        },
+        {
+          "title": "Comment installer Citrix",
+          "message": "Installez Citrix Workspace étape par étape avec le programme d'installation hors ligne. Après l'installation, redémarrez votre ordinateur une fois — puis vous êtes prêt.",
+          "ctaLink": "/faq/citrix-kurulum",
+          "ctaLabel": "Ouvrir le guide d'installation"
+        },
+        {
+          "title": "Comment passer à Windows 11",
+          "message": "Guide étape par étape pour passer de Windows 10 à Windows 11 à l'aide de l'Assistant d'installation de Microsoft — uniquement pour les PC x64 compatibles.",
+          "ctaLink": "/windows-11-upgrade",
+          "ctaLabel": "Ouvrir le guide de mise à niveau"
+        },
+        {
+          "title": "Installer AnyDesk et Citrix sur macOS",
+          "message": "Téléchargez et installez AnyDesk et Citrix Workspace sur votre Mac étape par étape. Suivez le guide visuel pour le faire facilement.",
+          "ctaLink": "/faq/mac-kurulum",
+          "ctaLabel": "Ouvrir le guide macOS"
+        },
+        {
+          "title": "Connexion à Citrix",
+          "message": "Lorsque vous vous connectez à Citrix, saisissez votre nom d'utilisateur et votre mot de passe — pas votre adresse e-mail."
+        },
+        {
+          "title": "Mises à jour de Citrix",
+          "message": "Vérifiez régulièrement les mises à jour de Citrix. Des clients obsolètes peuvent entraîner des problèmes de connexion et de performance."
+        },
+        {
+          "title": "Demande d'assistance via Rocket.Chat",
+          "message": "Lorsque vous demandez de l'aide via Rocket.Chat, indiquez votre nom, votre identifiant AnyDesk et une description détaillée du problème."
+        },
+        {
+          "title": "Demande de remplacement de matériel",
+          "message": "Lorsque vous envoyez une demande de changement de matériel par e-mail, joignez toujours le formulaire de demande de matériel. Obtenez l'approbation de l'informatique sur Rocket.Chat avant de la soumettre."
+        },
+        {
+          "title": "MFA et transfert OTP",
+          "message": "Effectuez le transfert OTP avant de remplacer le téléphone avec votre application MFA Authenticator — sinon vous risquez de perdre l'accès à votre compte."
+        },
+        {
+          "title": "Systèmes d'exploitation pris en charge",
+          "message": "Pris en charge : Windows 10 Pro, Windows 11 Pro, macOS Ventura et versions ultérieures, Ubuntu 24.04 et versions ultérieures."
+        },
+        {
+          "title": "Connexion Internet",
+          "message": "Privilégiez autant que possible une connexion Internet filaire (Ethernet) pour la stabilité et la vitesse."
+        },
+        {
+          "title": "Suivi d'expédition",
+          "message": "Vérifiez en temps réel où se trouve votre colis à l'aide de votre nom et de votre numéro de personnel à 6 chiffres.",
+          "ctaLink": "/cargo-status",
+          "ctaLabel": "Ouvrir le suivi d'expédition"
+        },
+        {
+          "title": "Formulaire de matériel",
+          "message": "Consultez le matériel qui vous est attribué et remplissez le formulaire de matériel pour donner votre confirmation numérique.",
+          "ctaLink": "/asset-confirmation",
+          "ctaLabel": "Remplir le formulaire de matériel"
+        }
+      ],
+      "features": {
+        "title": "Nos services",
+        "setup": "Installation du PC",
+        "setupDesc": "Guide détaillé d'installation de l'ordinateur avec images",
+        "test": "Test du casque",
+        "testDesc": "Test de l'audio et du microphone du casque USB",
+        "support": "Dépannage",
+        "supportDesc": "Solutions aux problèmes courants",
+        "faqDesc": "Foire aux questions avec réponses étape par étape",
+        "assets": "Confirmation du matériel",
+        "assetsDesc": "Remplissez votre formulaire de matériel et confirmez le matériel qui vous est attribué",
+        "cargo": "Suivi d'expédition",
+        "cargoDesc": "Vérifiez le statut de l'expédition avec votre nom et votre numéro de personnel"
+      },
+      "fillAssetForm": "Remplir le formulaire de matériel",
+      "trackCargo": "Ouvrir le suivi d'expédition",
+      "learnMore": "En savoir plus",
+      "quickLinks": {
+        "citrix": "Guide d'installation de Citrix",
+        "windows11": "Guide d'installation de Windows 11",
+        "mac": "Guide d'installation de macOS",
+        "faq": "Foire aux questions",
+        "rocketchat": "Assistance Rocket.Chat",
+        "ticket": "Ouvrir un ticket",
+        "cargo": "Suivi d'expédition",
+        "assetForm": "Formulaire de matériel"
+      },
+      "cta": {
+        "title": "Commencez maintenant",
+        "description": "Utilisez nos guides d'installation et nos outils de test pour être prêt en quelques minutes. Consultez la FAQ si vous êtes bloqué."
+      }
+    },
+    "pcSetup": {
+      "title": "Guide d'installation de l'ordinateur",
+      "subtitle": "Définitions du matériel qui vous est livré et installation de l'ordinateur",
+      "interactive": "Guide interactif",
+      "scrollView": "Toutes les étapes",
+      "important": "Notes importantes",
+      "equipmentDef": "Définitions du matériel",
+      "step0": {
+        "title": "Notes importantes",
+        "item1": "Les câbles HDMI et VGA utilisés pour connecter l'écran ont toujours une extrémité sur le moniteur* et l'autre sur le boîtier de l'ordinateur.",
+        "item2": "Si le câble ne correspond pas aux ports, veuillez ne pas forcer le port ni le câble.",
+        "item3": "Gardez l'ordinateur et le matériel à l'écart des liquides.",
+        "item4": "Conservez les cartons utilisés lorsque le matériel vous est livré. Lorsque vous nous renvoyez un ou plusieurs équipements, veuillez les emballer et les expédier tels qu'ils ont été livrés.",
+        "item5": "Faites attention à la propreté du matériel.",
+        "item6": "Ne manipulez pas le boîtier de l'ordinateur.",
+        "item7": "Ne retirez aucune pièce et ne dévissez rien.",
+        "item8": "Ne bloquez pas les orifices de ventilation du boîtier.",
+        "item9": "Ne placez pas de matériaux inflammables sur le boîtier de l'ordinateur.",
+        "item10": "N'utilisez pas l'ordinateur à des fins non professionnelles. En cas de dommage au matériel dû à un téléchargement ou à une installation, la responsabilité n'incombe pas à l'entreprise."
+      },
+      "step1": {
+        "title": "Définitions du matériel",
+        "desc": "Matériel requis et définitions des câbles pour l'installation",
+        "powerCable": "Câble d'alimentation",
+        "powerDesc": "Ce câble est connecté à l'écran et au boîtier, un pour chacun, et l'autre extrémité est branchée sur la prise électrique.",
+        "vgaCable": "Câble VGA",
+        "vgaDesc": "Ce câble de transfert d'image sera connecté à l'écran OÙ LE CÂBLE HDMI N'EST PAS connecté, une extrémité à l'écran et l'autre au boîtier de l'ordinateur.",
+        "hdmiCable": "Câble HDMI",
+        "hdmiDesc": "Ce câble de transfert d'image sera connecté à l'écran OÙ LE CÂBLE VGA N'EST PAS connecté, une extrémité à l'écran et l'autre au boîtier de l'ordinateur."
+      },
+      "step2": {
+        "title": "Définitions des ports",
+        "desc": "Connexions des ports sur le panneau arrière du boîtier de l'ordinateur",
+        "port1": "Entrée du câble d'alimentation",
+        "port2": "Entrée du câble HDMI",
+        "port3": "Entrée du câble VGA",
+        "port4": "Entrée du câble USB",
+        "port5": "Entrée du câble Ethernet*",
+        "note": "* Câble Internet"
+      },
+      "step3": {
+        "title": "Connexions du boîtier de l'ordinateur",
+        "desc": "Connexions des câbles au panneau arrière du boîtier du PC",
+        "connection1": "Le câble d'alimentation sera connecté ici.",
+        "connection2": "Le câble HDMI sera connecté ici.",
+        "connection3": "Le câble VGA sera connecté ici.",
+        "connection4": "Le casque, la souris, le clavier et la webcam seront connectés ici.",
+        "connection5": "L'autre extrémité du câble ETHERNET connecté au modem sera connectée ici."
+      },
+      "step4": {
+        "title": "Connexions du moniteur",
+        "desc": "Comment effectuer les connexions des câbles VGA et HDMI au moniteur",
+        "instruction1": "Connectez une extrémité du câble VGA à l'entrée VGA du PREMIER moniteur",
+        "instruction2": "Connectez l'autre extrémité du câble VGA au port VGA à l'arrière du boîtier du PC",
+        "instruction3": "Connectez une extrémité du câble HDMI à l'entrée HDMI du DEUXIÈME moniteur",
+        "instruction4": "Connectez l'autre extrémité du câble HDMI au port HDMI à l'arrière du boîtier du PC",
+        "tip": "Important : un moniteur doit être connecté en VGA, l'autre en HDMI"
+      },
+      "step5": {
+        "title": "Configuration à deux moniteurs",
+        "desc": "Configuration à deux moniteurs avec les paramètres Windows",
+        "instruction1": "Allumez les deux moniteurs et l'ordinateur",
+        "instruction2": "Appuyez sur la touche WINDOWS + P de votre clavier",
+        "instruction3": "Sélectionnez « Étendre » dans le menu qui apparaît",
+        "instruction4": "Vous devriez voir l'affichage sur les deux moniteurs",
+        "tip": "Le mode Étendre répartit votre bureau sur deux écrans"
+      },
+      "next": "Étape suivante",
+      "previous": "Étape précédente",
+      "complete": "Installation terminée !"
+    },
+    "headsetTest": {
+      "title": "Test audio du casque USB",
+      "subtitle": "Testez le microphone et la sortie audio de votre casque",
+      "startTest": "Démarrer le test",
+      "stopTest": "Arrêter le test",
+      "testing": "Test en cours...",
+      "speakerTest": "Test du haut-parleur",
+      "speakerDesc": "Entendez-vous le son de test ?",
+      "playSound": "Lire le son",
+      "stopSound": "Arrêter",
+      "micTest": "Test du microphone",
+      "micDesc": "Parlez dans le microphone, le niveau audio s'affichera",
+      "permission": "Autorisation du microphone requise",
+      "permissionDesc": "Veuillez autoriser l'accès au microphone dans le navigateur",
+      "requestPermission": "Demander l'autorisation",
+      "starting": "Ouverture du microphone...",
+      "micDenied": "L'autorisation du microphone a été refusée. Autorisez l'accès depuis l'icône de cadenas/micro dans la barre d'adresse et réessayez.",
+      "micUnavailable": "Impossible d'ouvrir le microphone. Assurez-vous que le casque est branché et n'est pas utilisé par une autre application.",
+      "micUnsupported": "Ce navigateur ne prend pas en charge l'accès au microphone. Veuillez utiliser Chrome ou Edge.",
+      "results": {
+        "title": "Résultats du test",
+        "speaker": "Haut-parleur",
+        "microphone": "Microphone",
+        "working": "Fonctionne",
+        "notWorking": "Ne fonctionne pas",
+        "notTested": "Non testé"
+      },
+      "troubleshoot": "Des problèmes ? Rendez-vous dans la section Dépannage"
+    },
+    "troubleshooting": {
+      "title": "Dépannage",
+      "subtitle": "Problèmes courants et solutions",
+      "noSound": {
+        "title": "Aucun son dans le casque",
+        "solution1": "Assurez-vous que le casque USB est branché sur un port USB du panneau ARRIÈRE",
+        "solution2": "Vérifiez les paramètres de son de Windows",
+        "solution3": "Changez le périphérique audio par défaut"
+      },
+      "noMic": {
+        "title": "Le microphone ne fonctionne pas",
+        "solution1": "Accordez l'autorisation du microphone dans les paramètres de confidentialité de Windows",
+        "solution2": "Définissez le microphone comme périphérique d'enregistrement par défaut",
+        "solution3": "Vérifiez le niveau du microphone"
+      },
+      "displayIssue": {
+        "title": "Aucun affichage sur le moniteur",
+        "solution1": "Vérifiez les connexions des câbles",
+        "solution2": "Assurez-vous que la bonne source d'entrée est sélectionnée sur le moniteur",
+        "solution3": "Appuyez sur WINDOWS + P et sélectionnez « Étendre »"
+      },
+      "soundSettings": {
+        "title": "Comment modifier les paramètres de son de Windows",
+        "step1": "CLIQUEZ AVEC LE BOUTON DROIT sur l'icône du haut-parleur dans la barre des tâches",
+        "step2": "Sélectionnez « Paramètres de son »",
+        "step3": "Sélectionnez votre casque USB dans la section « Sortie »",
+        "step4": "Lisez un son de test et vérifiez"
+      }
+    },
+    "faq": {
+      "title": "Foire aux questions",
+      "subtitle": "Coopération et formation des agents – questions et réponses courantes",
+      "introTitle": "Important : vérifiez d'abord vous-même !",
+      "introText": "Les problèmes de microphone ne nécessitent souvent pas d'assistance informatique. Veuillez effectuer les vérifications ci-dessous avant de contacter qui que ce soit. Un simple casque débranché peut facilement faire attendre tout le monde une heure ou plus.",
+      "macSetup": {
+        "featuredTitle": "Guide d'installation de macOS (AnyDesk et Citrix)",
+        "featuredDesc": "Téléchargez et installez AnyDesk et Citrix Workspace pour Mac — suivez notre guide visuel étape par étape.",
+        "openGuide": "Ouvrir le guide macOS"
+      },
+      "citrixInstall": {
+        "featuredTitle": "Guide d'installation de Citrix Workspace",
+        "featuredDesc": "Téléchargez le programme d'installation hors ligne, installez et redémarrez — suivez notre guide visuel étape par étape.",
+        "openGuide": "Ouvrir le guide d'installation",
+        "question": "Comment installer Citrix Workspace ?",
+        "answer1": "Téléchargez le fichier d'installation hors ligne (Offline Installer) depuis la page de téléchargement officielle de Citrix.",
+        "answer2": "Notre guide visuel vous accompagne dans le téléchargement, l'assistant d'installation et le redémarrage requis ensuite."
+      },
+      "q1": {
+        "question": "Que dois-je faire lorsque Citrix demande l'accès au microphone au premier lancement ?",
+        "answer1": "Lorsque Citrix demande l'autorisation d'accéder au microphone la première fois que vous l'ouvrez, vous DEVEZ cliquer sur « Se connecter automatiquement » (Automatisch verbinden).",
+        "answer2": "Nous avons eu de nombreux cas la semaine dernière où les clients n'entendaient pas les agents — parce que l'agent n'avait pas accordé l'autorisation du microphone à Citrix ou que le casque n'était pas connecté.",
+        "answer3": "L'autorisation peut aussi être accordée ultérieurement dans les propriétés de Citrix, sous « Connexions » (Verbindungen) — la petite barre noire en haut de l'écran. Après cette modification, vous devez vous reconnecter à Citrix (déconnexion puis reconnexion)."
+      },
+      "q2": {
+        "question": "Que dois-je vérifier en premier lorsque j'ai des problèmes de microphone ?",
+        "answer1": "Ce n'est pas vraiment un problème informatique mais un sujet de formation. Lorsque vous avez des problèmes de microphone, vous devez d'ABORD vérifier les trois points suivants — avant de contacter qui que ce soit.",
+        "answer2": "Ce sont des choses que vous auriez à faire vous-même même si vous ne travailliez pas pour nous. Un coup d'œil rapide à la barre des tâches suffit souvent."
+      },
+      "q3": {
+        "question": "Comment savoir si mon casque est connecté ?",
+        "answer1": "Vérifiez si le casque est bien connecté. Cela est visible dans la barre des tâches sous la forme d'une icône de haut-parleur avec une croix sur fond rouge.",
+        "win10": "Windows 10",
+        "win11": "Windows 11"
+      },
+      "q4": {
+        "question": "Comment configurer le microphone dans les paramètres de connexion Citrix ?",
+        "answer1": "Dans les paramètres de Citrix, allez dans « Connexions » (Verbindungen) et assurez-vous que « Se connecter automatiquement » (Automatisch verbinden) est sélectionné.",
+        "answer2": "Si ce n'est pas le cas, cliquez dessus, confirmez avec OK, puis déconnectez-vous et reconnectez-vous à Citrix.",
+        "answer3": "Si « Ne pas se connecter » (Keine Verbindung herstellen) ou « Demander » (Fragen) est défini, le microphone local ne sera PAS connecté — le client ne peut pas vous entendre et la connexion ttCall ne fonctionnera pas."
+      },
+      "q5": {
+        "question": "Comment accorder l'autorisation du microphone dans le navigateur web ?",
+        "answer1": "La même chose s'applique à notre page Web-RTC (la page de la grenouille) et aux pages de téléphonie Genesys pour BP AT, DGN, etc.",
+        "answer2": "Lors de la première visite, on vous demandera : utiliser le microphone ou bloquer. Vous DEVEZ simplement cliquer sur AUTORISER (Zulassen). Ce n'est pas sorcier — lisez simplement ce qui est à l'écran.",
+        "answer3": "Pour vérifier, cliquez sur l'icône à gauche de la barre d'adresse de votre navigateur (Chrome ou Edge)."
+      },
+      "q6": {
+        "question": "Comment vérifier l'autorisation du microphone dans Edge ?",
+        "answer1": "Vérification de l'autorisation dans Edge (une méthode très courte) : cliquez sur l'icône à gauche de l'adresse. Une petite fenêtre s'ouvre — l'accès au microphone devrait être autorisé.",
+        "answer2": "Dans Chrome, cela ressemble à ceci — cliquez sur l'icône à gauche de l'adresse."
+      },
+      "q7": {
+        "question": "Comment vérifier l'autorisation du microphone dans Chrome ?",
+        "answer1": "Vérification de l'autorisation dans Chrome (une méthode un peu plus longue). Suivez ces étapes :",
+        "step1": "Cliquez sur l'icône à gauche de la barre d'adresse.",
+        "step2": "Ouvrez les paramètres du site dans le menu qui apparaît.",
+        "step3": "Les paramètres devraient ressembler à ceci — microphone réglé sur « Autoriser »."
+      },
+      "q8": {
+        "question": "Que dois-je faire lorsque des messages apparaissent sur les systèmes des clients ?",
+        "answer1": "Lorsque des messages comme l'exemple ci-dessous apparaissent sur les systèmes des clients, cliquez sur le bouton exactement comme indiqué à l'écran.",
+        "answer2": "Si cela ne fonctionne toujours pas ensuite, revoyez les points 1 à 3 ci-dessus (vérification du casque, paramètres Citrix, autorisation du navigateur)."
+      }
+    },
+    "citrixSetup": {
+      "title": "Guide d'installation de Citrix Workspace",
+      "subtitle": "Installation étape par étape avec le programme hors ligne — redémarrez une fois à la fin",
+      "backToFaq": "Retour à la FAQ",
+      "alertTitle": "Important : utilisez le programme d'installation hors ligne",
+      "alertText": "Sur la page de téléchargement de Citrix, cliquez sur Télécharger pour « Citrix Workspace app … x64 - Offline Installer » (~883 Mo). Dans la fenêtre de licence, cliquez sur « Oui, j'accepte ».",
+      "openDownloadPage": "Ouvrir la page de téléchargement de Citrix",
+      "offlineBadge": "Hors ligne",
+      "eulaTitle": "Accepter le contrat de licence",
+      "eulaAccept": "Oui, j'accepte",
+      "eulaDecline": "Non",
+      "tipLabel": "Conseil",
+      "footerNote": "L'installation se termine par « Redémarrer » sur l'écran « Installation réussie ». Après le redémarrage, Citrix Workspace est prêt à l'emploi.",
+      "step1": {
+        "title": "Accepter la licence pour le programme d'installation hors ligne",
+        "desc": "Sur la page de téléchargement de Citrix, cliquez sur Télécharger pour « Citrix Workspace app 2603.10 x64 - Offline Installer ». Dans la fenêtre « End-User License Agreement », cliquez sur « Oui, j'accepte ».",
+        "tip": "Ligne correcte : x64 Offline Installer (~883 Mo). Confirmez la version approuvée auprès de l'informatique si vous avez un compte d'entreprise."
+      },
+      "step2": {
+        "title": "Attendre la fin du téléchargement",
+        "desc": "Dans les téléchargements de votre navigateur, attendez que CitrixWorkspaceFullInstaller_x64.exe soit entièrement téléchargé (~883 Mo).",
+        "tip": "Si le téléchargement a été interrompu, supprimez le fichier et recommencez à l'étape 1."
+      },
+      "step3": {
+        "title": "Lancer le programme d'installation — prérequis",
+        "desc": "Double-cliquez sur CitrixWorkspaceFullInstaller_x64.exe. Attendez « Preparing your device for workspace installation » et « Installing Prerequisites ».",
+        "tip": "N'éteignez pas le PC pendant cette phase."
+      },
+      "step4": {
+        "title": "Écran de bienvenue — Continuer",
+        "desc": "Sur l'écran « Welcome to Citrix Workspace app », cliquez sur « Continue » en bas à droite.",
+        "tip": "L'étape de la licence vient ensuite."
+      },
+      "step5": {
+        "title": "Accepter la licence et cliquer sur Installer",
+        "desc": "Sur « CITRIX LICENSE AGREEMENT », cochez « I agree » et cliquez sur « Install ».",
+        "tip": "L'installation ne peut pas continuer sans cocher « I agree »."
+      },
+      "step6": {
+        "title": "Attendre la fin de l'installation",
+        "desc": "Sur « Installing Citrix Workspace app... », attendez que la barre de progression se termine. N'éteignez pas le PC.",
+        "tip": "Ne mettez pas le PC en veille pendant l'installation."
+      },
+      "step7": {
+        "title": "Installation réussie — redémarrer",
+        "desc": "Sur « Installation successful », cliquez sur « Reboot » pour redémarrer votre ordinateur. Après le redémarrage, Citrix Workspace est prêt à l'emploi.",
+        "tip": "Ouvrez Citrix Workspace depuis le menu Démarrer et connectez-vous avec votre nom d'utilisateur — pas votre adresse e-mail."
+      }
+    },
+    "macSetup": {
+      "title": "Guide d'installation de macOS (AnyDesk et Citrix)",
+      "subtitle": "Téléchargez et installez AnyDesk et Citrix Workspace sur votre Mac, étape par étape",
+      "backToFaq": "Retour à la FAQ",
+      "alertTitle": "Ce guide est destiné à macOS",
+      "alertText": "Les étapes ci-dessous concernent les ordinateurs Mac (macOS). Ne téléchargez les applications que depuis les pages de téléchargement officielles. Si macOS demande une approbation de sécurité, confirmez « Ouvrir » / « Autoriser ».",
+      "tipLabel": "Conseil",
+      "anydesk": {
+        "title": "AnyDesk (bureau à distance)",
+        "subtitle": "AnyDesk pour que l'équipe informatique puisse fournir une assistance à distance",
+        "download": "Télécharger AnyDesk (Mac)",
+        "step1": {
+          "title": "Ouvrir la page de téléchargement d'AnyDesk",
+          "desc": "Dans Safari ou votre navigateur, allez sur anydesk.com/en/downloads/mac-os et cliquez sur le bouton rouge « Download Now » pour télécharger la version macOS.",
+          "tip": "Le fichier téléchargé a une extension .dmg et pèse environ 8 Mo."
+        },
+        "step2": {
+          "title": "Glisser l'application dans le dossier Applications",
+          "desc": "Double-cliquez sur le fichier .dmg. Dans la fenêtre qui s'ouvre, faites glisser l'icône AnyDesk sur le dossier « Applications ».",
+          "tip": "C'est tout — AnyDesk apparaît désormais dans le Launchpad et le dossier Applications."
+        },
+        "step3": {
+          "title": "Ouvrir AnyDesk et partager votre adresse",
+          "desc": "Ouvrez AnyDesk depuis Applications. Partagez l'adresse à 9 chiffres affichée sous « This Desk » (ex. 123 456 789) avec l'équipe informatique, et cliquez sur « Accepter » lorsqu'une demande de connexion arrive.",
+          "tip": "Au premier lancement, macOS peut demander des autorisations d'enregistrement de l'écran et d'accessibilité. Autorisez AnyDesk dans Réglages système > Confidentialité et sécurité."
+        }
+      },
+      "citrix": {
+        "title": "Citrix Workspace",
+        "subtitle": "Citrix Workspace pour accéder aux applications et aux bureaux de l'entreprise",
+        "download": "Télécharger Citrix Workspace (Mac)",
+        "step1": {
+          "title": "Ouvrir la page de téléchargement de Citrix",
+          "desc": "Sur citrix.com, allez à la page « Citrix Workspace app for Mac » et cliquez sur le bouton bleu « Download Citrix Workspace app for Mac ».",
+          "tip": "Le fichier téléchargé est un programme d'installation .pkg à l'intérieur d'un .dmg."
+        },
+        "step2": {
+          "title": "Lancer le programme d'installation",
+          "desc": "Ouvrez le .dmg et double-cliquez sur « Install Citrix Workspace » (.pkg). Cliquez sur « Continue » sur l'écran de bienvenue, acceptez la licence, puis cliquez sur « Install ».",
+          "tip": "Vous devrez peut-être saisir le mot de passe de votre Mac pour installer."
+        },
+        "step3": {
+          "title": "Terminer l'installation",
+          "desc": "Lorsque « The installation was successful » apparaît, cliquez sur « Close ». Si l'on vous demande d'ajouter un compte, saisissez l'adresse du Store/serveur fournie par l'équipe informatique.",
+          "tip": "Pour l'adresse du compte ou les identifiants, contactez le service informatique."
+        }
+      },
+      "footerTitle": "Installation terminée",
+      "footerText": "AnyDesk et Citrix Workspace sont désormais prêts à l'emploi sur votre Mac. Si vous rencontrez des problèmes, contactez le service informatique."
+    },
+    "windows11Upgrade": {
+      "title": "Guide de mise à niveau vers Windows 11",
+      "subtitle": "Mise à niveau étape par étape de Windows 10 vers Windows 11 à l'aide de l'Assistant d'installation de Microsoft",
+      "backToHome": "Retour à l'accueil",
+      "alertTitle": "Important : mise à niveau uniquement sur les PC compatibles",
+      "alertText": "Ce guide est destiné aux PC x64 qui répondent aux exigences de Windows 11. L'Assistant d'installation ne fonctionne pas sur les appareils ARM. Sauvegardez les fichiers importants avant la mise à niveau.",
+      "prereqTitle": "À vérifier avant de commencer",
+      "prereq": {
+        "cpu": "Processeur : 1 GHz ou plus rapide, avec 2 cœurs ou plus, sur un processeur 64 bits (x64) compatible.",
+        "ram": "Mémoire (RAM) : 4 Go ou plus.",
+        "storage": "Stockage : disque de 64 Go ou plus ; plus au moins 9 Go libres pour l'Assistant d'installation.",
+        "tpm": "Sécurité : le module TPM 2.0 (Trusted Platform Module) doit être activé.",
+        "secureBoot": "Micrologiciel : UEFI avec prise en charge du démarrage sécurisé (Secure Boot) requis.",
+        "graphics": "Graphiques : carte graphique compatible DirectX 12 avec pilote WDDM 2.0.",
+        "display": "Affichage : écran de 9 pouces ou plus, résolution 720p (HD).",
+        "version": "Système actuel : Windows 10 version 2004 ou ultérieure (x64, pas ARM)."
+      },
+      "prereqNote": "Tous les appareils Windows 10 ne sont pas éligibles à Windows 11. Vérifiez la compatibilité matérielle sur la page des spécifications de Microsoft.",
+      "checkRequirements": "Vérifier la configuration système requise",
+      "openDownloadPage": "Ouvrir la page de téléchargement de Microsoft",
+      "tipLabel": "Conseil",
+      "footerTitle": "Mise à niveau terminée",
+      "footerText": "Après l'installation, vérifiez votre version dans Paramètres > Système > À propos. Contactez l'assistance informatique via Rocket.Chat en cas de problème.",
+      "step1": {
+        "title": "Télécharger l'Assistant d'installation depuis Microsoft",
+        "desc": "Sur la page de téléchargement officielle de Windows 11 de Microsoft, cliquez sur le bouton bleu « Télécharger maintenant » sous « Assistant d'installation de Windows 11 ».",
+        "tip": "Bonne page : microsoft.com/software-download/windows11 — utilisez « Assistant d'installation », pas « Créer un support d'installation »."
+      },
+      "step2": {
+        "title": "Exécuter le fichier téléchargé en tant qu'administrateur",
+        "desc": "Double-cliquez sur Windows11InstallationAssistant.exe ou cliquez avec le bouton droit et choisissez Exécuter en tant qu'administrateur. Cliquez sur Oui dans l'invite du Contrôle de compte d'utilisateur (UAC).",
+        "tip": "Le fichier se trouve généralement dans les Téléchargements. Si l'UAC n'apparaît pas, utilisez clic droit → Exécuter en tant qu'administrateur."
+      },
+      "step3": {
+        "title": "Accepter les conditions de licence",
+        "desc": "Une fois la compatibilité matérielle confirmée, acceptez les conditions de licence et cliquez sur « Accepter et installer ».",
+        "tip": "Si le matériel est incompatible, la mise à niveau ne démarrera pas."
+      },
+      "step4": {
+        "title": "Attendre le téléchargement et la préparation",
+        "desc": "L'assistant télécharge les fichiers de Windows 11 et prépare l'installation. Attendez la fin de la progression.",
+        "tip": "Utilisez une connexion Internet stable — une connexion Ethernet filaire est préférable."
+      },
+      "step5": {
+        "title": "Cliquer sur « Redémarrer maintenant » pour commencer l'installation",
+        "desc": "Lorsque l'assistant est prêt, cliquez sur « Redémarrer maintenant ». Votre PC redémarrera pour lancer la configuration de Windows 11.",
+        "tip": "Enregistrez les fichiers ouverts et fermez les programmes avant de redémarrer."
+      },
+      "step6": {
+        "title": "Attendre la fin de l'installation",
+        "desc": "L'installation de Windows 11 peut prendre un certain temps ; votre PC redémarrera plusieurs fois. N'éteignez pas et ne débranchez pas l'ordinateur.",
+        "tip": "Un écran bleu de configuration de Windows avec une progression est normal — veuillez patienter."
+      },
+      "step7": {
+        "title": "Vérifier l'installation de Windows 11",
+        "desc": "Après la configuration, connectez-vous et allez dans Démarrer > Paramètres > Système > À propos pour confirmer Windows 11 ; le bureau et le menu Démarrer devraient afficher la présentation de Windows 11.",
+        "tip": "Contactez l'assistance informatique si Citrix, le VPN ou les pilotes d'imprimante posent problème après la mise à niveau."
+      }
+    },
+    "footer": {
+      "rights": "© 2025 DCS Communication Center. Tous droits réservés.",
+      "support": "Assistance informatique",
+      "contact": "Contact"
+    },
+    "splash": {
+      "title": "Bienvenue sur le portail d'assistance informatique DCS",
+      "description": "Ce site fournit des guides étape par étape pour les problèmes courants. Vous pouvez y effectuer la confirmation du matériel et suivre les expéditions.",
+      "team": "Équipe informatique DCS Turquie",
+      "creator": "Créé par Bayram Can Aslan",
+      "loading": "Chargement…",
+      "skip": "Continuer"
+    },
+    "assetConfirmation": {
+      "title": "Confirmation du matériel",
+      "subtitle": "Confirmez votre matériel avec votre nom complet et votre numéro de personnel.",
+      "personnelNo": "Numéro de personnel",
+      "step1Description": "Saisissez d'abord votre nom complet",
+      "step2Description": "Saisissez votre numéro de personnel à 6 chiffres pour vérifier votre identité",
+      "namePlaceholder": "Nom complet",
+      "enterFullName": "Veuillez saisir votre nom complet",
+      "enterPersonnelNo": "Saisissez votre numéro de personnel à 6 chiffres",
+      "personnelCodePlaceholder": "Votre numéro de personnel",
+      "continue": "Continuer",
+      "changeName": "Modifier",
+      "checkAssets": "Afficher mes articles",
+      "nameNotFound": "Aucun enregistrement trouvé pour ce nom.",
+      "verifyFailed": "Le nom et le numéro de personnel ne correspondent pas.",
+      "error": "Une erreur s'est produite. Veuillez réessayer.",
+      "confirmError": "Impossible d'envoyer la confirmation.",
+      "itemsTitle": "Articles qui vous sont attribués",
+      "itemName": "Nom de l'article",
+      "serialNo": "Numéro de série",
+      "confirmCheckbox": "J'ai lu et j'accepte le formulaire d'engagement de matériel.",
+      "openFormButton": "Lire et signer le formulaire d'engagement de matériel",
+      "openFormHint": "Cliquez d'abord sur le bouton ci-dessus, lisez le formulaire et acceptez pour continuer.",
+      "reviewForm": "Lire à nouveau",
+      "confirmButton": "Envoyer la confirmation numérique",
+      "formTitle": "Formulaire d'engagement et de confirmation de matériel",
+      "formIntro": "Veuillez lire l'engagement de matériel ci-dessous et fournir votre confirmation numérique.",
+      "formAssetsList": "Matériel attribué",
+      "formTermsTitle": "Engagements et responsabilités",
+      "formTermsCheckbox": "J'ai lu, compris et j'accepte toutes les conditions ci-dessus.",
+      "formCancel": "Annuler",
+      "formAccept": "J'accepte",
+      "formSigned": "Le formulaire d'engagement de matériel a été accepté.",
+      "formClauses": [
+        "Je déclare avoir reçu tous les biens et équipements attribués en parfait état de fonctionnement.",
+        "Je m'engage à utiliser le matériel attribué uniquement à des fins professionnelles, et non à des fins personnelles, commerciales ou non autorisées.",
+        "Je suis responsable de l'entretien, de la protection et de la sécurité du matériel et je ne le céderai pas à des tiers.",
+        "En cas de perte, de vol, de dommage, de dysfonctionnement ou d'utilisation non autorisée, j'informerai immédiatement mon responsable et le service informatique ; j'accepte la responsabilité des dommages causés par ma faute ou ma négligence.",
+        "J'accepte que les coûts de réparation, de remplacement ou de pièces de rechange résultant d'un dommage puissent être à ma charge conformément à la politique de l'entreprise.",
+        "En cas de démission, de changement de poste ou de réattribution du matériel, je restituerai tout le matériel complet, non endommagé et en état de fonctionnement.",
+        "Je respecterai les politiques de sécurité de l'information, de confidentialité et d'utilisation de l'entreprise ; j'accepte la responsabilité des violations de ces politiques.",
+        "Je reconnais que cette confirmation constitue une déclaration numérique de matériel valide et qu'elle sera enregistrée."
+      ],
+      "success": "Votre confirmation de matériel a été envoyée avec succès.",
+      "noAssets": "Aucun enregistrement de matériel trouvé pour ce numéro de personnel.",
+      "alreadyConfirmed": "Ce matériel a déjà été confirmé. Contactez l'informatique pour de nouvelles attributions.",
+      "personnelName": "Nom complet"
+    },
+    "cargoTracking": {
+      "nav": "Suivi de colis",
+      "title": "Recherche de statut de colis",
+      "subtitle": "Consultez le statut de votre expédition avec votre nom complet et votre numéro de personnel.",
+      "lookupTitle": "Statut du colis",
+      "step1Description": "Saisissez d'abord votre nom complet",
+      "step2Description": "Saisissez votre numéro de personnel à 6 chiffres pour vérifier votre identité",
+      "namePlaceholder": "Nom complet",
+      "enterFullName": "Veuillez saisir votre nom complet",
+      "enterPersonnelNo": "Saisissez votre numéro de personnel à 6 chiffres",
+      "personnelCodePlaceholder": "Votre numéro de personnel",
+      "continue": "Continuer",
+      "changeName": "Modifier",
+      "checkStatus": "Vérifier le statut",
+      "hint": "Pour la confirmation du matériel, rendez-vous sur",
+      "nameNotFound": "Aucun enregistrement trouvé pour ce nom. Veuillez vérifier l'orthographe.",
+      "verifyFailed": "Le nom et le numéro de personnel ne correspondent pas. Veuillez vérifier vos informations.",
+      "notFound": "Aucun enregistrement trouvé pour ce numéro de personnel.",
+      "noShipments": "Aucune expédition trouvée pour cette personne.",
+      "error": "Impossible de charger les informations de colis. Veuillez réessayer.",
+      "shipDate": "Date d'expédition",
+      "deliveryDate": "Date de livraison",
+      "recipient": "Destinataire",
+      "trackingNo": "Numéro de suivi du colis",
+      "shipmentCode": "Code d'expédition",
+      "trackOnYurtici": "Rechercher sur Yurtiçi Kargo",
+      "viewOnYurtici": "Voir sur Yurtiçi Kargo",
+      "movementHistory": "Historique des mouvements",
+      "cargoStatus": "Statut de l'expédition",
+      "liveTracking": "Suivi en direct",
+      "shipmentCodePending": "Le code d'expédition n'a pas encore pu être récupéré auprès de Yurtiçi Kargo. Veuillez contacter l'informatique.",
+      "status": {
+        "in_transit": "En transit",
+        "delivered": "Livré",
+        "returned": "Retour reçu"
+      }
+    },
+    "admin": {
+      "title": "Panneau d'administration",
+      "addAsset": "Ajouter un nouveau matériel",
+      "confirmations": "Confirmations entrantes",
+      "personnelId": "ID de personnel (6 chiffres)",
+      "personnelName": "Nom complet",
+      "itemName": "Nom de l'article",
+      "serialNo": "Numéro de série",
+      "submit": "Attribuer",
+      "printForm": "Imprimer",
+      "printFormMissingName": "Saisissez le nom complet avant d'imprimer.",
+      "printFormMissingItems": "Ajoutez au moins un article avant d'imprimer.",
+      "printFormPopupBlocked": "La fenêtre d'impression a été bloquée. Autorisez les fenêtres contextuelles dans votre navigateur.",
+      "printFormTemplateMissing": "Modèle de formulaire de matériel introuvable.",
+      "printFormError": "Échec de l'impression du formulaire.",
+      "tablePerson": "Personnel",
+      "tableDate": "Date",
+      "tableStatus": "Statut",
+      "loginTitle": "Connexion administrateur",
+      "username": "Nom d'utilisateur",
+      "password": "Mot de passe",
+      "loginButton": "Se connecter",
+      "dashboard": "Tableau de bord",
+      "adminManagement": "Gestion des administrateurs",
+      "userMgmt": {
+        "tab": "Gestion des utilisateurs",
+        "title": "Gestion des utilisateurs",
+        "subtitle": "Modifiez les utilisateurs et choisissez les sections qu'ils peuvent voir et les actions qu'ils peuvent effectuer.",
+        "module": "Module",
+        "canView": "Peut voir",
+        "canWrite": "Peut modifier",
+        "modules": {
+          "dashboard": "Tableau de bord",
+          "assets": "Ajouter un matériel",
+          "inventory": "Tout le matériel",
+          "outgoing_cargo": "Colis sortants",
+          "incoming_cargo": "Colis entrants",
+          "confirmations": "Confirmations",
+          "announcement": "Annonce",
+          "video_tutorials": "Vidéos",
+          "carousel": "Carrousel",
+          "tools": "Fichiers d'outils"
+        },
+        "edit": "Modifier",
+        "save": "Enregistrer",
+        "created": "Utilisateur créé.",
+        "updated": "Utilisateur mis à jour.",
+        "error": "L'opération a échoué.",
+        "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cet utilisateur ?",
+        "editTitle": "Modifier l'utilisateur",
+        "editHint": "Mettez à jour le rôle, le mot de passe et les autorisations de module.",
+        "newPasswordOptional": "Nouveau mot de passe (facultatif)",
+        "passwordKeepBlank": "Laissez vide pour conserver le mot de passe actuel",
+        "systemAdminNote": "Les administrateurs système ont un accès complet à tous les modules.",
+        "fullAccess": "Accès complet",
+        "views": "vue",
+        "writes": "actions",
+        "accessSummary": "Accès",
+        "you": "Vous",
+        "passwordHint": "Doit comporter au moins 10 caractères.",
+        "passwordTooShort": "Le mot de passe doit comporter au moins 10 caractères.",
+        "usernameRequired": "Le nom d'utilisateur est requis."
+      },
+      "stats": {
+        "totalPersonnel": "Personnel avec matériel",
+        "totalItems": "Attributions actives",
+        "returnedItems": "Retournés",
+        "pending": "Confirmations en attente"
+      },
+      "inventory": "Tout le matériel",
+      "searchByName": "Rechercher par nom...",
+      "noSearchResults": "Aucun enregistrement ne correspond à votre recherche.",
+      "returnButton": "Traiter le retour",
+      "returnNote": "Note de retour (facultatif)",
+      "status": "Statut",
+      "role": "Rôle",
+      "actions": "Actions",
+      "roles": {
+        "admin": "Administrateur",
+        "system_admin": "Administrateur système",
+        "viewer": "Utilisateur standard (lecture seule)"
+      },
+      "logout": "Se déconnecter",
+      "passwordTab": "Mot de passe",
+      "inventoryDesc": "Liste de tous les articles attribués et retournés",
+      "inventoryDescGrouped": "Résumé de l'inventaire par personnel — cliquez sur un nom pour les détails",
+      "inventoryFilter": {
+        "all": "Tous",
+        "assigned": "Attributions actives",
+        "returned": "Retournés"
+      },
+      "activeItems": "Attributions actives",
+      "returnedItemsCount": "Retournés",
+      "viewDetail": "Détails",
+      "personnelDetailError": "Impossible de charger les détails du personnel",
+      "personnelSaveError": "Impossible d'enregistrer les modifications",
+      "digitalConfirmed": "Confirmé numériquement",
+      "confirmationPending": "Confirmation en attente",
+      "outgoingCargo": "Colis sortants",
+      "incomingCargo": "Colis entrants",
+      "pendingConfirmations": "En attente d'approbation",
+      "pendingConfirmationsDesc": "Personnel avec des attributions actives n'ayant pas soumis de confirmation numérique",
+      "pendingConfirmationsCount": "personnel",
+      "pendingEmpty": "Aucune approbation en attente. Tout le personnel attribué a confirmé.",
+      "toolFiles": {
+        "tab": "Fichiers d'outils",
+        "title": "Fichiers d'outils téléchargeables",
+        "description": "Mettez à jour ici les programmes d'aide téléchargés depuis le site. Après avoir téléversé un nouveau fichier, les utilisateurs obtiennent la nouvelle version lorsqu'ils cliquent.",
+        "currentFile": "Fichier actuel",
+        "defaultFile": "Par défaut",
+        "custom": "Téléversement personnalisé",
+        "size": "Taille",
+        "updatedAt": "Mis à jour",
+        "updatedBy": "Par",
+        "chooseFile": "Choisir un fichier",
+        "upload": "Téléverser",
+        "uploading": "Téléversement...",
+        "revert": "Rétablir la valeur par défaut",
+        "download": "Télécharger / Tester",
+        "uploaded": "Fichier mis à jour.",
+        "reverted": "Rétabli à la valeur par défaut.",
+        "error": "L'opération a échoué.",
+        "tooLarge": "Fichier trop volumineux (max. 8 Mo).",
+        "confirmRevert": "Rétablir cet outil au fichier par défaut ?",
+        "hint": "Téléversez généralement un fichier .cmd. Max. 8 Mo.",
+        "headset": "Outil de réparation du casque",
+        "citrix": "Outil d'installation de Citrix"
+      },
+      "pendingSince": "Dernière attribution",
+      "confirmationStatus": "Statut de confirmation",
+      "pendingItemsLabel": "articles en attente de confirmation",
+      "assignedAt": "Attribué le",
+      "pendingHint": "Le personnel reste ici jusqu'à ce qu'il soumette sa confirmation numérique sur la page Confirmation du matériel.",
+      "exportPendingExcel": "Exporter vers Excel",
+      "pendingExportSummarySheet": "Résumé du personnel",
+      "pendingExportDetailSheet": "Détails des articles",
+      "pendingExportFilePrefix": "Confirmations_en_attente",
+      "pendingExportError": "Impossible de créer le fichier Excel",
+      "personnelAssets": "Articles attribués",
+      "condition": "État (dommage)",
+      "conditionOptions": {
+        "undamaged": "Non endommagé",
+        "damaged": "Endommagé"
+      },
+      "itNotes": "Notes informatiques",
+      "itNotesPlaceholder": "Note technique, pièces manquantes, description du dommage...",
+      "saveNotes": "Enregistrer",
+      "cargoStatusSection": "Statut d'expédition / Livraison",
+      "cargoDelivered": "Livré",
+      "cargoReturned": "Retourné",
+      "cargoInTransit": "En transit",
+      "deliveredAt": "Livré",
+      "incomingCargoSection": "Expéditions de retour entrantes",
+      "addNewAdmin": "Ajouter un utilisateur",
+      "adminsList": "Utilisateurs",
+      "addButton": "Ajouter",
+      "date": "Date",
+      "confirmed": "CONFIRMÉ",
+      "reset": "RÉINITIALISER",
+      "resetConfirm": "Réinitialiser la confirmation",
+      "assigned": "ATTRIBUÉ",
+      "returned": "RETOURNÉ",
+      "noRecords": "Aucun enregistrement trouvé",
+      "changePassword": "Changer le mot de passe",
+      "currentPassword": "Mot de passe actuel",
+      "newPassword": "Nouveau mot de passe",
+      "confirmNewPassword": "Nouveau mot de passe (à nouveau)",
+      "updatePassword": "Mettre à jour le mot de passe",
+      "productList": "Liste des produits",
+      "addRow": "Ajouter une ligne",
+      "clearSearch": "Effacer la recherche",
+      "importExcel": "Importer Excel",
+      "importPreview": "Aperçu Excel",
+      "importConfirm": "Importer",
+      "importCancel": "Annuler",
+      "importSuccess": "enregistrements importés avec succès",
+      "importSkipped": "enregistrements ignorés (doublon ou incomplet)",
+      "importNoRows": "Aucun enregistrement correspondant trouvé dans le fichier Excel",
+      "importError": "Impossible de lire le fichier Excel",
+      "importFormatCargo": "Format de rapport d'expédition détecté",
+      "importFormatDirect": "Format de liste d'inventaire détecté",
+      "importRowsFound": "enregistrements trouvés",
+      "outgoingCargoDesc": "Colis expédiés. Les articles correspondants dans les colis entrants sont marqués comme retournés.",
+      "incomingCargoDesc": "Retours et colis reçus.",
+      "cargoShipped": "Expédié",
+      "cargoReceived": "Reçu",
+      "cargoInspect": "Inspecter",
+      "cargoDetails": "Détails du colis",
+      "cargoOutgoingRecord": "Enregistrement sortant",
+      "cargoIncomingRecord": "Enregistrement entrant",
+      "cargoReturnMatched": "Cette expédition a été trouvée dans les colis entrants — le retour semble complet.",
+      "cargoNoMatch": "Aucun enregistrement correspondant trouvé pour l'instant.",
+      "cargoNoOutgoing": "Aucun enregistrement sortant correspondant",
+      "cargoNoIncoming": "Aucun enregistrement entrant correspondant",
+      "cargoAddress": "Adresse",
+      "cargoPhone": "Téléphone",
+      "cargoDeliveryType": "Type de livraison",
+      "cargoRecipient": "Destinataire",
+      "cargoReturnFlag": "Retour",
+      "cargoReturnReason": "Motif du retour",
+      "cargoSyncFromInventory": "Synchroniser depuis l'inventaire",
+      "cargoSyncConfirm": "Copier ici les enregistrements de type colis depuis la liste d'inventaire ? (Les numéros de série déjà existants sont ignorés)",
+      "cargoSyncDone": "enregistrements de colis synchronisés",
+      "cargoSyncError": "Échec de la synchronisation",
+      "cargoImportSelectDirection": "Ce fichier est une liste de colis. Sortant ou entrant ?",
+      "cargoImportHint": "Vous pouvez également importer des fichiers Excel de colis depuis les onglets Colis sortants/entrants.",
+      "announcement": {
+        "tab": "Annonce",
+        "title": "Annonce du site",
+        "desc": "Les annonces publiées apparaissent sous forme de fenêtre contextuelle pour tous les visiteurs.",
+        "heading": "Titre de l'annonce",
+        "headingPlaceholder": "ex. Maintenance planifiée",
+        "priority": "Priorité",
+        "background": "Arrière-plan",
+        "message": "Texte de l'annonce",
+        "messagePlaceholder": "Saisissez votre annonce ici...",
+        "publish": "Publier",
+        "deactivate": "Fermer l'annonce",
+        "preview": "Aperçu",
+        "live": "En direct",
+        "noActive": "Aucune annonce active.",
+        "published": "Annonce publiée.",
+        "deactivated": "Annonce fermée.",
+        "deactivateConfirm": "Fermer l'annonce active ?",
+        "required": "Le titre et le message sont requis.",
+        "error": "Impossible d'enregistrer l'annonce.",
+        "bg": {
+          "red": "Rouge",
+          "blue": "Bleu",
+          "green": "Vert",
+          "orange": "Orange",
+          "violet": "Violet",
+          "slate": "Sombre"
+        }
+      },
+      "videoTutorials": {
+        "tab": "Vidéos",
+        "title": "Vidéos de dépannage",
+        "desc": "Ajoutez un titre pour chaque langue et un lien vidéo. Les URL YouTube, Vimeo ou les URL de vidéos directes sont prises en charge.",
+        "titleTr": "Titre (turc)",
+        "titleDe": "Titre (allemand)",
+        "titleEn": "Titre (anglais)",
+        "titleFr": "Titre (français)",
+        "titleKa": "Titre (géorgien)",
+        "heading": "Titre de la vidéo",
+        "headingPlaceholder": "ex. Problème de connexion Citrix",
+        "videoUrl": "Lien vidéo",
+        "videoUrlPlaceholder": "https://www.youtube.com/watch?v=...",
+        "add": "Ajouter une vidéo",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "added": "Vidéo ajoutée.",
+        "updated": "Vidéo mise à jour.",
+        "empty": "Aucune vidéo ajoutée pour l'instant.",
+        "deleteConfirm": "Supprimer cette vidéo ?",
+        "required": "Au moins un titre et un lien vidéo sont requis.",
+        "error": "Impossible d'enregistrer la vidéo."
+      },
+      "carousel": {
+        "tab": "Diapositives",
+        "title": "Diapositives du carrousel de la page d'accueil",
+        "desc": "Ajoutez des diapositives avec des modèles de couleurs et des icônes prêts à l'emploi. Saisissez le texte en TR, DE et EN. Les nouvelles diapositives sont ajoutées après les diapositives intégrées.",
+        "heading": "Titre",
+        "headingPlaceholder": "ex. Nouvelle annonce",
+        "message": "Message",
+        "messagePlaceholder": "Texte de description de la diapositive…",
+        "ctaLink": "Lien du bouton (facultatif)",
+        "ctaLinkHint": "ex. /pc-setup — laissez vide pour aucun bouton.",
+        "ctaLinkInvalid": "Le lien doit commencer par /.",
+        "ctaLabel": "Libellé du bouton",
+        "ctaLabelPlaceholder": "ex. Voir les détails",
+        "ctaLabelRequired": "Si vous ajoutez un lien, saisissez un libellé de bouton dans au moins une langue.",
+        "template": "Modèle de couleur",
+        "icon": "Icône",
+        "preview": "Aperçu",
+        "previewTitle": "Titre de la diapositive",
+        "previewMessage": "Le message de la diapositive apparaît ici.",
+        "add": "Ajouter une diapositive",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "added": "Diapositive ajoutée.",
+        "updated": "Diapositive mise à jour.",
+        "empty": "Aucune diapositive personnalisée ajoutée pour l'instant.",
+        "deleteConfirm": "Supprimer cette diapositive ?",
+        "required": "Au moins un titre et un message sont requis.",
+        "error": "Impossible d'enregistrer la diapositive.",
+        "inactive": "Inactive",
+        "orderTitle": "Ordre des diapositives",
+        "orderDesc": "Utilisez les flèches pour modifier l'ordre de toutes les diapositives (intégrées et personnalisées). Les modifications sont enregistrées immédiatement.",
+        "builtIn": "Diapositive intégrée",
+        "custom": "Diapositive personnalisée",
+        "moveUp": "Déplacer vers le haut",
+        "moveDown": "Déplacer vers le bas",
+        "reorderError": "Impossible d'enregistrer l'ordre des diapositives.",
+        "defaultDuration": "Durée par défaut des diapositives",
+        "defaultDurationHint": "Les diapositives sans durée personnalisée restent visibles pendant ce nombre de secondes (3 à 60 s).",
+        "slideDuration": "Durée de la diapositive (secondes)",
+        "seconds": "secondes",
+        "secondsShort": "s",
+        "durationError": "Impossible d'enregistrer la durée de la diapositive."
+      }
+    },
+    "videoTutorials": {
+      "title": "Dépannage vidéo",
+      "subtitle": "Guides vidéo étape par étape pour les problèmes courants.",
+      "empty": "Aucune vidéo publiée pour l'instant."
+    },
+    "announcement": {
+      "priority": {
+        "high": "Priorité élevée",
+        "medium": "Priorité moyenne",
+        "low": "Priorité faible"
+      },
+      "understood": "Compris",
+      "close": "Fermer"
     }
   },
   "ka": {
@@ -3577,6 +4494,7 @@ export const translations = {
         "titleTr": "სათაური (თურქული)",
         "titleDe": "სათაური (გერმანული)",
         "titleEn": "სათაური (ინგლისური)",
+        "titleFr": "სათაური (ფრანგული)",
         "heading": "ვიდეოს სათაური",
         "headingPlaceholder": "მაგ. Citrix კავშირის პრობლემა",
         "videoUrl": "ვიდეო ლინკი",
