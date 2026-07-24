@@ -1,30 +1,52 @@
-import api from './api';
 import { SYSTEM_MIN } from './systemCheck';
 
 const DOWNLOAD_PATH = `${process.env.PUBLIC_URL || ''}/speed-test.bin`;
-const UPLOAD_BYTES = 1.5 * 1024 * 1024; // 1.5 MB
+const UPLOAD_BYTES = 512 * 1024; // 512 KB — enough to estimate Mbps
 
 function mbpsFrom(bytes, elapsedMs) {
   if (!elapsedMs || elapsedMs <= 0) return 0;
   return (bytes * 8) / (elapsedMs / 1000) / 1_000_000;
 }
 
+/** Fill buffer without crypto.getRandomValues size limit (max 65536). */
+function fillRandomBytes(size) {
+  const out = new Uint8Array(size);
+  const chunk = 65536;
+  for (let offset = 0; offset < size; offset += chunk) {
+    const end = Math.min(offset + chunk, size);
+    const slice = out.subarray(offset, end);
+    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+      crypto.getRandomValues(slice);
+    } else {
+      for (let i = 0; i < slice.length; i += 1) slice[i] = (Math.random() * 256) | 0;
+    }
+  }
+  return out;
+}
+
 /**
- * Download speed test against a static public file (cache-busted).
- * @param {(p: { phase: string, progress: number, mbps: number|null }) => void} onProgress
+ * Always same-origin — ignore REACT_APP_API_URL (avoids broken upload hosts).
  */
+function speedEchoUrl() {
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    return `${window.location.origin}/api/speed-echo`;
+  }
+  return '/api/speed-echo';
+}
+
 export async function runDownloadSpeedTest(onProgress) {
   const url = `${DOWNLOAD_PATH}?t=${Date.now()}`;
   const t0 = performance.now();
   onProgress?.({ phase: 'download', progress: 0, mbps: null });
 
-  const res = await fetch(url, { cache: 'no-store' });
+  const res = await fetch(url, { cache: 'no-store', credentials: 'same-origin' });
   if (!res.ok) throw new Error(`download_http_${res.status}`);
 
   const total = Number(res.headers.get('content-length')) || 0;
-  const reader = res.body?.getReader();
+  const reader = res.body?.getReader?.();
   if (!reader) {
     const buf = await res.arrayBuffer();
+    if (buf.byteLength < 100_000) throw new Error('download_too_small');
     const elapsed = performance.now() - t0;
     const mbps = mbpsFrom(buf.byteLength, elapsed);
     onProgress?.({ phase: 'download', progress: 1, mbps });
@@ -46,28 +68,26 @@ export async function runDownloadSpeedTest(onProgress) {
     });
   }
 
+  if (received < 100_000) throw new Error('download_too_small');
+
   const elapsed = performance.now() - t0;
   const mbps = mbpsFrom(received, elapsed);
   onProgress?.({ phase: 'download', progress: 1, mbps });
   return { bytes: received, mbps, elapsedMs: elapsed };
 }
 
-/**
- * Upload speed test via POST /api/speed-echo (body discarded server-side).
- */
 export async function runUploadSpeedTest(onProgress) {
-  const payload = new Uint8Array(UPLOAD_BYTES);
-  crypto.getRandomValues(payload);
+  const payload = fillRandomBytes(UPLOAD_BYTES);
+  const blob = new Blob([payload], { type: 'application/octet-stream' });
 
   onProgress?.({ phase: 'upload', progress: 0, mbps: null });
   const t0 = performance.now();
-
-  const base = api.defaults.baseURL || '';
-  const url = `${base}/api/speed-echo`;
+  const url = speedEchoUrl();
 
   await new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', url, true);
+    xhr.timeout = 60_000;
     xhr.setRequestHeader('Content-Type', 'application/octet-stream');
     xhr.upload.onprogress = (e) => {
       if (!e.lengthComputable) return;
@@ -83,7 +103,8 @@ export async function runUploadSpeedTest(onProgress) {
       else reject(new Error(`upload_http_${xhr.status}`));
     };
     xhr.onerror = () => reject(new Error('upload_network'));
-    xhr.send(payload);
+    xhr.ontimeout = () => reject(new Error('upload_timeout'));
+    xhr.send(blob);
   });
 
   const elapsed = performance.now() - t0;
@@ -93,8 +114,24 @@ export async function runUploadSpeedTest(onProgress) {
 }
 
 export async function runSpeedTests(onProgress) {
-  const download = await runDownloadSpeedTest(onProgress);
-  const upload = await runUploadSpeedTest(onProgress);
+  let download;
+  try {
+    download = await runDownloadSpeedTest(onProgress);
+  } catch (err) {
+    const e = new Error(`download:${err?.message || err}`);
+    e.phase = 'download';
+    throw e;
+  }
+
+  let upload;
+  try {
+    upload = await runUploadSpeedTest(onProgress);
+  } catch (err) {
+    const e = new Error(`upload:${err?.message || err}`);
+    e.phase = 'upload';
+    throw e;
+  }
+
   return {
     downloadMbps: Math.round(download.mbps * 10) / 10,
     uploadMbps: Math.round(upload.mbps * 10) / 10,

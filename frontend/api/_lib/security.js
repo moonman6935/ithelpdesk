@@ -62,7 +62,17 @@ function requireRateLimit(req, res, action, options) {
 }
 
 function sendRateLimitError(res) {
-    res.status(429).json({ detail: 'Çok fazla istek. Lütfen bir süre sonra tekrar deneyin.' });
+    try {
+        if (typeof res.status === 'function' && typeof res.json === 'function') {
+            res.status(429).json({ detail: 'Çok fazla istek. Lütfen bir süre sonra tekrar deneyin.' });
+            return;
+        }
+    } catch {
+        /* fall through */
+    }
+    res.statusCode = 429;
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.end(JSON.stringify({ detail: 'Çok fazla istek. Lütfen bir süre sonra tekrar deneyin.' }));
 }
 
 function coerceString(value, maxLen = 200) {

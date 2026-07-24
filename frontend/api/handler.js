@@ -771,6 +771,10 @@ const TOOL_FILES = {
             ka: 'DCS-Agent-Ilk-Kurulum-ka.cmd',
         },
     },
+    syshw: {
+        default_filename: 'DCS-Sistem-Donanim.cmd',
+        static_path: '/tools/DCS-Sistem-Donanim.cmd',
+    },
 };
 
 const MAX_TOOL_BYTES = 8 * 1024 * 1024; // 8 MB

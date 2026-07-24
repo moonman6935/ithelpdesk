@@ -70,6 +70,47 @@ export function detectGpuName() {
   }
 }
 
+/**
+ * Infer whether GPU likely has >= minVramGb from WebGL renderer string.
+ * @returns {boolean|null} null = unknown
+ */
+export function inferGpuVramOk(gpuName, minVramGb = SYSTEM_MIN.gpuVramGb) {
+  if (!gpuName) return null;
+  const s = String(gpuName);
+
+  const gbMatch = s.match(/(\d+(?:\.\d+)?)\s*GB/i);
+  if (gbMatch) {
+    return parseFloat(gbMatch[1]) >= minVramGb;
+  }
+  const mbMatch = s.match(/(\d+)\s*MB/i);
+  if (mbMatch) {
+    return parseFloat(mbMatch[1]) / 1024 >= minVramGb;
+  }
+
+  // Integrated / weak
+  if (/UHD|HD Graphics|Iris Xe|Intel\(R\) HD|SwiftShader|Microsoft Basic/i.test(s)) {
+    return minVramGb <= 0.5 ? true : false;
+  }
+
+  // Discrete NVIDIA / AMD commonly >= 2 GB for GTX/RX class and above
+  if (/RTX\s*[2-9]|GTX\s*(1[0-9]{2,}|[2-9]\d{2,})|Quadro|Tesla/i.test(s)) return true;
+  if (/Radeon\s*(RX|R[579]|Pro|Vega)/i.test(s)) return true;
+  if (/GeForce/i.test(s) && !/GT\s*\d{2,3}\b/i.test(s)) return true;
+
+  return null;
+}
+
+/**
+ * Weak CPU heuristic from core count only (not a substitute for real model).
+ * @returns {boolean|null}
+ */
+export function inferCpuLikelyOk(cpuCores) {
+  if (typeof cpuCores !== 'number' || cpuCores < 1) return null;
+  // i3-9xxx typically 4 threads; very low core counts unlikely to meet policy
+  if (cpuCores < 4) return false;
+  return null; // cannot confirm generation from cores alone
+}
+
 export async function detectStorageEstimateGb() {
   try {
     if (!navigator.storage?.estimate) return null;
@@ -81,14 +122,38 @@ export async function detectStorageEstimateGb() {
   return null;
 }
 
+/** Decode ?hw= base64 JSON produced by DCS-Sistem-Donanim.cmd */
+export function parseHwPayloadFromSearch(search = '') {
+  try {
+    const q = new URLSearchParams(String(search || '').replace(/^\?/, ''));
+    let hw = q.get('hw');
+    if (!hw) return null;
+    hw = hw.replace(/-/g, '+').replace(/_/g, '/');
+    while (hw.length % 4) hw += '=';
+    const binary = atob(hw);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+    const json = new TextDecoder().decode(bytes);
+    const data = JSON.parse(json);
+    if (!data || typeof data !== 'object') return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
 export async function collectAutoProbes() {
   const [os, storageEstimateGb] = await Promise.all([detectOs(), detectStorageEstimateGb()]);
+  const gpuName = detectGpuName();
+  const cpuCores = detectCpuCores();
   return {
     os,
     ramGb: detectRamGb(),
-    cpuCores: detectCpuCores(),
-    gpuName: detectGpuName(),
+    cpuCores,
+    gpuName,
     storageEstimateGb,
+    gpuVramOk: inferGpuVramOk(gpuName),
+    cpuLikelyOk: inferCpuLikelyOk(cpuCores),
   };
 }
 

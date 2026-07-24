@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import PageShell from '../components/PageShell';
 import { Button } from '../components/ui/button';
@@ -26,8 +26,10 @@ import {
   SYSTEM_MIN,
   collectAutoProbes,
   evaluateSystemCheck,
+  parseHwPayloadFromSearch,
 } from '../lib/systemCheck';
 import { runSpeedTests } from '../lib/systemCheckSpeed';
+import api from '../lib/api';
 
 const YES_NO = [
   { value: '', labelKey: 'systemCheck.selectPlaceholder' },
@@ -108,7 +110,9 @@ function formatCheckValue(id, value, t) {
 
 const SystemCheck = () => {
   const { t } = useLanguage();
+  const location = useLocation();
   const [probes, setProbes] = useState(null);
+  const [hwSource, setHwSource] = useState(null); // 'cmd' | 'browser' | null
   const [osSelect, setOsSelect] = useState('');
   const [cpuSelect, setCpuSelect] = useState('');
   const [ramSelect, setRamSelect] = useState('');
@@ -121,12 +125,40 @@ const SystemCheck = () => {
   const [error, setError] = useState('');
   const [report, setReport] = useState(null);
 
+  const hwToolUrl = `${api.defaults.baseURL || ''}/api/tools/syshw`;
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
+        const fromCmd = parseHwPayloadFromSearch(location.search);
         const auto = await collectAutoProbes();
         if (cancelled) return;
+
+        if (fromCmd) {
+          setHwSource('cmd');
+          setProbes({
+            ...auto,
+            os: fromCmd.os || auto.os,
+            ramGb: typeof fromCmd.ramGb === 'number' ? fromCmd.ramGb : auto.ramGb,
+            gpuName: fromCmd.gpuName || auto.gpuName,
+            cpuName: fromCmd.cpuName || null,
+            fromCmd: true,
+          });
+          if (fromCmd.os === 'windows11' || fromCmd.os === 'windows10' || fromCmd.os === 'other') {
+            setOsSelect(fromCmd.os);
+          }
+          setCpuSelect(fromCmd.cpuOk ? 'yes' : 'no');
+          setDiskSelect(fromCmd.diskOk ? 'yes' : 'no');
+          setGpuSelect(fromCmd.gpuOk ? 'yes' : 'no');
+          const ram = typeof fromCmd.ramGb === 'number' ? fromCmd.ramGb : auto.ramGb;
+          if (typeof ram === 'number') {
+            setRamSelect(ram >= SYSTEM_MIN.ramGb ? 'yes' : 'no');
+          }
+          return;
+        }
+
+        setHwSource('browser');
         setProbes(auto);
         if (auto.os === 'windows11' || auto.os === 'windows10' || auto.os === 'other') {
           setOsSelect(auto.os);
@@ -136,6 +168,9 @@ const SystemCheck = () => {
         } else if (typeof auto.ramGb === 'number' && auto.ramGb < SYSTEM_MIN.ramGb) {
           setRamSelect('no');
         }
+        if (auto.gpuVramOk === true) setGpuSelect('yes');
+        else if (auto.gpuVramOk === false) setGpuSelect('no');
+        if (auto.cpuLikelyOk === false) setCpuSelect('no');
       } catch {
         if (!cancelled) setProbes({});
       }
@@ -143,10 +178,15 @@ const SystemCheck = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [location.search]);
 
   const needsRamManual = !(typeof probes?.ramGb === 'number' && probes.ramGb > 0);
-  const needsOsManual = !osSelect || probes?.os === 'unknown';
+  const needsOsManual = !osSelect || (probes?.os === 'unknown' && hwSource !== 'cmd');
+  const cpuLocked = hwSource === 'cmd' && (cpuSelect === 'yes' || cpuSelect === 'no');
+  const diskLocked = hwSource === 'cmd' && (diskSelect === 'yes' || diskSelect === 'no');
+  const gpuLocked =
+    (hwSource === 'cmd' && (gpuSelect === 'yes' || gpuSelect === 'no')) ||
+    (hwSource === 'browser' && probes?.gpuVramOk != null && (gpuSelect === 'yes' || gpuSelect === 'no'));
 
   const canStart =
     osSelect &&
@@ -194,7 +234,10 @@ const SystemCheck = () => {
         gpuName: probes?.gpuName,
       });
     } catch (err) {
-      setError(t('systemCheck.speedError'));
+      const msg = String(err?.message || '');
+      if (msg.startsWith('download:')) setError(t('systemCheck.speedErrorDownload'));
+      else if (msg.startsWith('upload:')) setError(t('systemCheck.speedErrorUpload'));
+      else setError(t('systemCheck.speedError'));
     } finally {
       setRunning(false);
       setPhase('');
@@ -249,6 +292,28 @@ const SystemCheck = () => {
             <CardDescription>{t('systemCheck.formDesc')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <Alert className="border-teal-200 bg-teal-50">
+              <AlertDescription className="text-teal-900 text-sm space-y-2">
+                <p className="font-semibold">{t('systemCheck.hwToolTitle')}</p>
+                <p>{t('systemCheck.hwToolDesc')}</p>
+                <a href={hwToolUrl} download="DCS-Sistem-Donanim.cmd">
+                  <Button type="button" variant="outline" size="sm" className="mt-1 border-teal-600 text-teal-800">
+                    <Download className="w-4 h-4 mr-2" />
+                    {t('systemCheck.hwToolDownload')}
+                  </Button>
+                </a>
+              </AlertDescription>
+            </Alert>
+
+            {hwSource === 'cmd' && (
+              <Alert className="border-emerald-200 bg-emerald-50">
+                <AlertDescription className="text-emerald-900 text-sm">
+                  {t('systemCheck.hwToolApplied')}
+                  {probes?.cpuName ? ` — ${probes.cpuName}` : ''}
+                </AlertDescription>
+              </Alert>
+            )}
+
             {probes && (
               <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 text-sm text-gray-600 space-y-1">
                 <p className="font-medium text-gray-800">{t('systemCheck.autoTitle')}</p>
@@ -266,6 +331,11 @@ const SystemCheck = () => {
                   {t('systemCheck.autoRam')}:{' '}
                   {typeof probes.ramGb === 'number' ? `${probes.ramGb} GB` : t('systemCheck.unknown')}
                 </p>
+                {probes.cpuName && (
+                  <p className="break-all">
+                    {t('systemCheck.autoCpu')}: {probes.cpuName}
+                  </p>
+                )}
                 <p>
                   {t('systemCheck.autoCores')}:{' '}
                   {probes.cpuCores != null ? probes.cpuCores : t('systemCheck.unknown')}
@@ -273,9 +343,10 @@ const SystemCheck = () => {
                 <p className="break-all">
                   {t('systemCheck.autoGpu')}: {probes.gpuName || t('systemCheck.unknown')}
                 </p>
-                {probes.storageEstimateGb != null && (
+                {probes.storageEstimateGb != null && hwSource !== 'cmd' && (
                   <p>
                     {t('systemCheck.autoStorage')}: ~{probes.storageEstimateGb} GB
+                    <span className="text-amber-700"> ({t('systemCheck.autoStorageHint')})</span>
                   </p>
                 )}
               </div>
@@ -288,7 +359,7 @@ const SystemCheck = () => {
                   className="w-full h-10 rounded-md border border-input bg-white px-3 text-sm"
                   value={osSelect}
                   onChange={(e) => setOsSelect(e.target.value)}
-                  disabled={running}
+                  disabled={running || hwSource === 'cmd'}
                 >
                   {OS_OPTIONS.map((o) => (
                     <option key={o.value || 'empty'} value={o.value}>
@@ -307,7 +378,7 @@ const SystemCheck = () => {
                   className="w-full h-10 rounded-md border border-input bg-white px-3 text-sm"
                   value={cpuSelect}
                   onChange={(e) => setCpuSelect(e.target.value)}
-                  disabled={running}
+                  disabled={running || cpuLocked}
                 >
                   {YES_NO.map((o) => (
                     <option key={o.value || 'empty'} value={o.value}>
@@ -342,7 +413,7 @@ const SystemCheck = () => {
                   className="w-full h-10 rounded-md border border-input bg-white px-3 text-sm"
                   value={diskSelect}
                   onChange={(e) => setDiskSelect(e.target.value)}
-                  disabled={running}
+                  disabled={running || diskLocked}
                 >
                   {YES_NO.map((o) => (
                     <option key={o.value || 'empty'} value={o.value}>
@@ -359,7 +430,7 @@ const SystemCheck = () => {
                   className="w-full h-10 rounded-md border border-input bg-white px-3 text-sm"
                   value={gpuSelect}
                   onChange={(e) => setGpuSelect(e.target.value)}
-                  disabled={running}
+                  disabled={running || gpuLocked}
                 >
                   {YES_NO.map((o) => (
                     <option key={o.value || 'empty'} value={o.value}>
