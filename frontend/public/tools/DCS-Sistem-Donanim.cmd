@@ -1,60 +1,34 @@
 @echo off
 title DCS IT - Sistem Donanim Okuyucu
-:: DCS IT - Sistem Uygunluk: donanim bilgilerini okuyup tarayiciya aktarir
-:: Yazan: Bayram Can Aslan
-
+:: DCS IT - Donanim okuyucu (gomulu PowerShell)  ^|  Yazan: Bayram Can Aslan
 setlocal EnableExtensions
-set "SITE=https://ithelpdesk-dxv7.vercel.app/sistem-kontrol"
-
-net session >nul 2>&1
-rem Admin not required for WMI read
-
-powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-  "$ErrorActionPreference='Stop'; ^
-  function Test-CpuOk([string]$name) { ^
-    if ($name -match 'Intel.*Core.*i[3579][\s\-]?(\d{4,5})') { ^
-      $m=$Matches[1]; if ($m.Length -eq 4) { return ([int]$m[0].ToString() -ge 9) }; ^
-      if ($m.Length -ge 5) { return ([int]$m.Substring(0,2) -ge 9) } ^
-    }; ^
-    if ($name -match 'Ryzen\s+[3579]\s+(\d{4})') { return ([int]$Matches[1] -ge 3000) }; ^
-    if ($name -match 'Ryzen\s+[3579]\s+(\d)(\d{3})') { return ([int]($Matches[1]+'000') -ge 3000) }; ^
-    return $false ^
-  }; ^
-  $cpu=(Get-CimInstance Win32_Processor | Select-Object -First 1).Name; ^
-  $cpuOk=Test-CpuOk $cpu; ^
-  $ramGb=[math]::Round((Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory/1GB,0); ^
-  $ssdOk=$false; ^
-  try { ^
-    $disks=Get-PhysicalDisk -ErrorAction Stop; ^
-    foreach($d in $disks){ ^
-      $gb=[math]::Round($d.Size/1GB,0); ^
-      $media=[string]$d.MediaType; ^
-      if ($gb -ge 128 -and ($media -match 'SSD|4' -or $d.BusType -eq 'NVMe')) { $ssdOk=$true } ^
-    } ^
-  } catch { ^
-    $vols=Get-CimInstance Win32_LogicalDisk -Filter \"DriveType=3\"; ^
-    $total=($vols | Measure-Object Size -Sum).Sum; ^
-    if ($total -ge 128GB) { $ssdOk=$true } ^
-  }; ^
-  $gpuOk=$false; $gpuName=''; ^
-  $gpus=@(Get-CimInstance Win32_VideoController | Where-Object { $_.Name -and $_.Name -notmatch 'Basic|Remote|Microsoft' }); ^
-  foreach($g in $gpus){ ^
-    if (-not $gpuName) { $gpuName=[string]$g.Name }; ^
-    $vram=[double]($g.AdapterRAM); if ($vram -lt 0) { $vram = [uint32]$g.AdapterRAM }; ^
-    if (($vram/1GB) -ge 2) { $gpuOk=$true } ^
-  }; ^
-  if (-not $gpuOk -and $gpuName -match 'RX|RTX|GTX|Radeon|GeForce') { $gpuOk=$true }; ^
-  $caption=(Get-CimInstance Win32_OperatingSystem).Caption; ^
-  $os='other'; ^
-  if ($caption -match 'Windows 11') { $os='windows11' } elseif ($caption -match 'Windows 10') { $os='windows10' }; ^
-  $obj=[ordered]@{ v=1; source='cmd'; os=$os; cpuName=$cpu; cpuOk=$cpuOk; ramGb=$ramGb; diskOk=$ssdOk; gpuName=$gpuName; gpuOk=$gpuOk }; ^
-  $json=($obj | ConvertTo-Json -Compress); ^
-  $b64=[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($json)); ^
-  $url='%SITE%?hw=' + [uri]::EscapeDataString($b64); ^
-  Write-Host $json; ^
-  Start-Process $url"
+cd /d "%~dp0"
 
 echo.
-echo Tarayici acildi. Pencereyi kapatabilirsiniz.
-timeout /t 4 >nul
+echo   DCS IT - Donanim okuyucu
+echo   ----------------------------------------
+echo   Bilgiler okunuyor...
+echo.
+
+set "PS1=%TEMP%\DCS-Sistem-Donanim.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Set-Content -LiteralPath (Join-Path $env:TEMP 'DCS-Sistem-Donanim.ps1') -Value ([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('IyBEQ1MgSVQgLSBTaXN0ZW0gRG9uYW5pbSBPa3V5dWN1DQojIFlhemFuOiBCYXlyYW0gQ2FuIEFzbGFuDQojIE9rdW5hbiBiaWxnaWxlcmkgc2lzdGVtLWtvbnRyb2wgc2F5ZmFzaW5hID9odz0gaWxlIGFrdGFyaXIuDQoNCiRFcnJvckFjdGlvblByZWZlcmVuY2UgPSAnU3RvcCcNCiRTaXRlID0gaWYgKCRlbnY6RENTX1NJVEUpIHsgJGVudjpEQ1NfU0lURSB9IGVsc2UgeyAnaHR0cHM6Ly9pdGhlbHBkZXNrLWR4djcudmVyY2VsLmFwcC9zaXN0ZW0ta29udHJvbCcgfQ0KDQpmdW5jdGlvbiBUZXN0LUNwdU9rKFtzdHJpbmddJG5hbWUpIHsNCiAgICBpZiAoJG5hbWUgLW1hdGNoICdJbnRlbC4qP0NvcmUuKj9pWzM1NzldW1xzXC1dPyhcZHs0LDV9KScpIHsNCiAgICAgICAgJG0gPSAkTWF0Y2hlc1sxXQ0KICAgICAgICBpZiAoJG0uTGVuZ3RoIC1lcSA0KSB7IHJldHVybiAoW2ludF0kbS5TdWJzdHJpbmcoMCwgMSkgLWdlIDkpIH0NCiAgICAgICAgaWYgKCRtLkxlbmd0aCAtZ2UgNSkgeyByZXR1cm4gKFtpbnRdJG0uU3Vic3RyaW5nKDAsIDIpIC1nZSA5KSB9DQogICAgfQ0KICAgIGlmICgkbmFtZSAtbWF0Y2ggJ1J5emVuXHMrWzM1NzldXHMrKFxkezR9KScpIHsNCiAgICAgICAgcmV0dXJuIChbaW50XSRNYXRjaGVzWzFdIC1nZSAzMDAwKQ0KICAgIH0NCiAgICByZXR1cm4gJGZhbHNlDQp9DQoNCnRyeSB7DQogICAgV3JpdGUtSG9zdCAnJw0KICAgIFdyaXRlLUhvc3QgJyAgRENTIElUIC0gRG9uYW5pbSBva3V5dWN1Jw0KICAgIFdyaXRlLUhvc3QgJyAgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLScNCg0KICAgICRjcHUgPSAoR2V0LUNpbUluc3RhbmNlIFdpbjMyX1Byb2Nlc3NvciB8IFNlbGVjdC1PYmplY3QgLUZpcnN0IDEpLk5hbWUNCiAgICAkY3B1T2sgPSBUZXN0LUNwdU9rICRjcHUNCiAgICAkcmFtR2IgPSBbbWF0aF06OlJvdW5kKChHZXQtQ2ltSW5zdGFuY2UgV2luMzJfQ29tcHV0ZXJTeXN0ZW0pLlRvdGFsUGh5c2ljYWxNZW1vcnkgLyAxR0IsIDApDQoNCiAgICAkc3NkT2sgPSAkZmFsc2UNCiAgICB0cnkgew0KICAgICAgICBmb3JlYWNoICgkZCBpbiAoR2V0LVBoeXNpY2FsRGlzayAtRXJyb3JBY3Rpb24gU3RvcCkpIHsNCiAgICAgICAgICAgICRnYiA9IFttYXRoXTo6Um91bmQoJGQuU2l6ZSAvIDFHQiwgMCkNCiAgICAgICAgICAgICRtZWRpYSA9IFtzdHJpbmddJGQuTWVkaWFUeXBlDQogICAgICAgICAgICBpZiAoJGdiIC1nZSAxMjggLWFuZCAoJG1lZGlhIC1tYXRjaCAnU1NEJyAtb3IgJGQuQnVzVHlwZSAtZXEgJ05WTWUnKSkgew0KICAgICAgICAgICAgICAgICRzc2RPayA9ICR0cnVlDQogICAgICAgICAgICB9DQogICAgICAgIH0NCiAgICB9IGNhdGNoIHsNCiAgICAgICAgJHRvdGFsID0gKChHZXQtQ2ltSW5zdGFuY2UgV2luMzJfTG9naWNhbERpc2sgLUZpbHRlciAnRHJpdmVUeXBlPTMnKSB8IE1lYXN1cmUtT2JqZWN0IFNpemUgLVN1bSkuU3VtDQogICAgICAgIGlmICgkdG90YWwgLWdlIDEyOEdCKSB7ICRzc2RPayA9ICR0cnVlIH0NCiAgICB9DQoNCiAgICAkZ3B1T2sgPSAkZmFsc2UNCiAgICAkZ3B1TmFtZSA9ICcnDQogICAgZm9yZWFjaCAoJGcgaW4gQChHZXQtQ2ltSW5zdGFuY2UgV2luMzJfVmlkZW9Db250cm9sbGVyIHwgV2hlcmUtT2JqZWN0IHsNCiAgICAgICAgICAgICAgICAkXy5OYW1lIC1hbmQgJF8uTmFtZSAtbm90bWF0Y2ggJ0Jhc2ljfFJlbW90ZXxNaWNyb3NvZnQnDQogICAgICAgICAgICB9KSkgew0KICAgICAgICBpZiAoLW5vdCAkZ3B1TmFtZSkgeyAkZ3B1TmFtZSA9IFtzdHJpbmddJGcuTmFtZSB9DQogICAgICAgICR2cmFtID0gMC4wDQogICAgICAgIHRyeSB7DQogICAgICAgICAgICAkcmF3ID0gJGcuQWRhcHRlclJBTQ0KICAgICAgICAgICAgaWYgKCRudWxsIC1uZSAkcmF3KSB7DQogICAgICAgICAgICAgICAgaWYgKFtpbnQ2NF0kcmF3IC1sdCAwKSB7ICR2cmFtID0gW2RvdWJsZV0oW3VpbnQzMl0kcmF3KSB9DQogICAgICAgICAgICAgICAgZWxzZSB7ICR2cmFtID0gW2RvdWJsZV0kcmF3IH0NCiAgICAgICAgICAgIH0NCiAgICAgICAgfSBjYXRjaCB7ICR2cmFtID0gMCB9DQogICAgICAgIGlmICgoJHZyYW0gLyAxR0IpIC1nZSAyKSB7ICRncHVPayA9ICR0cnVlIH0NCiAgICB9DQogICAgaWYgKC1ub3QgJGdwdU9rIC1hbmQgJGdwdU5hbWUgLW1hdGNoICdSWHxSVFh8R1RYfFJhZGVvbnxHZUZvcmNlJykgeyAkZ3B1T2sgPSAkdHJ1ZSB9DQoNCiAgICAkY2FwdGlvbiA9IChHZXQtQ2ltSW5zdGFuY2UgV2luMzJfT3BlcmF0aW5nU3lzdGVtKS5DYXB0aW9uDQogICAgJG9zID0gJ290aGVyJw0KICAgIGlmICgkY2FwdGlvbiAtbWF0Y2ggJ1dpbmRvd3MgMTEnKSB7ICRvcyA9ICd3aW5kb3dzMTEnIH0NCiAgICBlbHNlaWYgKCRjYXB0aW9uIC1tYXRjaCAnV2luZG93cyAxMCcpIHsgJG9zID0gJ3dpbmRvd3MxMCcgfQ0KDQogICAgJG9iaiA9IFtvcmRlcmVkXUB7DQogICAgICAgIHYgICAgICAgPSAxDQogICAgICAgIHNvdXJjZSAgPSAnY21kJw0KICAgICAgICBvcyAgICAgID0gJG9zDQogICAgICAgIGNwdU5hbWUgPSAiJGNwdSINCiAgICAgICAgY3B1T2sgICA9IFtib29sXSRjcHVPaw0KICAgICAgICByYW1HYiAgID0gW2ludF0kcmFtR2INCiAgICAgICAgZGlza09rICA9IFtib29sXSRzc2RPaw0KICAgICAgICBncHVOYW1lID0gIiRncHVOYW1lIg0KICAgICAgICBncHVPayAgID0gW2Jvb2xdJGdwdU9rDQogICAgfQ0KDQogICAgJGpzb24gPSAoJG9iaiB8IENvbnZlcnRUby1Kc29uIC1Db21wcmVzcykNCiAgICAkYjY0ID0gW0NvbnZlcnRdOjpUb0Jhc2U2NFN0cmluZyhbVGV4dC5FbmNvZGluZ106OlVURjguR2V0Qnl0ZXMoJGpzb24pKQ0KICAgICR1cmwgPSAkU2l0ZS5UcmltRW5kKCcvJykgKyAnP2h3PScgKyBbdXJpXTo6RXNjYXBlRGF0YVN0cmluZygkYjY0KQ0KDQogICAgV3JpdGUtSG9zdCAoIiAgQ1BVIDogezB9IChvaz17MX0pIiAtZiAkY3B1LCAkY3B1T2spDQogICAgV3JpdGUtSG9zdCAoIiAgUkFNIDogezB9IEdCIiAtZiAkcmFtR2IpDQogICAgV3JpdGUtSG9zdCAoIiAgU1NEIDogb2s9ezB9IiAtZiAkc3NkT2spDQogICAgV3JpdGUtSG9zdCAoIiAgR1BVIDogezB9IChvaz17MX0pIiAtZiAkZ3B1TmFtZSwgJGdwdU9rKQ0KICAgIFdyaXRlLUhvc3QgKCIgIE9TICA6IHswfSIgLWYgJG9zKQ0KICAgIFdyaXRlLUhvc3QgJycNCiAgICBXcml0ZS1Ib3N0ICcgIFRhcmF5aWNpIGFjaWxpeW9yLi4uJw0KICAgIFN0YXJ0LVByb2Nlc3MgJHVybA0KICAgIFdyaXRlLUhvc3QgJyAgVGFtYW0uJw0KICAgIFdyaXRlLUhvc3QgJycNCiAgICBleGl0IDANCn0gY2F0Y2ggew0KICAgIFdyaXRlLUhvc3QgJycNCiAgICBXcml0ZS1Ib3N0ICgnICBbSEFUQV0gJyArICRfLkV4Y2VwdGlvbi5NZXNzYWdlKSAtRm9yZWdyb3VuZENvbG9yIFJlZA0KICAgIFdyaXRlLUhvc3QgJycNCiAgICBleGl0IDENCn0NCg=='))) -Encoding UTF8"
+if not exist "%PS1%" (
+  echo   [HATA] Script yazilamadi.
+  pause
+  exit /b 1
+)
+
+powershell -NoProfile -ExecutionPolicy Bypass -File "%PS1%"
+set "ERR=%ERRORLEVEL%"
+del "%PS1%" >nul 2>&1
+
+echo.
+if not "%ERR%"=="0" (
+  echo   Donanim okunamadi.
+  pause
+  exit /b 1
+)
+
+echo   Islem bitti. Bu pencereyi kapatabilirsiniz.
+pause
 exit /b 0
