@@ -31,7 +31,9 @@
 param(
     [switch]$Force,
     [switch]$SkipAudio,
-    [switch]$SkipOpen
+    [switch]$SkipOpen,
+    [ValidateSet('tr','de','en','fr','ka','')]
+    [string]$Lang = ''
 )
 
 $ErrorActionPreference = 'Continue'
@@ -43,8 +45,45 @@ try {
         [Net.SecurityProtocolType]::Tls
 } catch {}
 
-$script:AppName     = 'DCS IT - Agent Ilk Kurulum'
-$script:Version     = '1.0.0'
+# Build-time default language (overridden by -Lang). Marker replaced by build-bat.ps1
+$script:BundledLang = '###BUNDLED_LANG###'
+if (-not $Lang) {
+    if ($script:BundledLang -and $script:BundledLang -notmatch 'BUNDLED_LANG') { $Lang = $script:BundledLang }
+    else { $Lang = 'de' }
+}
+$Lang = $Lang.ToLowerInvariant()
+if (@('tr','de','en','fr','ka') -notcontains $Lang) { $Lang = 'de' }
+$script:Lang = $Lang
+
+# Load UI strings (same folder when running as .ps1; inlined by build-bat.ps1 for .cmd)
+###EMBED_UI_STRINGS###
+if (-not $script:UiCatalog) {
+    $uiPath = Join-Path (Split-Path -Parent $PSCommandPath) 'UiStrings.ps1'
+    if (Test-Path -LiteralPath $uiPath) { . $uiPath }
+}
+if (-not $script:UiCatalog) {
+    Write-Host 'UI strings missing.' -ForegroundColor Red
+}
+
+function T {
+    param([Parameter(Mandatory)][string]$Key, [object[]]$FormatArgs)
+    $map = $null
+    if ($script:UiCatalog -and $script:UiCatalog.ContainsKey($script:Lang)) {
+        $map = $script:UiCatalog[$script:Lang]
+    }
+    if (-not $map) { $map = $script:UiCatalog['en'] }
+    $s = $null
+    if ($map -and $map.ContainsKey($Key)) { $s = [string]$map[$Key] }
+    if (-not $s -and $script:UiCatalog['en'].ContainsKey($Key)) { $s = [string]$script:UiCatalog['en'][$Key] }
+    if (-not $s) { $s = $Key }
+    if ($FormatArgs -and $FormatArgs.Count -gt 0) {
+        try { return ($s -f $FormatArgs) } catch { return $s }
+    }
+    return $s
+}
+
+$script:AppName     = (T 'AppTitle')
+$script:Version     = '1.1.0'
 $script:Author      = 'Bayram Can Aslan'
 $script:CagUrl      = 'https://cag.dmc-rz.com'
 $script:RocketUrl   = 'https://rocket.dmc-rz.com'
@@ -88,7 +127,8 @@ function Format-Bytes {
 }
 
 function Show-ProgressLine {
-    param([int]$Percent, [string]$Label = 'Indiriliyor', [long]$Received = -1, [long]$Total = -1)
+    param([int]$Percent, [string]$Label = '', [long]$Received = -1, [long]$Total = -1)
+    if (-not $Label) { $Label = (T 'Downloading') }
     if ($Percent -lt 0) { $Percent = 0 }
     if ($Percent -gt 100) { $Percent = 100 }
     $barWidth = 28
@@ -147,7 +187,7 @@ function Download-WithStream {
             if ($pct -ne $lastPct -or ($now - $lastUi).TotalMilliseconds -ge 400) {
                 $lastPct = $pct; $lastUi = $now
                 if ($total -gt 0) { Show-ProgressLine -Percent $pct -Received $received -Total $total }
-                else { Show-ProgressLine -Percent 0 -Label 'Indiriliyor' -Received $received }
+                else { Show-ProgressLine -Percent 0 -Label (T 'Downloading') -Received $received }
             }
         }
         Write-Host ''
@@ -179,16 +219,16 @@ function Invoke-Download {
         @{ Name = 'curl'; Fn = { param($u, $o) Download-WithCurl -Url $u -OutFile $o } }
     )
     foreach ($url in $Urls) {
-        Write-Step "Kaynak: $url"
+        Write-Step (T 'Source' @($url))
         foreach ($m in $methods) {
             try {
-                Write-Step ("Yontem: {0}" -f $m.Name)
+                Write-Step (T 'Method' @($m.Name))
                 & $m.Fn $url $OutFile
                 if (Test-ExeFile -Path $OutFile -MinBytes $MinBytes) {
-                    Write-Ok ("$Label indirme tamam ({0}, {1})" -f $m.Name, (Format-Bytes (Get-Item $OutFile).Length))
+                    Write-Ok (T 'DownloadOk' @($Label, $m.Name, (Format-Bytes (Get-Item $OutFile).Length)))
                     return $true
                 }
-                Write-Warn2 "$($m.Name): dosya bozuk veya cok kucuk"
+                Write-Warn2 (T 'DownloadBad' @($m.Name))
                 Remove-Item -LiteralPath $OutFile -Force -ErrorAction SilentlyContinue
             } catch {
                 Write-Warn2 ("{0}: {1}" -f $m.Name, $_.Exception.Message)
@@ -201,7 +241,7 @@ function Invoke-Download {
 
 function Get-RocketChatDownloadUrl {
     try {
-        Write-Step 'Rocket.Chat son surum GitHub uzerinden sorgulaniyor...'
+        Write-Step (T 'RocketQuery')
         $headers = @{ 'User-Agent' = 'DCS-IT-Agent-Setup/1.0'; 'Accept' = 'application/vnd.github+json' }
         $rel = Invoke-RestMethod -Uri 'https://api.github.com/repos/RocketChat/Rocket.Chat.Electron/releases/latest' -Headers $headers -TimeoutSec 30
         $asset = $rel.assets | Where-Object { $_.name -match 'win\.exe$' -and $_.name -notmatch 'ia32|arm' } | Select-Object -First 1
@@ -209,13 +249,13 @@ function Get-RocketChatDownloadUrl {
             $asset = $rel.assets | Where-Object { $_.name -match 'win\.exe$' } | Select-Object -First 1
         }
         if ($asset -and $asset.browser_download_url) {
-            Write-Ok ("Rocket.Chat surum: {0} ({1})" -f $rel.tag_name, $asset.name)
+            Write-Ok (T 'RocketVer' @($rel.tag_name, $asset.name))
             return [string]$asset.browser_download_url
         }
     } catch {
-        Write-Warn2 "GitHub sorgu basarisiz: $($_.Exception.Message)"
+        Write-Warn2 (T 'GhFail' @($_.Exception.Message))
     }
-    Write-Warn2 'Sabit Rocket.Chat indirme adresi kullanilacak.'
+    Write-Warn2 (T 'RocketPinned')
     return $script:RocketPinnedUrl
 }
 
@@ -253,17 +293,17 @@ function Find-InstalledApp {
 
 #region ---------- Yonetici ----------
 if (-not (Test-Admin)) {
-    Write-Host 'Yonetici haklari gerekiyor, yeniden baslatiliyor (UAC)...' -ForegroundColor Yellow
+    Write-Host (T 'Elevating') -ForegroundColor Yellow
     try {
-        $argList = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', "`"$PSCommandPath`"")
+        $argList = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', "`"$PSCommandPath`"", '-Lang', $script:Lang)
         if ($Force) { $argList += '-Force' }
         if ($SkipAudio) { $argList += '-SkipAudio' }
         if ($SkipOpen) { $argList += '-SkipOpen' }
         Start-Process -FilePath (Get-Process -Id $PID).Path -Verb RunAs -ArgumentList $argList | Out-Null
         exit 0
     } catch {
-        Write-Err2 'Yonetici yukseltmesi iptal edildi. Kurulum icin Yonetici izni zorunludur.'
-        Write-Host "`n  Kapatmak icin bir tusa basin..." -ForegroundColor DarkGray
+        Write-Err2 (T 'ElevateFailed')
+        Write-Host ("`n  {0}" -f (T 'PressKey')) -ForegroundColor DarkGray
         try { [void][System.Console]::ReadKey($true) } catch { Read-Host | Out-Null }
         exit 1
     }
@@ -273,28 +313,28 @@ if (-not (Test-Admin)) {
 Clear-Host
 Write-Host ''
 Write-Host '  ####################################################' -ForegroundColor Blue
-Write-Host '  #     DCS IT - AGENT ILK KURULUM ARACI             #' -ForegroundColor White
-Write-Host "  #     Surum $script:Version                                    #" -ForegroundColor DarkGray
-Write-Host "  #     Gelistiren: $script:Author               #" -ForegroundColor DarkGray
+Write-Host ('  #  ' + (T 'BannerTitle')) -ForegroundColor White
+Write-Host ('  #  ' + (T 'VersionLine' @($script:Version)) + ' | ' + (T 'AuthorLine' @($script:Author))) -ForegroundColor DarkGray
 Write-Host '  ####################################################' -ForegroundColor Blue
 Write-Host ''
-Write-Host '  Kurulum sirasi: AnyDesk -> Rocket.Chat -> Citrix -> Ses -> CAG/Rocket' -ForegroundColor Cyan
+Write-Host ('  ' + (T 'OrderLine')) -ForegroundColor Cyan
+Write-Host ('  Lang: ' + $script:Lang) -ForegroundColor DarkGray
 Write-Log "$script:AppName v$script:Version basladi. Admin=$(Test-Admin) Force=$Force OS=$([Environment]::OSVersion.VersionString)"
 
 #region 1) AnyDesk
-Write-Head '1) AnyDesk'
+Write-Head (T 'HeadAnyDesk')
 $anyDeskExe = Find-InstalledApp -NamePattern 'AnyDesk' -ExePaths @(
     "${env:ProgramFiles(x86)}\AnyDesk\AnyDesk.exe",
     "$env:ProgramFiles\AnyDesk\AnyDesk.exe"
 )
 if ($anyDeskExe -and -not $Force) {
-    Write-Ok "AnyDesk zaten kurulu: $anyDeskExe"
-    Add-Result 'AnyDesk' 'Zaten kurulu'
+    Write-Ok (T 'AnyDeskAlready' @($anyDeskExe))
+    Add-Result 'AnyDesk' (T 'Already')
 } else {
     $installer = Join-Path $env:TEMP 'DCS-AnyDesk.exe'
     $ok = Invoke-Download -Urls $script:AnyDeskUrls -OutFile $installer -MinBytes $script:MinAnyDeskBytes -Label 'AnyDesk'
     if ($ok) {
-        Write-Step 'AnyDesk sessiz kuruluyor...'
+        Write-Step (T 'AnyDeskSilent')
         $installDir = "${env:ProgramFiles(x86)}\AnyDesk"
         $args = "--install `"$installDir`" --start-with-win --create-shortcuts --create-desktop-icon --silent"
         Write-Log "Kurulum: `"$installer`" $args"
@@ -308,26 +348,26 @@ if ($anyDeskExe -and -not $Force) {
                 "$env:ProgramFiles\AnyDesk\AnyDesk.exe"
             )
             if ($after -or $code -eq 0) {
-                Write-Ok 'AnyDesk kuruldu.'
-                Add-Result 'AnyDesk' 'Kuruldu'
+                Write-Ok (T 'AnyDeskOk')
+                Add-Result 'AnyDesk' (T 'Installed')
                 try { Start-Process -FilePath (Join-Path $installDir 'AnyDesk.exe') -ErrorAction SilentlyContinue } catch {}
             } else {
-                Write-Err2 "AnyDesk kurulumu dogrulanamadi (kod $code)."
-                Add-Result 'AnyDesk' "Basarisiz ($code)"
+                Write-Err2 (T 'AnyDeskVerifyFail' @($code))
+                Add-Result 'AnyDesk' ((T 'Failed') + " ($code)")
             }
         } catch {
-            Write-Err2 "AnyDesk kurulamadi: $($_.Exception.Message)"
-            Add-Result 'AnyDesk' 'Hata'
+            Write-Err2 (T 'AnyDeskFail' @($_.Exception.Message))
+            Add-Result 'AnyDesk' (T 'Error')
         }
     } else {
-        Write-Err2 'AnyDesk indirilemedi.'
-        Add-Result 'AnyDesk' 'Indirme basarisiz'
+        Write-Err2 (T 'AnyDeskDlFail')
+        Add-Result 'AnyDesk' (T 'DownloadFail')
     }
 }
 #endregion
 
 #region 2) Rocket.Chat
-Write-Head '2) Rocket.Chat Desktop'
+Write-Head (T 'HeadRocket')
 $rocketExe = Find-InstalledApp -NamePattern 'Rocket\.?Chat' -ExePaths @(
     "$env:LOCALAPPDATA\Programs\rocketchat\Rocket.Chat.exe",
     "$env:LOCALAPPDATA\Programs\Rocket.Chat\Rocket.Chat.exe",
@@ -335,14 +375,14 @@ $rocketExe = Find-InstalledApp -NamePattern 'Rocket\.?Chat' -ExePaths @(
     "${env:ProgramFiles(x86)}\Rocket.Chat\Rocket.Chat.exe"
 )
 if ($rocketExe -and -not $Force) {
-    Write-Ok "Rocket.Chat zaten kurulu: $rocketExe"
-    Add-Result 'Rocket.Chat' 'Zaten kurulu'
+    Write-Ok (T 'RocketAlready' @($rocketExe))
+    Add-Result 'Rocket.Chat' (T 'Already')
 } else {
     $rocketUrl = Get-RocketChatDownloadUrl
     $installer = Join-Path $env:TEMP 'DCS-RocketChat-Setup.exe'
     $ok = Invoke-Download -Urls @($rocketUrl) -OutFile $installer -MinBytes $script:MinRocketBytes -Label 'Rocket.Chat'
     if ($ok) {
-        Write-Step 'Rocket.Chat sessiz kuruluyor (/S /allusers)...'
+        Write-Step (T 'RocketSilent')
         Write-Log "Kurulum: `"$installer`" /S /allusers"
         try {
             $proc = Start-Process -FilePath $installer -ArgumentList '/S','/allusers' -Wait -PassThru -ErrorAction Stop
@@ -355,10 +395,10 @@ if ($rocketExe -and -not $Force) {
                 "$env:ProgramFiles\Rocket.Chat\Rocket.Chat.exe"
             )
             if ($after -or $code -eq 0) {
-                Write-Ok 'Rocket.Chat kuruldu.'
-                Add-Result 'Rocket.Chat' 'Kuruldu'
+                Write-Ok (T 'RocketOk')
+                Add-Result 'Rocket.Chat' (T 'Installed')
             } else {
-                Write-Warn2 "Rocket.Chat dogrulama belirsiz (kod $code) - /currentuser ile tekrar deneniyor..."
+                Write-Warn2 (T 'RocketRetry' @($code))
                 $proc2 = Start-Process -FilePath $installer -ArgumentList '/S','/currentuser' -Wait -PassThru -ErrorAction SilentlyContinue
                 $code2 = if ($proc2 -and $null -ne $proc2.ExitCode) { [int]$proc2.ExitCode } else { -1 }
                 Write-Log "Rocket.Chat currentuser cikis: $code2"
@@ -367,26 +407,26 @@ if ($rocketExe -and -not $Force) {
                     "$env:LOCALAPPDATA\Programs\Rocket.Chat\Rocket.Chat.exe"
                 )
                 if ($after2) {
-                    Write-Ok 'Rocket.Chat kuruldu (current user).'
-                    Add-Result 'Rocket.Chat' 'Kuruldu'
+                    Write-Ok (T 'RocketOkUser')
+                    Add-Result 'Rocket.Chat' (T 'Installed')
                 } else {
-                    Write-Err2 'Rocket.Chat kurulumu dogrulanamadi.'
-                    Add-Result 'Rocket.Chat' 'Basarisiz'
+                    Write-Err2 (T 'RocketVerifyFail')
+                    Add-Result 'Rocket.Chat' (T 'Failed')
                 }
             }
         } catch {
-            Write-Err2 "Rocket.Chat kurulamadi: $($_.Exception.Message)"
-            Add-Result 'Rocket.Chat' 'Hata'
+            Write-Err2 (T 'RocketFail' @($_.Exception.Message))
+            Add-Result 'Rocket.Chat' (T 'Error')
         }
     } else {
-        Write-Err2 'Rocket.Chat indirilemedi.'
-        Add-Result 'Rocket.Chat' 'Indirme basarisiz'
+        Write-Err2 (T 'RocketDlFail')
+        Add-Result 'Rocket.Chat' (T 'DownloadFail')
     }
 }
 #endregion
 
 #region 3) Citrix Workspace
-Write-Head '3) Citrix Workspace'
+Write-Head (T 'HeadCitrix')
 function Get-CitrixInstall {
     $keys = @(
         'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*',
@@ -414,13 +454,13 @@ function Test-CitrixSuccessCode {
 
 $existingCitrix = Get-CitrixInstall
 if ($existingCitrix -and -not $Force) {
-    Write-Ok "Citrix zaten kurulu: $($existingCitrix.Name) ($($existingCitrix.Version))"
-    Add-Result 'Citrix' 'Zaten kurulu'
+    Write-Ok (T 'CitrixAlready' @($existingCitrix.Name, $existingCitrix.Version))
+    Add-Result 'Citrix' (T 'Already')
 } else {
     $installer = Join-Path $env:TEMP 'DCS-CitrixWorkspaceApp.exe'
     $ok = Invoke-Download -Urls $script:CitrixUrls -OutFile $installer -MinBytes $script:MinCitrixBytes -Label 'Citrix'
     if ($ok) {
-        Write-Step 'Citrix Workspace sessiz kuruluyor (5-15 dk surebilir)...'
+        Write-Step (T 'CitrixSilent')
         $argLine = '/silent /noreboot /AutoUpdateCheck=disabled /EnableCEIP=false /FORCE_LITE_MODE=no'
         if ($existingCitrix) { $argLine += ' /forceinstall' }
         Write-Log "Kurulum: `"$installer`" $argLine"
@@ -431,42 +471,42 @@ if ($existingCitrix -and -not $Force) {
             Start-Sleep -Seconds 3
             $after = Get-CitrixInstall
             if ((Test-CitrixSuccessCode -Code $code) -or $after) {
-                Write-Ok ("Citrix kurulum sonucu OK (kod {0})" -f $code)
+                Write-Ok (T 'CitrixOk' @($code))
                 if ($after) { Write-Ok "$($after.Name) ($($after.Version))" }
-                if ($code -eq 3010) { Write-Warn2 'Citrix icin yeniden baslatma onerilir.' }
-                Add-Result 'Citrix' 'Kuruldu'
+                if ($code -eq 3010) { Write-Warn2 (T 'CitrixReboot') }
+                Add-Result 'Citrix' (T 'Installed')
             } else {
-                Write-Err2 "Citrix kurulumu basarisiz (kod $code)."
-                Add-Result 'Citrix' "Basarisiz ($code)"
+                Write-Err2 (T 'CitrixFailCode' @($code))
+                Add-Result 'Citrix' ((T 'Failed') + " ($code)")
             }
         } catch {
-            Write-Err2 "Citrix kurulamadi: $($_.Exception.Message)"
-            Add-Result 'Citrix' 'Hata'
+            Write-Err2 (T 'CitrixFail' @($_.Exception.Message))
+            Add-Result 'Citrix' (T 'Error')
         }
     } else {
-        Write-Err2 'Citrix indirilemedi.'
-        Add-Result 'Citrix' 'Indirme basarisiz'
+        Write-Err2 (T 'CitrixDlFail')
+        Add-Result 'Citrix' (T 'DownloadFail')
     }
 }
 #endregion
 
 #region 4) Ses ayarlari
-Write-Head '4) Ses servisleri ve mikrofon erisimi'
+Write-Head (T 'HeadAudio')
 if ($SkipAudio) {
-    Write-Warn2 'Ses adimi atlandi (-SkipAudio).'
-    Add-Result 'Ses' 'Atlandi'
+    Write-Warn2 (T 'AudioSkip')
+    Add-Result 'Audio' (T 'Skipped')
 } else {
     $audioOk = $true
     foreach ($svcName in @('Audiosrv', 'AudioEndpointBuilder')) {
         try {
             $svc = Get-Service -Name $svcName -ErrorAction Stop
             if ($svc.Status -ne 'Running') {
-                Write-Step "$svcName baslatiliyor..."
+                Write-Step (T 'SvcStarting' @($svcName))
                 Set-Service -Name $svcName -StartupType Automatic -ErrorAction SilentlyContinue
                 Start-Service -Name $svcName -ErrorAction Stop
-                Write-Ok "$svcName calisiyor."
+                Write-Ok (T 'SvcRunning' @($svcName))
             } else {
-                Write-Ok "$svcName zaten calisiyor."
+                Write-Ok (T 'SvcAlready' @($svcName))
             }
         } catch {
             Write-Warn2 ("{0}: {1}" -f $svcName, $_.Exception.Message)
@@ -481,9 +521,9 @@ if ($SkipAudio) {
             New-Item -Path $micKey -Force | Out-Null
         }
         New-ItemProperty -Path $micKey -Name 'Value' -Value 'Allow' -PropertyType String -Force | Out-Null
-        Write-Ok 'Mikrofon erisimi (sistem) Allow olarak ayarlandi.'
+        Write-Ok (T 'MicSystem')
     } catch {
-        Write-Warn2 "Mikrofon erisim ayari: $($_.Exception.Message)"
+        Write-Warn2 (T 'MicWarn' @($_.Exception.Message))
         $audioOk = $false
     }
 
@@ -491,28 +531,28 @@ if ($SkipAudio) {
         $userMic = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\microphone'
         if (-not (Test-Path $userMic)) { New-Item -Path $userMic -Force | Out-Null }
         New-ItemProperty -Path $userMic -Name 'Value' -Value 'Allow' -PropertyType String -Force | Out-Null
-        Write-Ok 'Mikrofon erisimi (kullanici) Allow olarak ayarlandi.'
+        Write-Ok (T 'MicUser')
     } catch {
-        Write-Warn2 "Kullanici mikrofon ayari: $($_.Exception.Message)"
+        Write-Warn2 (T 'MicUserWarn' @($_.Exception.Message))
     }
 
-    if ($audioOk) { Add-Result 'Ses' 'Tamam' } else { Add-Result 'Ses' 'Kismi / uyarili' }
-    Write-Step 'Not: USB kulakligi varsayilan yapmak icin DCS-Kulaklik-Onarim aracini ayrica calistirabilirsiniz.'
+    if ($audioOk) { Add-Result 'Audio' (T 'OkStatus') } else { Add-Result 'Audio' (T 'Partial') }
+    Write-Step (T 'AudioNote')
 }
 #endregion
 
 #region 5) CAG + Rocket.Chat ac
-Write-Head '5) CAG ve Rocket.Chat aciliyor'
+Write-Head (T 'HeadOpen')
 if ($SkipOpen) {
-    Write-Warn2 'URL acma atlandi (-SkipOpen).'
-    Add-Result 'CAG/Rocket acilis' 'Atlandi'
+    Write-Warn2 (T 'OpenSkip')
+    Add-Result (T 'OpenOk') (T 'Skipped')
 } else {
     try {
-        Write-Step "Tarayici: $script:CagUrl"
+        Write-Step (T 'BrowserCag' @($script:CagUrl))
         Start-Process $script:CagUrl | Out-Null
-        Write-Ok 'CAG tarayicida acildi.'
+        Write-Ok (T 'CagOpened')
     } catch {
-        Write-Warn2 "CAG acilamadi: $($_.Exception.Message)"
+        Write-Warn2 (T 'CagFail' @($_.Exception.Message))
     }
 
     $rocketLaunch = Find-InstalledApp -NamePattern 'Rocket\.?Chat' -ExePaths @(
@@ -523,33 +563,33 @@ if ($SkipOpen) {
     )
     if ($rocketLaunch -and (Test-Path -LiteralPath $rocketLaunch)) {
         try {
-            Write-Step "Rocket.Chat uygulamasi baslatiliyor: $rocketLaunch"
+            Write-Step (T 'RocketLaunch' @($rocketLaunch))
             Start-Process -FilePath $rocketLaunch -ErrorAction Stop | Out-Null
-            Write-Ok 'Rocket.Chat uygulamasi acildi.'
+            Write-Ok (T 'RocketOpened')
         } catch {
-            Write-Warn2 "Rocket.Chat uygulamasi acilamadi: $($_.Exception.Message)"
+            Write-Warn2 (T 'RocketLaunchFail' @($_.Exception.Message))
         }
     } else {
-        Write-Warn2 'Rocket.Chat.exe bulunamadi; tarayici ile acilacak.'
+        Write-Warn2 (T 'RocketMissing')
     }
 
     try {
-        Write-Step "Rocket.Chat sunucu adresi: $script:RocketUrl"
+        Write-Step (T 'RocketUrl' @($script:RocketUrl))
         Start-Process $script:RocketUrl | Out-Null
-        Write-Ok 'rocket.dmc-rz.com tarayicida acildi.'
-        Add-Result 'CAG/Rocket acilis' 'Tamam'
+        Write-Ok (T 'RocketUrlOpened')
+        Add-Result (T 'OpenOk') (T 'OkStatus')
     } catch {
-        Write-Warn2 "Rocket URL acilamadi: $($_.Exception.Message)"
-        Add-Result 'CAG/Rocket acilis' 'Kismi'
+        Write-Warn2 (T 'RocketUrlFail' @($_.Exception.Message))
+        Add-Result (T 'OpenOk') (T 'Partial')
     }
 }
 #endregion
 
 #region Rapor
-Write-Head 'RAPOR'
-Write-Host '  Kurulum ozeti:' -ForegroundColor White
+Write-Head (T 'HeadReport')
+Write-Host ('  ' + (T 'Summary')) -ForegroundColor White
 foreach ($line in $script:Results) {
-    $color = if ($line -match 'Basarisiz|Hata|Indirme') { 'Red' } elseif ($line -match 'uyari|Kismi|Atlandi') { 'Yellow' } else { 'Green' }
+    $color = if ($line -match [regex]::Escape((T 'Failed')) -or $line -match [regex]::Escape((T 'Error')) -or $line -match [regex]::Escape((T 'DownloadFail'))) { 'Red' } elseif ($line -match [regex]::Escape((T 'Partial')) -or $line -match [regex]::Escape((T 'Skipped'))) { 'Yellow' } else { 'Green' }
     Write-Host "   - $line" -ForegroundColor $color
 }
 
@@ -557,27 +597,27 @@ $logPath = Join-Path ([Environment]::GetFolderPath('Desktop')) ("DCS-Agent-Ilk-K
 try {
     $head = @(
         "$script:AppName v$script:Version",
-        "Gelistiren : $script:Author",
-        "Tarih      : $(Get-Date)",
-        "Bilgisayar : $env:COMPUTERNAME",
-        "Kullanici  : $env:USERNAME",
-        "Yonetici   : $(Test-Admin)",
+        ("{0} : {1}" -f (T 'LogAuthor'), $script:Author),
+        ("{0}      : {1}" -f (T 'LogDate'), (Get-Date)),
+        ("{0} : {1}" -f (T 'LogPc'), $env:COMPUTERNAME),
+        ("{0}  : {1}" -f (T 'LogUser'), $env:USERNAME),
+        ("{0}   : {1}" -f (T 'LogAdmin'), (Test-Admin)),
         ('-' * 50),
-        'OZET:'
-    ) + $script:Results + @('', 'AYRINTILI GUNLUK:')
+        (T 'LogSummary')
+    ) + $script:Results + @('', (T 'LogDetail'))
     ($head -join "`r`n") + "`r`n" + ($script:LogLines -join "`r`n") | Out-File -FilePath $logPath -Encoding UTF8
-    Write-Host "  Rapor : $logPath" -ForegroundColor Cyan
+    Write-Host ('  ' + (T 'Report' @($logPath))) -ForegroundColor Cyan
 } catch {
-    Write-Warn2 "Rapor yazilamadi: $($_.Exception.Message)"
+    Write-Warn2 (T 'ReportFail' @($_.Exception.Message))
 }
 
 Write-Host ''
 Write-Host "  CAG        : $script:CagUrl" -ForegroundColor Gray
 Write-Host "  Rocket.Chat: $script:RocketUrl" -ForegroundColor Gray
-Write-Host "`n  Kapatmak icin bir tusa basin..." -ForegroundColor DarkGray
+Write-Host ("`n  " + (T 'PressKey')) -ForegroundColor DarkGray
 try { [void][System.Console]::ReadKey($true) } catch { Read-Host | Out-Null }
 
-$failed = @($script:Results | Where-Object { $_ -match 'Basarisiz|Hata|Indirme basarisiz' })
+$failed = @($script:Results | Where-Object { $_ -match [regex]::Escape((T 'Failed')) -or $_ -match [regex]::Escape((T 'Error')) -or $_ -match [regex]::Escape((T 'DownloadFail')) })
 if ($failed.Count -gt 0) { exit 1 } else { exit 0 }
 #endregion
 

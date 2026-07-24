@@ -6,10 +6,11 @@ import { Badge } from './ui/badge';
 import { Download, Zap, ShieldCheck, Cpu, CheckCircle2 } from 'lucide-react';
 import api from '../lib/api';
 
-const TOOL_URL = `${api.defaults.baseURL || ''}/api/tools/agent`;
-
 const AgentInstallToolCard = ({ className = '' }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const lang = ['tr', 'de', 'en', 'fr', 'ka'].includes(language) ? language : 'de';
+  const toolUrl = `${api.defaults.baseURL || ''}/api/tools/agent?lang=${lang}`;
+  const downloadName = `DCS-Agent-Ilk-Kurulum-${lang}.cmd`;
 
   const bullets = [
     t('agentInstallTool.f1'),
@@ -64,7 +65,7 @@ const AgentInstallToolCard = ({ className = '' }) => {
             </div>
 
             <div className="md:w-64 shrink-0">
-              <a href={TOOL_URL} download>
+              <a href={toolUrl} download={downloadName}>
                 <Button
                   size="lg"
                   className="w-full bg-gradient-to-br from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white shadow-lg rounded-xl"

@@ -1,6 +1,6 @@
 ﻿@echo off
-title DCS IT - Agent Setup [de]
-:: DCS IT - Agent Ilk Kurulum Araci (de)  ^|  Yazan: Bayram Can Aslan
+title DCS IT - Agent Setup [tr]
+:: DCS IT - Agent Ilk Kurulum Araci (tr)  ^|  Yazan: Bayram Can Aslan
 :: Sira: AnyDesk -> Rocket.Chat -> Citrix -> Ses -> CAG / Rocket
 
 net session >nul 2>&1
@@ -9,14 +9,14 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
-set "PS1=%TEMP%\DCS-Agent-Ilk-Kurulum-de.ps1"
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$m='###AGENT'+'_SETUP_PAYLOAD###'; $raw=Get-Content -LiteralPath '%~f0' -Raw -Encoding UTF8; $i=$raw.IndexOf($m); if($i -ge 0){ Set-Content -LiteralPath (Join-Path $env:TEMP 'DCS-Agent-Ilk-Kurulum-de.ps1') -Value $raw.Substring($i+$m.Length) -Encoding UTF8 }"
+set "PS1=%TEMP%\DCS-Agent-Ilk-Kurulum-tr.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$m='###AGENT'+'_SETUP_PAYLOAD###'; $raw=Get-Content -LiteralPath '%~f0' -Raw -Encoding UTF8; $i=$raw.IndexOf($m); if($i -ge 0){ Set-Content -LiteralPath (Join-Path $env:TEMP 'DCS-Agent-Ilk-Kurulum-tr.ps1') -Value $raw.Substring($i+$m.Length) -Encoding UTF8 }"
 if not exist "%PS1%" (
     echo [X] Setup script extract failed.
     pause
     exit /b 1
 )
-powershell -NoProfile -ExecutionPolicy Bypass -File "%PS1%" -Lang de
+powershell -NoProfile -ExecutionPolicy Bypass -File "%PS1%" -Lang tr
 set "ERR=%ERRORLEVEL%"
 del "%PS1%" >nul 2>&1
 if not "%ERR%"=="0" (
@@ -74,7 +74,7 @@ try {
 } catch {}
 
 # Build-time default language (overridden by -Lang). Marker replaced by build-bat.ps1
-$script:BundledLang = 'de'
+$script:BundledLang = 'tr'
 if (-not $Lang) {
     if ($script:BundledLang -and $script:BundledLang -notmatch 'BUNDLED_LANG') { $Lang = $script:BundledLang }
     else { $Lang = 'de' }

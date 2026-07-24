@@ -28,9 +28,11 @@ const STEP_SCREENS = {
 const STEP_ICONS = [Download, UserCog, ShieldCheck, Terminal, Globe, MessageSquare];
 
 const AgentFirstSetup = () => {
-  const { t } = useLanguage();
-  const imgSrc = (file) => `${process.env.PUBLIC_URL}/agent-setup/${file}`;
-  const toolUrl = `${api.defaults.baseURL || ''}/api/tools/agent`;
+  const { t, language } = useLanguage();
+  const lang = ['tr', 'de', 'en', 'fr', 'ka'].includes(language) ? language : 'de';
+  const imgSrc = (file) => `${process.env.PUBLIC_URL}/agent-setup/${lang}/${file}`;
+  const toolUrl = `${api.defaults.baseURL || ''}/api/tools/agent?lang=${lang}`;
+  const downloadName = `DCS-Agent-Ilk-Kurulum-${lang}.cmd`;
 
   return (
     <PageShell
@@ -57,7 +59,7 @@ const AgentFirstSetup = () => {
       <AgentInstallToolCard className="mb-6" />
 
       <div className="mb-6 text-center">
-        <a href={toolUrl} download>
+        <a href={toolUrl} download={downloadName}>
           <Button size="lg" variant="brand" className="bg-teal-600 hover:bg-teal-700 px-8">
             <Download className="w-5 h-5 mr-2" />
             {t('agentSetup.downloadButton')}
@@ -124,7 +126,7 @@ const AgentFirstSetup = () => {
           </div>
           <p className="text-sm text-gray-600 mb-4 max-w-2xl mx-auto">{t('agentSetup.footerHint')}</p>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <a href={toolUrl} download>
+            <a href={toolUrl} download={downloadName}>
               <Button className="bg-teal-600 hover:bg-teal-700 text-white">
                 <Download className="w-4 h-4 mr-2" />
                 {t('agentSetup.downloadButton')}

@@ -756,6 +756,20 @@ const TOOL_FILES = {
     agent: {
         default_filename: 'DCS-Agent-Ilk-Kurulum.cmd',
         static_path: '/tools/DCS-Agent-Ilk-Kurulum.cmd',
+        lang_static: {
+            tr: '/tools/DCS-Agent-Ilk-Kurulum-tr.cmd',
+            de: '/tools/DCS-Agent-Ilk-Kurulum-de.cmd',
+            en: '/tools/DCS-Agent-Ilk-Kurulum-en.cmd',
+            fr: '/tools/DCS-Agent-Ilk-Kurulum-fr.cmd',
+            ka: '/tools/DCS-Agent-Ilk-Kurulum-ka.cmd',
+        },
+        lang_filename: {
+            tr: 'DCS-Agent-Ilk-Kurulum-tr.cmd',
+            de: 'DCS-Agent-Ilk-Kurulum-de.cmd',
+            en: 'DCS-Agent-Ilk-Kurulum-en.cmd',
+            fr: 'DCS-Agent-Ilk-Kurulum-fr.cmd',
+            ka: 'DCS-Agent-Ilk-Kurulum-ka.cmd',
+        },
     },
 };
 
@@ -826,17 +840,26 @@ module.exports = async (req, res) => {
             if (!meta) return sendError(res, 404, 'Araç bulunamadı');
             if (!requireRateLimit(req, res, 'tool-download', { max: 40, windowMs: 60_000 })) return;
 
+            const rawLang = String(req.query?.lang || '').toLowerCase().trim();
+            const lang = ['tr', 'de', 'en', 'fr', 'ka'].includes(rawLang) ? rawLang : '';
+
             const doc = await db.collection('tool_files').findOne({ key });
             if (!doc || !doc.content_base64) {
+                const staticPath =
+                    (lang && meta.lang_static && meta.lang_static[lang]) || meta.static_path;
                 res.statusCode = 302;
-                res.setHeader('Location', meta.static_path);
+                res.setHeader('Location', staticPath);
                 res.setHeader('Cache-Control', 'no-store');
                 res.end();
                 return;
             }
 
             const buffer = Buffer.from(doc.content_base64, 'base64');
-            const filename = (doc.filename || meta.default_filename).replace(/"/g, '');
+            const filename = (
+                (lang && meta.lang_filename && meta.lang_filename[lang]) ||
+                doc.filename ||
+                meta.default_filename
+            ).replace(/"/g, '');
             res.setHeader('Content-Type', doc.content_type || 'application/octet-stream');
             res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
             res.setHeader('Content-Length', buffer.length);
