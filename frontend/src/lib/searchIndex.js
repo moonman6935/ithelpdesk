@@ -10,6 +10,7 @@ import {
   Download,
   Laptop,
   RefreshCw,
+  UserCog,
 } from 'lucide-react';
 
 /**
@@ -116,6 +117,32 @@ export const SEARCH_ENTRIES = [
       en: ['faq', 'frequently asked questions', 'questions', 'help', 'guide', 'how to', 'answers'],
       fr: ['faq', 'questions frequentes', 'questions', 'aide', 'guide', 'comment faire', 'reponses'],
       ka: ['faq', 'კითხვები', 'პასუხები', 'ხშირი კითხვები', 'დახმარება'],
+    },
+  },
+  {
+    id: 'agent-setup',
+    path: '/agent-ilk-kurulum',
+    icon: UserCog,
+    title: {
+      tr: 'Personel İlk Kurulum',
+      de: 'Personal-Ersteinrichtung',
+      en: 'Personnel First Setup',
+      fr: 'Première installation du personnel',
+      ka: 'პერსონალის პირველი დაყენება',
+    },
+    description: {
+      tr: 'AnyDesk, Rocket.Chat ve Citrix tek dosyayla kurulum rehberi',
+      de: 'AnyDesk, Rocket.Chat und Citrix mit einer Datei installieren',
+      en: 'Install AnyDesk, Rocket.Chat and Citrix with one setup file',
+      fr: 'Installer AnyDesk, Rocket.Chat et Citrix avec un seul fichier',
+      ka: 'AnyDesk, Rocket.Chat და Citrix ერთი ფაილით დაყენების სახელმძღვანელო',
+    },
+    keywords: {
+      tr: ['personel kurulum', 'ilk kurulum', 'agent kurulum', 'anydesk', 'rocketchat', 'citrix', 'yonetici', 'uac', 'agent setup'],
+      de: ['personal', 'ersteinrichtung', 'agent', 'anydesk', 'rocketchat', 'citrix', 'administrator', 'uac'],
+      en: ['personnel', 'first setup', 'agent setup', 'anydesk', 'rocketchat', 'citrix', 'administrator', 'uac'],
+      fr: ['personnel', 'premiere installation', 'agent', 'anydesk', 'rocketchat', 'citrix', 'administrateur', 'uac'],
+      ka: ['პერსონალი', 'პირველი დაყენება', 'anydesk', 'rocketchat', 'citrix', 'ადმინისტრატორი'],
     },
   },
   {

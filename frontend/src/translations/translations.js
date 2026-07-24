@@ -44,6 +44,18 @@ export const translations = {
       "download": "Aracı İndir",
       "hint": "İndirin, çift tıklayın; çıkan \"Evet / Çalıştır\" onayına tıklayın."
     },
+    "agentInstallTool": {
+      "title": "Personel İlk Kurulum Aracı",
+      "badge": "Yeni",
+      "subtitle": "Küçük bir program indirin; AnyDesk, Rocket.Chat ve Citrix otomatik kurulsun.",
+      "f1": "AnyDesk uzaktan destek programını kurar",
+      "f2": "Rocket.Chat mesajlaşma uygulamasını kurar",
+      "f3": "Citrix Workspace'i kurar ve ses ayarlarını yapar",
+      "f4": "cag.dmc-rz.com ve rocket.dmc-rz.com adreslerini açar",
+      "safe": "Sadece gerekli kurumsal uygulamaları kurar",
+      "download": "Aracı İndir",
+      "hint": "İndirin, çift tıklayın; çıkan \"Evet / Çalıştır\" onayına tıklayın."
+    },
     "home": {
       "welcome": "DCS Communication Center IT Departmanı",
       "subtitle": "Bilgisayar Kurulum ve Destek Rehberi",
@@ -132,6 +144,7 @@ export const translations = {
       "trackCargo": "Kargo Takibine Git",
       "learnMore": "İncele",
       "quickLinks": {
+        "agentSetup": "Personel İlk Kurulum",
         "citrix": "Citrix Kurulum Rehberi",
         "windows11": "Windows 11 Kurulum Rehberi",
         "mac": "macOS Kurulum Rehberi",
@@ -498,6 +511,47 @@ export const translations = {
         "tip": "Güncelleme sonrası Citrix, VPN veya yazıcı sürücülerinde sorun olursa IT destek ekibine başvurun."
       }
     },
+    "agentSetup": {
+      "title": "Personel İlk Kurulum",
+      "subtitle": "Tek bir araçla AnyDesk, Rocket.Chat ve Citrix'i otomatik kurun; ardından CAG ve Rocket.Chat adresleri açılsın.",
+      "backToHome": "Ana sayfaya dön",
+      "alertTitle": "Başlamadan önce",
+      "alertText": "Bu araç AnyDesk, Rocket.Chat ve Citrix Workspace uygulamalarını otomatik kurar, ses ayarlarını yapar ve cag.dmc-rz.com ile rocket.dmc-rz.com adreslerini açar. Kurulum için yönetici izni gerekir.",
+      "downloadButton": "Kurulum Aracını İndir",
+      "tipLabel": "İpucu",
+      "footerNote": "Kurulum tamamlandı",
+      "footerHint": "Sorun yaşarsanız Rocket.Chat üzerinden IT destek ekibine yazın.",
+      "step1": {
+        "title": "Kurulum dosyasını indirin",
+        "desc": "Aşağıdaki butona tıklayarak DCS-Agent-Ilk-Kurulum.cmd dosyasını indirin.",
+        "tip": "Dosya genelde İndirilenler klasöründe bulunur."
+      },
+      "step2": {
+        "title": "Yönetici olarak çalıştırın",
+        "desc": "İndirilen DCS-Agent-Ilk-Kurulum.cmd dosyasına sağ tıklayıp \"Yönetici olarak çalıştır\" seçin.",
+        "tip": "Yönetici izni olmadan kurulum tamamlanamaz."
+      },
+      "step3": {
+        "title": "UAC uyarısında Evet'e tıklayın",
+        "desc": "Kullanıcı Hesabı Denetimi (UAC) penceresi açıldığında \"Evet\" butonuna tıklayın.",
+        "tip": "Bu pencere programın değişiklik yapmasına izin verir."
+      },
+      "step4": {
+        "title": "Kurulumların tamamlanmasını bekleyin",
+        "desc": "Araç AnyDesk, Rocket.Chat ve Citrix'i sırayla kurar, ses ayarlarını yapar. İşlem bitene kadar pencereyi kapatmayın.",
+        "tip": "İnternet bağlantınızın stabil olduğundan emin olun."
+      },
+      "step5": {
+        "title": "CAG tarayıcı sayfasını açın",
+        "desc": "Kurulum sonunda cag.dmc-rz.com adresi tarayıcıda otomatik açılır; kullanıcı bilgilerinizle giriş yapın.",
+        "tip": "Sayfa açılmazsa tarayıcıya cag.dmc-rz.com yazın."
+      },
+      "step6": {
+        "title": "Rocket.Chat'e giriş yapın",
+        "desc": "rocket.dmc-rz.com adresi açılır; kurumsal hesabınızla oturum açarak mesajlaşmaya başlayın.",
+        "tip": "Sorularınız için IT destek ekibine Rocket.Chat üzerinden yazabilirsiniz."
+      }
+    },
     "footer": {
       "rights": "© 2025 DCS Communication Center. Tüm hakları saklıdır.",
       "support": "IT Destek",
@@ -722,7 +776,8 @@ export const translations = {
         "confirmRevert": "Bu araç varsayılan dosyaya dönsün mü?",
         "hint": "Genellikle .cmd uzantılı dosya yükleyin. En fazla 8 MB.",
         "headset": "Kulaklık Onarım Aracı",
-        "citrix": "Citrix Kurulum Aracı"
+        "citrix": "Citrix Kurulum Aracı",
+        "agent": "Personel İlk Kurulum Aracı"
       },
       "pendingSince": "Son Zimmet",
       "confirmationStatus": "Onay Durumu",
@@ -958,6 +1013,18 @@ export const translations = {
       "download": "Tool herunterladen",
       "hint": "Herunterladen, doppelklicken und die Abfrage \"Ja / Ausführen\" bestätigen."
     },
+    "agentInstallTool": {
+      "title": "Personal-Ersteinrichtungs-Tool",
+      "badge": "Neu",
+      "subtitle": "Laden Sie ein kleines Programm herunter; AnyDesk, Rocket.Chat und Citrix werden automatisch installiert.",
+      "f1": "Installiert das Fernwartungsprogramm AnyDesk",
+      "f2": "Installiert die Messaging-App Rocket.Chat",
+      "f3": "Installiert Citrix Workspace und richtet die Audioeinstellungen ein",
+      "f4": "Öffnet cag.dmc-rz.com und rocket.dmc-rz.com",
+      "safe": "Installiert nur die erforderlichen Unternehmensanwendungen",
+      "download": "Tool herunterladen",
+      "hint": "Herunterladen, doppelklicken und die Abfrage \"Ja / Ausführen\" bestätigen."
+    },
     "home": {
       "welcome": "DCS Communication Center IT-Abteilung",
       "subtitle": "Computer-Installations- und Support-Handbuch",
@@ -1046,6 +1113,7 @@ export const translations = {
       "trackCargo": "Zur Sendungsverfolgung",
       "learnMore": "Mehr erfahren",
       "quickLinks": {
+        "agentSetup": "Personal-Ersteinrichtung",
         "citrix": "Citrix-Installationsanleitung",
         "windows11": "Windows-11-Installationsanleitung",
         "mac": "macOS-Installationsanleitung",
@@ -1412,6 +1480,47 @@ export const translations = {
         "tip": "Bei Citrix-, VPN- oder Druckerproblemen IT-Support kontaktieren."
       }
     },
+    "agentSetup": {
+      "title": "Personal-Ersteinrichtung",
+      "subtitle": "Installieren Sie mit einem einzigen Tool AnyDesk, Rocket.Chat und Citrix automatisch; danach werden CAG und Rocket.Chat geöffnet.",
+      "backToHome": "Zurück zur Startseite",
+      "alertTitle": "Vor dem Start",
+      "alertText": "Dieses Tool installiert automatisch AnyDesk, Rocket.Chat und Citrix Workspace, richtet die Audioeinstellungen ein und öffnet cag.dmc-rz.com sowie rocket.dmc-rz.com. Für die Installation sind Administratorrechte erforderlich.",
+      "downloadButton": "Installationstool herunterladen",
+      "tipLabel": "Tipp",
+      "footerNote": "Installation abgeschlossen",
+      "footerHint": "Bei Problemen wenden Sie sich über Rocket.Chat an das IT-Support-Team.",
+      "step1": {
+        "title": "Installationsdatei herunterladen",
+        "desc": "Klicken Sie auf die Schaltfläche unten, um die Datei DCS-Agent-Ilk-Kurulum.cmd herunterzuladen.",
+        "tip": "Die Datei befindet sich in der Regel im Ordner Downloads."
+      },
+      "step2": {
+        "title": "Als Administrator ausführen",
+        "desc": "Klicken Sie mit der rechten Maustaste auf die heruntergeladene Datei DCS-Agent-Ilk-Kurulum.cmd und wählen Sie \"Als Administrator ausführen\".",
+        "tip": "Ohne Administratorrechte kann die Installation nicht abgeschlossen werden."
+      },
+      "step3": {
+        "title": "Bei der UAC-Abfrage auf Ja klicken",
+        "desc": "Wenn das Fenster der Benutzerkontensteuerung (UAC) erscheint, klicken Sie auf \"Ja\".",
+        "tip": "Dieses Fenster erlaubt dem Programm, Änderungen vorzunehmen."
+      },
+      "step4": {
+        "title": "Warten, bis die Installationen abgeschlossen sind",
+        "desc": "Das Tool installiert nacheinander AnyDesk, Rocket.Chat und Citrix und richtet die Audioeinstellungen ein. Schließen Sie das Fenster nicht, bis der Vorgang abgeschlossen ist.",
+        "tip": "Stellen Sie sicher, dass Ihre Internetverbindung stabil ist."
+      },
+      "step5": {
+        "title": "Die CAG-Browserseite öffnen",
+        "desc": "Am Ende der Installation wird cag.dmc-rz.com automatisch im Browser geöffnet; melden Sie sich mit Ihren Benutzerdaten an.",
+        "tip": "Wenn die Seite nicht geöffnet wird, geben Sie cag.dmc-rz.com im Browser ein."
+      },
+      "step6": {
+        "title": "Bei Rocket.Chat anmelden",
+        "desc": "rocket.dmc-rz.com wird geöffnet; melden Sie sich mit Ihrem Firmenkonto an und beginnen Sie mit dem Nachrichtenaustausch.",
+        "tip": "Bei Fragen können Sie das IT-Support-Team über Rocket.Chat kontaktieren."
+      }
+    },
     "footer": {
       "rights": "© 2025 DCS Communication Center. Alle Rechte vorbehalten.",
       "support": "IT-Support",
@@ -1636,7 +1745,8 @@ export const translations = {
         "confirmRevert": "Dieses Tool auf die Standarddatei zurücksetzen?",
         "hint": "Laden Sie in der Regel eine .cmd-Datei hoch. Max. 8 MB.",
         "headset": "Headset-Reparatur-Tool",
-        "citrix": "Citrix-Installationstool"
+        "citrix": "Citrix-Installationstool",
+        "agent": "Personal-Ersteinrichtungs-Tool"
       },
       "pendingSince": "Letzte Zuweisung",
       "confirmationStatus": "Bestätigungsstatus",
@@ -1872,6 +1982,18 @@ export const translations = {
       "download": "Download Tool",
       "hint": "Download, double-click, and confirm the \"Yes / Run\" prompt."
     },
+    "agentInstallTool": {
+      "title": "Personnel First Setup Tool",
+      "badge": "New",
+      "subtitle": "Download a small program that installs AnyDesk, Rocket.Chat and Citrix automatically.",
+      "f1": "Installs the AnyDesk remote support program",
+      "f2": "Installs the Rocket.Chat messaging app",
+      "f3": "Installs Citrix Workspace and configures audio settings",
+      "f4": "Opens cag.dmc-rz.com and rocket.dmc-rz.com",
+      "safe": "Only installs the required corporate applications",
+      "download": "Download Tool",
+      "hint": "Download, double-click, and confirm the \"Yes / Run\" prompt."
+    },
     "home": {
       "welcome": "DCS Communication Center IT Department",
       "subtitle": "Computer Installation and Support Guide",
@@ -1960,6 +2082,7 @@ export const translations = {
       "trackCargo": "Open Shipment Tracking",
       "learnMore": "Learn more",
       "quickLinks": {
+        "agentSetup": "Personnel First Setup",
         "citrix": "Citrix Setup Guide",
         "windows11": "Windows 11 Setup Guide",
         "mac": "macOS Setup Guide",
@@ -2326,6 +2449,47 @@ export const translations = {
         "tip": "Contact IT support if Citrix, VPN, or printer drivers have issues after the upgrade."
       }
     },
+    "agentSetup": {
+      "title": "Personnel First Setup",
+      "subtitle": "Use a single tool to install AnyDesk, Rocket.Chat and Citrix automatically, then open the CAG and Rocket.Chat pages.",
+      "backToHome": "Back to home",
+      "alertTitle": "Before you start",
+      "alertText": "This tool automatically installs AnyDesk, Rocket.Chat and Citrix Workspace, configures audio settings, and opens cag.dmc-rz.com and rocket.dmc-rz.com. Administrator permission is required for installation.",
+      "downloadButton": "Download Setup Tool",
+      "tipLabel": "Tip",
+      "footerNote": "Setup complete",
+      "footerHint": "If you run into any issues, message the IT support team on Rocket.Chat.",
+      "step1": {
+        "title": "Download the setup file",
+        "desc": "Click the button below to download the DCS-Agent-Ilk-Kurulum.cmd file.",
+        "tip": "The file is usually located in the Downloads folder."
+      },
+      "step2": {
+        "title": "Run as administrator",
+        "desc": "Right-click the downloaded DCS-Agent-Ilk-Kurulum.cmd file and choose \"Run as administrator\".",
+        "tip": "The installation cannot complete without administrator permission."
+      },
+      "step3": {
+        "title": "Click Yes on the UAC prompt",
+        "desc": "When the User Account Control (UAC) window appears, click \"Yes\".",
+        "tip": "This window allows the program to make changes."
+      },
+      "step4": {
+        "title": "Wait for the installations to finish",
+        "desc": "The tool installs AnyDesk, Rocket.Chat and Citrix in turn and configures audio settings. Do not close the window until the process is complete.",
+        "tip": "Make sure your internet connection is stable."
+      },
+      "step5": {
+        "title": "Open the CAG browser page",
+        "desc": "At the end of setup, cag.dmc-rz.com opens automatically in your browser; sign in with your user credentials.",
+        "tip": "If the page does not open, type cag.dmc-rz.com in your browser."
+      },
+      "step6": {
+        "title": "Sign in to Rocket.Chat",
+        "desc": "rocket.dmc-rz.com opens; sign in with your corporate account and start messaging.",
+        "tip": "For questions, you can reach the IT support team via Rocket.Chat."
+      }
+    },
     "footer": {
       "rights": "© 2025 DCS Communication Center. All rights reserved.",
       "support": "IT Support",
@@ -2550,7 +2714,8 @@ export const translations = {
         "confirmRevert": "Revert this tool to the default file?",
         "hint": "Usually upload a .cmd file. Max 8 MB.",
         "headset": "Headset Repair Tool",
-        "citrix": "Citrix Installation Tool"
+        "citrix": "Citrix Installation Tool",
+        "agent": "Personnel First Setup Tool"
       },
       "pendingSince": "Last Assignment",
       "confirmationStatus": "Confirmation Status",
@@ -2786,6 +2951,18 @@ export const translations = {
       "download": "Télécharger l'outil",
       "hint": "Téléchargez, double-cliquez et confirmez l'invite « Oui / Exécuter »."
     },
+    "agentInstallTool": {
+      "title": "Outil de première installation du personnel",
+      "badge": "Nouveau",
+      "subtitle": "Téléchargez un petit programme qui installe automatiquement AnyDesk, Rocket.Chat et Citrix.",
+      "f1": "Installe le programme d'assistance à distance AnyDesk",
+      "f2": "Installe l'application de messagerie Rocket.Chat",
+      "f3": "Installe Citrix Workspace et configure les paramètres audio",
+      "f4": "Ouvre cag.dmc-rz.com et rocket.dmc-rz.com",
+      "safe": "N'installe que les applications d'entreprise nécessaires",
+      "download": "Télécharger l'outil",
+      "hint": "Téléchargez, double-cliquez et confirmez l'invite « Oui / Exécuter »."
+    },
     "home": {
       "welcome": "Service informatique du DCS Communication Center",
       "subtitle": "Guide d'installation et d'assistance informatique",
@@ -2874,6 +3051,7 @@ export const translations = {
       "trackCargo": "Ouvrir le suivi d'expédition",
       "learnMore": "En savoir plus",
       "quickLinks": {
+        "agentSetup": "Première installation du personnel",
         "citrix": "Guide d'installation de Citrix",
         "windows11": "Guide d'installation de Windows 11",
         "mac": "Guide d'installation de macOS",
@@ -3240,6 +3418,47 @@ export const translations = {
         "tip": "Contactez l'assistance informatique si Citrix, le VPN ou les pilotes d'imprimante posent problème après la mise à niveau."
       }
     },
+    "agentSetup": {
+      "title": "Première installation du personnel",
+      "subtitle": "Installez automatiquement AnyDesk, Rocket.Chat et Citrix avec un seul outil, puis ouvrez les pages CAG et Rocket.Chat.",
+      "backToHome": "Retour à l'accueil",
+      "alertTitle": "Avant de commencer",
+      "alertText": "Cet outil installe automatiquement AnyDesk, Rocket.Chat et Citrix Workspace, configure les paramètres audio et ouvre cag.dmc-rz.com et rocket.dmc-rz.com. Des droits d'administrateur sont nécessaires pour l'installation.",
+      "downloadButton": "Télécharger l'outil d'installation",
+      "tipLabel": "Astuce",
+      "footerNote": "Installation terminée",
+      "footerHint": "En cas de problème, contactez l'équipe d'assistance informatique via Rocket.Chat.",
+      "step1": {
+        "title": "Télécharger le fichier d'installation",
+        "desc": "Cliquez sur le bouton ci-dessous pour télécharger le fichier DCS-Agent-Ilk-Kurulum.cmd.",
+        "tip": "Le fichier se trouve généralement dans le dossier Téléchargements."
+      },
+      "step2": {
+        "title": "Exécuter en tant qu'administrateur",
+        "desc": "Cliquez avec le bouton droit sur le fichier DCS-Agent-Ilk-Kurulum.cmd téléchargé et choisissez « Exécuter en tant qu'administrateur ».",
+        "tip": "L'installation ne peut pas se terminer sans droits d'administrateur."
+      },
+      "step3": {
+        "title": "Cliquer sur Oui dans l'invite UAC",
+        "desc": "Lorsque la fenêtre du Contrôle de compte d'utilisateur (UAC) apparaît, cliquez sur « Oui ».",
+        "tip": "Cette fenêtre autorise le programme à apporter des modifications."
+      },
+      "step4": {
+        "title": "Attendre la fin des installations",
+        "desc": "L'outil installe successivement AnyDesk, Rocket.Chat et Citrix et configure les paramètres audio. Ne fermez pas la fenêtre avant la fin du processus.",
+        "tip": "Assurez-vous que votre connexion Internet est stable."
+      },
+      "step5": {
+        "title": "Ouvrir la page du navigateur CAG",
+        "desc": "À la fin de l'installation, cag.dmc-rz.com s'ouvre automatiquement dans le navigateur ; connectez-vous avec vos identifiants.",
+        "tip": "Si la page ne s'ouvre pas, saisissez cag.dmc-rz.com dans votre navigateur."
+      },
+      "step6": {
+        "title": "Se connecter à Rocket.Chat",
+        "desc": "rocket.dmc-rz.com s'ouvre ; connectez-vous avec votre compte d'entreprise et commencez à échanger des messages.",
+        "tip": "Pour toute question, vous pouvez joindre l'équipe d'assistance informatique via Rocket.Chat."
+      }
+    },
     "footer": {
       "rights": "© 2025 DCS Communication Center. Tous droits réservés.",
       "support": "Assistance informatique",
@@ -3464,7 +3683,8 @@ export const translations = {
         "confirmRevert": "Rétablir cet outil au fichier par défaut ?",
         "hint": "Téléversez généralement un fichier .cmd. Max. 8 Mo.",
         "headset": "Outil de réparation du casque",
-        "citrix": "Outil d'installation de Citrix"
+        "citrix": "Outil d'installation de Citrix",
+        "agent": "Outil de première installation du personnel"
       },
       "pendingSince": "Dernière attribution",
       "confirmationStatus": "Statut de confirmation",
@@ -3700,6 +3920,18 @@ export const translations = {
       "download": "ჩამოტვირთეთ ინსტრუმენტი",
       "hint": "ჩამოტვირთეთ, დააწკაპუნეთ ორჯერ და დაადასტურეთ მოთხოვნა \"დიახ / გაშვება\"."
     },
+    "agentInstallTool": {
+      "title": "პერსონალის პირველი დაყენების ხელსაწყო",
+      "badge": "ახალი",
+      "subtitle": "ჩამოტვირთეთ პატარა პროგრამა; AnyDesk, Rocket.Chat და Citrix ავტომატურად დაინსტალირდება.",
+      "f1": "აინსტალირებს დისტანციური მხარდაჭერის პროგრამა AnyDesk-ს",
+      "f2": "აინსტალირებს შეტყობინებების აპლიკაცია Rocket.Chat-ს",
+      "f3": "აინსტალირებს Citrix Workspace-ს და აყენებს ხმის პარამეტრებს",
+      "f4": "ხსნის cag.dmc-rz.com და rocket.dmc-rz.com მისამართებს",
+      "safe": "აინსტალირებს მხოლოდ საჭირო კორპორატიულ აპლიკაციებს",
+      "download": "ჩამოტვირთეთ ინსტრუმენტი",
+      "hint": "ჩამოტვირთეთ, დააწკაპუნეთ ორჯერ და დაადასტურეთ მოთხოვნა \"დიახ / გაშვება\"."
+    },
     "home": {
       "welcome": "DCS საკომუნიკაციო ცენტრი IT დეპარტამენტი",
       "subtitle": "კომპიუტერის ინსტალაციისა და მხარდაჭერის სახელმძღვანელო",
@@ -3788,6 +4020,7 @@ export const translations = {
       "trackCargo": "გახსენით მიწოდების თვალყურის დევნება",
       "learnMore": "შეიტყვეთ მეტი",
       "quickLinks": {
+        "agentSetup": "პერსონალის პირველი დაყენება",
         "citrix": "Citrix დაყენების სახელმძღვანელო",
         "windows11": "Windows 11 დაყენების სახელმძღვანელო",
         "mac": "macOS დაყენების სახელმძღვანელო",
@@ -4154,6 +4387,47 @@ export const translations = {
         "tip": "დაუკავშირდით IT მხარდაჭერას, თუ Citrix, VPN ან პრინტერის დრაივერებს აქვთ პრობლემები განახლების შემდეგ."
       }
     },
+    "agentSetup": {
+      "title": "პერსონალის პირველი დაყენება",
+      "subtitle": "ერთი ხელსაწყოთი ავტომატურად დააინსტალირეთ AnyDesk, Rocket.Chat და Citrix, შემდეგ კი გაიხსნება CAG და Rocket.Chat გვერდები.",
+      "backToHome": "მთავარ გვერდზე დაბრუნება",
+      "alertTitle": "სანამ დაიწყებთ",
+      "alertText": "ეს ხელსაწყო ავტომატურად აინსტალირებს AnyDesk-ს, Rocket.Chat-ს და Citrix Workspace-ს, აყენებს ხმის პარამეტრებს და ხსნის cag.dmc-rz.com და rocket.dmc-rz.com მისამართებს. ინსტალაციისთვის საჭიროა ადმინისტრატორის ნებართვა.",
+      "downloadButton": "ჩამოტვირთეთ დაყენების ხელსაწყო",
+      "tipLabel": "რჩევა",
+      "footerNote": "დაყენება დასრულდა",
+      "footerHint": "თუ პრობლემას წააწყდებით, მისწერეთ IT მხარდაჭერის გუნდს Rocket.Chat-ის საშუალებით.",
+      "step1": {
+        "title": "ჩამოტვირთეთ დაყენების ფაილი",
+        "desc": "დააჭირეთ ქვემოთ მოცემულ ღილაკს DCS-Agent-Ilk-Kurulum.cmd ფაილის ჩამოსატვირთად.",
+        "tip": "ფაილი ჩვეულებრივ მდებარეობს Downloads საქაღალდეში."
+      },
+      "step2": {
+        "title": "გაუშვით ადმინისტრატორის უფლებით",
+        "desc": "დააწკაპუნეთ მარჯვენა ღილაკით ჩამოტვირთულ DCS-Agent-Ilk-Kurulum.cmd ფაილზე და აირჩიეთ \"ადმინისტრატორის სახელით გაშვება\".",
+        "tip": "ადმინისტრატორის ნებართვის გარეშე ინსტალაცია ვერ დასრულდება."
+      },
+      "step3": {
+        "title": "UAC ფანჯარაში დააჭირეთ დიახ",
+        "desc": "როდესაც მომხმარებლის ანგარიშის კონტროლის (UAC) ფანჯარა გამოჩნდება, დააჭირეთ \"დიახ\".",
+        "tip": "ეს ფანჯარა პროგრამას აძლევს ცვლილებების შეტანის უფლებას."
+      },
+      "step4": {
+        "title": "დაელოდეთ ინსტალაციების დასრულებას",
+        "desc": "ხელსაწყო თანმიმდევრულად აინსტალირებს AnyDesk-ს, Rocket.Chat-ს და Citrix-ს და აყენებს ხმის პარამეტრებს. ნუ დახურავთ ფანჯარას პროცესის დასრულებამდე.",
+        "tip": "დარწმუნდით, რომ თქვენი ინტერნეტ კავშირი სტაბილურია."
+      },
+      "step5": {
+        "title": "გახსენით CAG ბრაუზერის გვერდი",
+        "desc": "ინსტალაციის ბოლოს cag.dmc-rz.com ავტომატურად იხსნება ბრაუზერში; შედით თქვენი მომხმარებლის მონაცემებით.",
+        "tip": "თუ გვერდი არ იხსნება, ბრაუზერში აკრიფეთ cag.dmc-rz.com."
+      },
+      "step6": {
+        "title": "შედით Rocket.Chat-ში",
+        "desc": "იხსნება rocket.dmc-rz.com; შედით თქვენი კორპორატიული ანგარიშით და დაიწყეთ მიმოწერა.",
+        "tip": "კითხვების შემთხვევაში დაუკავშირდით IT მხარდაჭერის გუნდს Rocket.Chat-ის საშუალებით."
+      }
+    },
     "footer": {
       "rights": "© 2025 DCS საკომუნიკაციო ცენტრი. ყველა უფლება დაცულია.",
       "support": "IT მხარდაჭერა",
@@ -4378,7 +4652,8 @@ export const translations = {
         "confirmRevert": "დააბრუნოთ ეს ინსტრუმენტი ნაგულისხმევ ფაილზე?",
         "hint": "ჩვეულებრივ ატვირთეთ .cmd ფაილი. მაქსიმუმ 8 MB.",
         "headset": "ყურსასმენის შეკეთების ხელსაწყო",
-        "citrix": "Citrix ინსტალაციის ხელსაწყო"
+        "citrix": "Citrix ინსტალაციის ხელსაწყო",
+        "agent": "პერსონალის პირველი დაყენების ხელსაწყო"
       },
       "pendingSince": "ბოლო დავალება",
       "confirmationStatus": "დადასტურების სტატუსი",

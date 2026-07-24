@@ -15,6 +15,7 @@ import {
   Truck,
   RefreshCw,
   Laptop,
+  UserCog,
 } from 'lucide-react';
 import HomeHeroCarousel from '../components/HomeHeroCarousel';
 import { StaggerChildren } from '../components/PageShell';
@@ -148,6 +149,15 @@ function ColorCard({ gradient, blob, accent, Icon, title, description, cta, to, 
 }
 
 const QUICK_LINKS = [
+  {
+    key: 'agentSetup',
+    labelKey: 'home.quickLinks.agentSetup',
+    Icon: UserCog,
+    gradient: 'from-teal-500 to-emerald-600',
+    blob: 'bg-teal-300/30',
+    accent: 'bg-emerald-300/20',
+    to: '/agent-ilk-kurulum',
+  },
   {
     key: 'citrix',
     labelKey: 'home.quickLinks.citrix',

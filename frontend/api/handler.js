@@ -753,6 +753,10 @@ const TOOL_FILES = {
         default_filename: 'DCS-Citrix-Kurulum.cmd',
         static_path: '/tools/DCS-Citrix-Kurulum.cmd',
     },
+    agent: {
+        default_filename: 'DCS-Agent-Ilk-Kurulum.cmd',
+        static_path: '/tools/DCS-Agent-Ilk-Kurulum.cmd',
+    },
 };
 
 const MAX_TOOL_BYTES = 8 * 1024 * 1024; // 8 MB
