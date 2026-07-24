@@ -16,6 +16,7 @@ import {
   RefreshCw,
   Laptop,
   UserCog,
+  Gauge,
 } from 'lucide-react';
 import HomeHeroCarousel from '../components/HomeHeroCarousel';
 import { StaggerChildren } from '../components/PageShell';
@@ -68,6 +69,17 @@ const FEATURE_CARDS = [
 ];
 
 const EXTRA_CARDS = [
+  {
+    key: 'systemCheck',
+    to: '/sistem-kontrol',
+    Icon: Gauge,
+    gradient: 'from-slate-600 via-slate-700 to-zinc-800',
+    blob: 'bg-slate-300/25',
+    accent: 'bg-zinc-400/20',
+    titleKey: 'home.features.systemCheck',
+    descKey: 'home.features.systemCheckDesc',
+    ctaKey: 'home.learnMore',
+  },
   {
     key: 'faq',
     to: '/faq',
@@ -347,7 +359,7 @@ const Home = () => {
             ))}
           </StaggerChildren>
 
-          <StaggerChildren className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <StaggerChildren className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {EXTRA_CARDS.map((card) => (
               <ColorCard
                 key={card.key}

@@ -11,6 +11,7 @@ import {
   Laptop,
   RefreshCw,
   UserCog,
+  Gauge,
 } from 'lucide-react';
 
 /**
@@ -117,6 +118,32 @@ export const SEARCH_ENTRIES = [
       en: ['faq', 'frequently asked questions', 'questions', 'help', 'guide', 'how to', 'answers'],
       fr: ['faq', 'questions frequentes', 'questions', 'aide', 'guide', 'comment faire', 'reponses'],
       ka: ['faq', 'კითხვები', 'პასუხები', 'ხშირი კითხვები', 'დახმარება'],
+    },
+  },
+  {
+    id: 'system-check',
+    path: '/sistem-kontrol',
+    icon: Gauge,
+    title: {
+      tr: 'Sistem Uygunluk Kontrolü',
+      de: 'Systemanforderungsprüfung',
+      en: 'System Compatibility Check',
+      fr: 'Contrôle de compatibilité système',
+      ka: 'სისტემის თავსებადობის შემოწმება',
+    },
+    description: {
+      tr: 'Donanım ve internet hızını minimum gereksinimlere göre kontrol edin',
+      de: 'Hardware und Internetgeschwindigkeit anhand der Mindestanforderungen prüfen',
+      en: 'Check hardware and internet speed against minimum requirements',
+      fr: 'Vérifiez le matériel et la vitesse Internet par rapport aux exigences minimales',
+      ka: 'შეამოწმეთ აპარატურა და ინტერნეტის სიჩქარე მინიმალური მოთხოვნების მიხედვით',
+    },
+    keywords: {
+      tr: ['sistem kontrol', 'uygunluk', 'donanim', 'ram', 'islemci', 'internet hizi', 'hiz testi', 'windows 11', 'gereksinim', 'system check'],
+      de: ['systemprufung', 'anforderungen', 'hardware', 'ram', 'prozessor', 'geschwindigkeit', 'windows 11', 'kompatibilitat'],
+      en: ['system check', 'compatibility', 'hardware', 'ram', 'cpu', 'speed test', 'windows 11', 'requirements'],
+      fr: ['controle systeme', 'compatibilite', 'materiel', 'ram', 'processeur', 'vitesse', 'windows 11', 'exigences'],
+      ka: ['სისტემა', 'შემოწმება', 'აპარატურა', 'ram', 'სიჩქარე', 'windows 11', 'მოთხოვნები'],
     },
   },
   {

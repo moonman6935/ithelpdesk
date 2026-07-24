@@ -826,6 +826,13 @@ module.exports = async (req, res) => {
     const segments = route ? route.split('/').filter(Boolean) : [];
     const method = req.method;
 
+    // Public speed-test echo — no DB (body discarded; client measures upload time)
+    if (method === 'POST' && route === 'speed-echo') {
+        if (!requireRateLimit(req, res, 'speed-echo', { max: 30, windowMs: 60_000 })) return;
+        res.setHeader('Cache-Control', 'no-store');
+        return sendJson(res, 200, { ok: true });
+    }
+
     try {
         const db = await getDb();
         await ensureDefaultAdmin(db);
@@ -1895,4 +1902,13 @@ module.exports = async (req, res) => {
         const status = err.statusCode || 500;
         return sendError(res, status, safeErrorDetail(err));
     }
+};
+
+// Allow binary upload body for speed-echo (Vercel Node)
+module.exports.config = {
+    api: {
+        bodyParser: {
+            sizeLimit: '4mb',
+        },
+    },
 };
