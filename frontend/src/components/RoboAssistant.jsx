@@ -32,7 +32,8 @@ import {
   Search,
   Apple,
 } from 'lucide-react';
-import RoboDog, { RoboDogArena } from './RoboDog';
+import RoboDog from './RoboDog';
+import RoboDogRoam from './RoboDogRoam';
 
 const SEARCH_DURATION_MS = 4200;
 
@@ -97,20 +98,17 @@ function RoboOverlay({ onClose }) {
       return;
     }
     const n = getFlowNode(id);
-    if (n.type === 'choices') setDogMode('still');
+    if (n.type === 'choices') setDogMode(id === 'root' ? 'still' : 'roam');
     else if (n.type === 'checklist') setDogMode('roam');
-    else setDogMode('still');
+    else setDogMode('roam');
   }, []);
 
   useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    setDogMode('roam');
+    setDogMode('still');
     const settle = window.setTimeout(() => {
       syncDogModeForNode('root', 'flow');
-    }, 2200);
+    }, 1200);
     return () => {
-      document.body.style.overflow = prev;
       resetBodyInteraction();
       window.clearTimeout(settle);
     };
@@ -381,49 +379,55 @@ function RoboOverlay({ onClose }) {
   const canGoBack = phase !== 'flow' || (node.parent && nodeId !== 'root');
 
   return (
-    <div className="robo-overlay" role="dialog" aria-modal="true" aria-label="Robo">
-      <div className="robo-overlay__grid" aria-hidden="true" />
-      <div className="robo-overlay__glow robo-overlay__glow--a" aria-hidden="true" />
-      <div className="robo-overlay__glow robo-overlay__glow--b" aria-hidden="true" />
+    <>
+      <RoboDogRoam mode={dogMode} visible />
 
-      <header className="robo-overlay__header">
-        <div className="robo-overlay__brand">
-          {canGoBack && (
-            <button
-              type="button"
-              onClick={handleBack}
-              className="mr-2 p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
-              aria-label={t('robo.back')}
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-          )}
-          <div className="robo-overlay__avatar robo-overlay__avatar--dog">
-            <RoboDog mode="still" size="sm" />
-          </div>
-          <div>
-            <p className="robo-overlay__name">Robo</p>
-            <p className="robo-overlay__status">
-              <span className="robo-overlay__status-dot" />
-              DCS IT Assistant
-            </p>
-          </div>
-        </div>
+      <div className="robo-shell" role="dialog" aria-modal="true" aria-label="Robo">
         <button
           type="button"
+          className="robo-shell__scrim"
           onClick={onClose}
-          className="p-2.5 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition-colors"
           aria-label={t('robo.close')}
-        >
-          <X className="w-6 h-6" />
-        </button>
-      </header>
+        />
 
-      <div className="robo-overlay__layout">
-        <div className="robo-overlay__body">{content}</div>
-        <RoboDogArena mode={dogMode} hint={dogMode === 'search' ? t('robo.searching') : ''} />
+        <div className="robo-panel-float">
+        <header className="robo-overlay__header">
+          <div className="robo-overlay__brand">
+            {canGoBack && (
+              <button
+                type="button"
+                onClick={handleBack}
+                className="mr-2 p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                aria-label={t('robo.back')}
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+            )}
+            <div className="robo-overlay__avatar robo-overlay__avatar--dog">
+              <RoboDog mode="still" size="sm" />
+            </div>
+            <div>
+              <p className="robo-overlay__name">Robo</p>
+              <p className="robo-overlay__status">
+                <span className="robo-overlay__status-dot" />
+                DCS IT Assistant
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2.5 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+            aria-label={t('robo.close')}
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </header>
+
+        <div className="robo-panel-float__body">{content}</div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

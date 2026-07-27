@@ -7,7 +7,15 @@ import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import { Badge } from './ui/badge';
 import { Images, Plus, Trash2, Pencil, Save, X, Eye, ChevronUp, ChevronDown, GripVertical } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from './ui/dialog';
 import api from '../lib/api';
+import { buildDefaultSlideForm } from '../lib/carouselDefaultForm';
 import {
   CAROUSEL_TEMPLATES,
   CAROUSEL_ICON_MAP,
@@ -75,8 +83,9 @@ const CarouselSlidesAdmin = () => {
   const { t, language } = useLanguage();
   const [slides, setSlides] = useState([]);
   const [order, setOrder] = useState([]);
+  const [defaultOverrides, setDefaultOverrides] = useState({});
   const [form, setForm] = useState(EMPTY_CAROUSEL_FORM);
-  const [editingId, setEditingId] = useState(null);
+  const [editingSlideId, setEditingSlideId] = useState(null);
   const [editForm, setEditForm] = useState(EMPTY_CAROUSEL_FORM);
   const [saving, setSaving] = useState(false);
   const [reordering, setReordering] = useState(false);
@@ -94,12 +103,14 @@ const CarouselSlidesAdmin = () => {
       if (Array.isArray(data)) {
         setSlides(data);
         setOrder(buildDefaultCarouselOrder(defaultSlides.length));
+        setDefaultOverrides({});
         setDefaultDurationMs(DEFAULT_CAROUSEL_DURATION_MS);
         setSlideDurations({});
         return;
       }
       setSlides(data.slides || []);
       setOrder(data.order || buildDefaultCarouselOrder(defaultSlides.length));
+      setDefaultOverrides(data.default_overrides || {});
       setDefaultDurationMs(data.default_duration_ms ?? DEFAULT_CAROUSEL_DURATION_MS);
       setSlideDurations(data.slide_durations || {});
     } catch {
@@ -135,8 +146,34 @@ const CarouselSlidesAdmin = () => {
     await persistOrder(nextOrder);
   };
 
-  const getSlideTitle = (slideId) =>
-    getSlideLabelFromId(slideId, { defaultSlides, customSlides: slides, language });
+  const getSlideTitle = (slideId) => {
+    if (isDefaultSlideId(slideId) && defaultOverrides[slideId]) {
+      const normalized = normalizeCarouselSlide(defaultOverrides[slideId]);
+      const overrideTitle = getCarouselText(normalized.titles, language);
+      if (overrideTitle) return overrideTitle;
+    }
+    return getSlideLabelFromId(slideId, { defaultSlides, customSlides: slides, language });
+  };
+
+  const getSlidePreset = (slideId, customSlide, defIndex) => {
+    const override = isDefaultSlideId(slideId) ? defaultOverrides[slideId] : null;
+    if (customSlide) {
+      return buildSlideMeta(customSlide.template, customSlide.icon);
+    }
+    if (override) {
+      return buildSlideMeta(
+        override.template || DEFAULT_SLIDE_META[defIndex]?.template || 'red',
+        override.icon || DEFAULT_SLIDE_META[defIndex]?.icon || 'sparkles'
+      );
+    }
+    if (defIndex >= 0) {
+      return buildSlideMeta(
+        DEFAULT_SLIDE_META[defIndex]?.template || 'red',
+        DEFAULT_SLIDE_META[defIndex]?.icon || 'sparkles'
+      );
+    }
+    return buildSlideMeta('red', 'sparkles');
+  };
 
   const getDurationSecondsForSlide = (slideId) =>
     durationMsToSeconds(getSlideDurationMs(slideId, {
@@ -150,6 +187,9 @@ const CarouselSlidesAdmin = () => {
       const res = await api.put('/api/admin/carousel-slides/settings', payload);
       if (res.data?.default_duration_ms != null) {
         setDefaultDurationMs(res.data.default_duration_ms);
+      }
+      if (res.data?.default_overrides) {
+        setDefaultOverrides(res.data.default_overrides);
       }
       if (res.data?.slide_durations) {
         setSlideDurations(res.data.slide_durations);
@@ -219,23 +259,35 @@ const CarouselSlidesAdmin = () => {
     }
   };
 
-  const startEdit = (slide) => {
-    setEditingId(slide.id);
-    setEditForm(slideToForm(slide));
+  const startEditSlide = (slideId) => {
+    setEditingSlideId(slideId);
+    if (isDefaultSlideId(slideId)) {
+      setEditForm(buildDefaultSlideForm(slideId, defaultOverrides[slideId]));
+    } else {
+      const slide = slides.find((s) => s.id === slideId);
+      if (slide) setEditForm(slideToForm(slide));
+    }
   };
 
   const cancelEdit = () => {
-    setEditingId(null);
+    setEditingSlideId(null);
     setEditForm(EMPTY_CAROUSEL_FORM);
   };
 
-  const handleSaveEdit = async (slideId) => {
+  const handleSaveEdit = async () => {
+    if (!editingSlideId) return;
     const payload = validateForm(editForm);
     if (!payload) return;
 
     setSaving(true);
     try {
-      await api.put(`/api/admin/carousel-slides/${slideId}`, payload);
+      if (isDefaultSlideId(editingSlideId)) {
+        await api.put('/api/admin/carousel-slides/settings', {
+          default_overrides: { [editingSlideId]: payload },
+        });
+      } else {
+        await api.put(`/api/admin/carousel-slides/${editingSlideId}`, payload);
+      }
       cancelEdit();
       alert(t('admin.carousel.updated'));
       fetchSlides();
@@ -246,15 +298,31 @@ const CarouselSlidesAdmin = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm(t('admin.carousel.deleteConfirm'))) return;
+  const handleRemoveSlide = async (slideId) => {
+    const isDefault = isDefaultSlideId(slideId);
+    const confirmMsg = isDefault
+      ? t('admin.carousel.removeBuiltInConfirm')
+      : t('admin.carousel.deleteConfirm');
+    if (!window.confirm(confirmMsg)) return;
+
     setSaving(true);
     try {
-      await api.delete(`/api/admin/carousel-slides/${id}`);
-      if (editingId === id) cancelEdit();
+      if (!isDefault) {
+        await api.delete(`/api/admin/carousel-slides/${slideId}`);
+      }
+      const nextOrder = order.filter((id) => id !== slideId);
+      setOrder(nextOrder);
+      await api.put('/api/admin/carousel-slides/reorder', { order: nextOrder });
+      if (isDefault) {
+        await api.put('/api/admin/carousel-slides/settings', {
+          default_overrides: { [slideId]: null },
+        });
+      }
+      if (editingSlideId === slideId) cancelEdit();
       fetchSlides();
     } catch (err) {
       alert(err.response?.data?.detail || t('admin.carousel.error'));
+      fetchSlides();
     } finally {
       setSaving(false);
     }
@@ -403,14 +471,7 @@ const CarouselSlidesAdmin = () => {
             {order.map((slideId, index) => {
               const customSlide = slides.find((s) => s.id === slideId);
               const defIndex = getDefaultSlideIndex(slideId);
-              const preset = customSlide
-                ? buildSlideMeta(customSlide.template, customSlide.icon)
-                : defIndex >= 0
-                  ? buildSlideMeta(
-                      DEFAULT_SLIDE_META[defIndex]?.template || 'red',
-                      DEFAULT_SLIDE_META[defIndex]?.icon || 'sparkles'
-                    )
-                  : buildSlideMeta('red', 'sparkles');
+              const preset = getSlidePreset(slideId, customSlide, defIndex);
               const { Icon, gradient } = preset;
 
               return (
@@ -438,6 +499,11 @@ const CarouselSlidesAdmin = () => {
                           {t('admin.carousel.custom')}
                         </Badge>
                       )}
+                      {isDefaultSlideId(slideId) && defaultOverrides[slideId] && (
+                        <Badge className="text-xs bg-blue-100 text-blue-800 hover:bg-blue-100">
+                          {t('admin.carousel.edited')}
+                        </Badge>
+                      )}
                       {customSlide?.active === false && (
                         <Badge className="bg-gray-400 text-xs">{t('admin.carousel.inactive')}</Badge>
                       )}
@@ -458,6 +524,28 @@ const CarouselSlidesAdmin = () => {
                     <span className="text-xs text-gray-500 w-4">{t('admin.carousel.secondsShort')}</span>
                   </div>
                   <div className="flex gap-1 shrink-0">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="h-9 w-9 border-orange-200 text-orange-700 hover:bg-orange-50"
+                      disabled={saving || reordering}
+                      onClick={() => startEditSlide(slideId)}
+                      aria-label={t('admin.carousel.edit')}
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="h-9 w-9 text-red-600 border-red-200 hover:bg-red-50"
+                      disabled={saving || reordering}
+                      onClick={() => handleRemoveSlide(slideId)}
+                      aria-label={t('admin.carousel.delete')}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                     <Button
                       type="button"
                       variant="outline"
@@ -488,6 +576,35 @@ const CarouselSlidesAdmin = () => {
         </CardContent>
       </Card>
 
+      <Dialog open={Boolean(editingSlideId)} onOpenChange={(open) => !open && cancelEdit()}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{t('admin.carousel.editTitle')}</DialogTitle>
+            <DialogDescription>
+              {editingSlideId ? getSlideTitle(editingSlideId) : ''}
+            </DialogDescription>
+          </DialogHeader>
+          {renderForm(
+            editForm,
+            setEditForm,
+            (e) => {
+              e.preventDefault();
+              handleSaveEdit();
+            },
+            (
+              <>
+                <Save className="w-4 h-4 mr-2 inline" />
+                {saving ? '...' : t('admin.carousel.save')}
+              </>
+            )
+          )}
+          <Button type="button" variant="outline" disabled={saving} onClick={cancelEdit} className="mt-2">
+            <X className="w-4 h-4 mr-1" />
+            {t('admin.carousel.cancel')}
+          </Button>
+        </DialogContent>
+      </Dialog>
+
       <Card className="border-2">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -505,100 +622,6 @@ const CarouselSlidesAdmin = () => {
           ))}
         </CardContent>
       </Card>
-
-      {slides.length === 0 ? (
-        <p className="text-center text-gray-500 py-8">{t('admin.carousel.empty')}</p>
-      ) : (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          {slides.map((slide) => {
-            const normalized = normalizeCarouselSlide(slide);
-            const isEditing = editingId === slide.id;
-            const displayTitle = getCarouselText(normalized.titles, language);
-            const meta = buildSlideMeta(slide.template, slide.icon);
-            const { Icon, gradient } = meta;
-
-            return (
-              <Card key={slide.id} className="border-2 overflow-hidden">
-                {isEditing ? (
-                  <CardContent className="pt-6 space-y-4">
-                    {renderForm(
-                      editForm,
-                      setEditForm,
-                      (e) => {
-                        e.preventDefault();
-                        handleSaveEdit(slide.id);
-                      },
-                      (
-                        <>
-                          <Save className="w-4 h-4 mr-2 inline" />
-                          {saving ? '...' : t('admin.carousel.save')}
-                        </>
-                      )
-                    )}
-                    <Button type="button" variant="outline" disabled={saving} onClick={cancelEdit}>
-                      <X className="w-4 h-4 mr-1" />
-                      {t('admin.carousel.cancel')}
-                    </Button>
-                  </CardContent>
-                ) : (
-                  <>
-                    <div className={`h-2 bg-gradient-to-r ${gradient}`} />
-                    <CardHeader className="pb-2">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex gap-3 min-w-0">
-                          <div className={`w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white`}>
-                            <Icon className="w-6 h-6" />
-                          </div>
-                          <div className="min-w-0">
-                            <CardTitle className="text-lg truncate">{displayTitle}</CardTitle>
-                            <div className="mt-1 flex flex-wrap gap-1">
-                              <Badge variant="outline">{slide.template}</Badge>
-                              <Badge variant="outline">{slide.icon}</Badge>
-                              {slide.active === false && (
-                                <Badge className="bg-gray-400">{t('admin.carousel.inactive')}</Badge>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex gap-1 shrink-0">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            disabled={saving}
-                            onClick={() => startEdit(slide)}
-                            className="border-orange-200 text-orange-700 hover:bg-orange-50"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            disabled={saving}
-                            onClick={() => handleDelete(slide.id)}
-                            className="text-red-600 border-red-200 hover:bg-red-50"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-gray-600 line-clamp-2">
-                        {getCarouselText(normalized.messages, language)}
-                      </p>
-                      {slide.cta_link && (
-                        <p className="text-xs text-gray-400 mt-2 font-mono">{slide.cta_link}</p>
-                      )}
-                    </CardContent>
-                  </>
-                )}
-              </Card>
-            );
-          })}
-        </div>
-      )}
     </div>
   );
 };

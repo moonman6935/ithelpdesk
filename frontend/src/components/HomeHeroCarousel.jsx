@@ -134,6 +134,7 @@ const HomeHeroCarousel = () => {
   const isMobile = useIsMobile();
   const [carouselOrder, setCarouselOrder] = useState(null);
   const [customSlides, setCustomSlides] = useState([]);
+  const [defaultOverrides, setDefaultOverrides] = useState({});
   const [carouselTiming, setCarouselTiming] = useState({
     default_duration_ms: 7000,
     slide_durations: {},
@@ -148,8 +149,9 @@ const HomeHeroCarousel = () => {
         customSlides,
         language,
         activeOnly: true,
+        defaultOverrides,
       }),
-    [carouselOrder, defaultSlides, customSlides, language]
+    [carouselOrder, defaultSlides, customSlides, language, defaultOverrides]
   );
 
   const [active, setActive] = useState(0);
@@ -169,11 +171,13 @@ const HomeHeroCarousel = () => {
         if (Array.isArray(data)) {
           setCustomSlides(data);
           setCarouselOrder(null);
+          setDefaultOverrides({});
           setCarouselTiming({ default_duration_ms: 7000, slide_durations: {} });
           return;
         }
         setCustomSlides(data.slides || []);
         setCarouselOrder(data.order || null);
+        setDefaultOverrides(data.default_overrides || {});
         setCarouselTiming({
           default_duration_ms: data.default_duration_ms ?? 7000,
           slide_durations: data.slide_durations || {},

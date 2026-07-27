@@ -11,7 +11,17 @@ const RoboDog = ({
   showGlass = false,
 }) => {
   const px =
-    size === 'fab' ? 56 : size === 'sm' ? 40 : size === 'stage' ? 168 : size === 'lg' ? 72 : 56;
+    size === 'fab'
+      ? 48
+      : size === 'roam'
+        ? 52
+        : size === 'sm'
+          ? 36
+          : size === 'stage'
+            ? 120
+            : size === 'lg'
+              ? 64
+              : 52;
 
   const glassOn = showGlass || mode === 'search';
 
@@ -119,11 +129,9 @@ const RoboDog = ({
 
 export function RoboDogArena({ mode, hint }) {
   return (
-    <div className="robo-arena" aria-hidden="true">
-      <div className="robo-arena__glow" />
-      <div className="robo-arena__floor" />
+    <div className="robo-arena robo-arena--compact" aria-hidden="true">
       {mode === 'search' && hint && <p className="robo-arena__hint">{hint}</p>}
-      <RoboDog mode={mode} size="stage" showGlass={mode === 'search'} />
+      <RoboDog mode={mode} size="sm" showGlass={mode === 'search'} />
     </div>
   );
 }

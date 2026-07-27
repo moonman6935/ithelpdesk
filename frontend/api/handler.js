@@ -620,19 +620,19 @@ function normalizeCarouselOrderIds(order, customIds) {
     const seen = new Set();
     const normalized = [];
 
-    (Array.isArray(order) ? order : []).forEach((id) => {
-        if (allIds.has(id) && !seen.has(id)) {
+    if (Array.isArray(order) && order.length > 0) {
+        order.forEach((id) => {
+            if (allIds.has(id) && !seen.has(id)) {
+                normalized.push(id);
+                seen.add(id);
+            }
+        });
+    } else {
+        defaultOrder.forEach((id) => {
             normalized.push(id);
             seen.add(id);
-        }
-    });
-
-    defaultOrder.forEach((id) => {
-        if (!seen.has(id)) {
-            normalized.push(id);
-            seen.add(id);
-        }
-    });
+        });
+    }
 
     customIds.forEach((id) => {
         if (!seen.has(id)) {
@@ -644,12 +644,26 @@ function normalizeCarouselOrderIds(order, customIds) {
     return normalized;
 }
 
+function sanitizeDefaultOverrides(map) {
+    const result = {};
+    if (!map || typeof map !== 'object') return result;
+    for (const [id, payload] of Object.entries(map)) {
+        if (!isDefaultCarouselSlideId(id) || !payload) continue;
+        const validated = validateCarouselPayload(payload);
+        if (!validated.error) {
+            result[id] = validated;
+        }
+    }
+    return result;
+}
+
 async function getCarouselConfig(db, customIds) {
     const doc = await db.collection('carousel_config').findOne({ _id: 'order' });
     return {
         order: normalizeCarouselOrderIds(doc?.slide_ids, customIds),
         default_duration_ms: clampCarouselDuration(doc?.default_duration_ms ?? DEFAULT_CAROUSEL_DURATION_MS),
         slide_durations: sanitizeSlideDurations(doc?.slide_durations, customIds),
+        default_overrides: sanitizeDefaultOverrides(doc?.default_overrides),
     };
 }
 
@@ -678,6 +692,21 @@ async function saveCarouselSettingsDoc(db, customIds, settings) {
     };
     const cleanedDurations = sanitizeSlideDurations(nextDurations, customIds);
 
+    let nextOverrides = { ...current.default_overrides };
+    if (settings.default_overrides && typeof settings.default_overrides === 'object') {
+        for (const [id, payload] of Object.entries(settings.default_overrides)) {
+            if (!isDefaultCarouselSlideId(id)) continue;
+            if (payload === null) {
+                delete nextOverrides[id];
+                continue;
+            }
+            const validated = validateCarouselPayload(payload);
+            if (!validated.error) {
+                nextOverrides[id] = validated;
+            }
+        }
+    }
+
     await db.collection('carousel_config').updateOne(
         { _id: 'order' },
         {
@@ -685,6 +714,7 @@ async function saveCarouselSettingsDoc(db, customIds, settings) {
                 slide_ids: current.order,
                 default_duration_ms: settings.default_duration_ms ?? current.default_duration_ms,
                 slide_durations: cleanedDurations,
+                default_overrides: nextOverrides,
                 updated_at: new Date().toISOString(),
             },
         },
@@ -695,6 +725,7 @@ async function saveCarouselSettingsDoc(db, customIds, settings) {
         order: current.order,
         default_duration_ms: settings.default_duration_ms ?? current.default_duration_ms,
         slide_durations: cleanedDurations,
+        default_overrides: nextOverrides,
     };
 }
 
@@ -715,8 +746,12 @@ function validateCarouselSettings(body, customIds) {
         }
     }
 
-    if (!result.default_duration_ms && !result.slide_durations) {
-        return { error: 'Geçersiz süre ayarları' };
+    if (body?.default_overrides && typeof body.default_overrides === 'object') {
+        result.default_overrides = body.default_overrides;
+    }
+
+    if (!result.default_duration_ms && !result.slide_durations && !result.default_overrides) {
+        return { error: 'Geçersiz ayarlar' };
     }
 
     return result;
@@ -726,18 +761,19 @@ function validateCarouselReorder(order, customIds) {
     if (!Array.isArray(order) || order.length === 0) {
         return { error: 'Geçersiz sıra listesi' };
     }
-    const defaultIds = buildDefaultCarouselOrder();
-    const allValid = new Set([...defaultIds, ...customIds]);
+    const allValid = getValidCarouselSlideIds(customIds);
     const unique = new Set(order);
     if (unique.size !== order.length) {
         return { error: 'Sıra listesinde tekrar eden slayt var' };
     }
-    if (order.length !== allValid.size) {
-        return { error: 'Tüm slaytlar sıra listesinde olmalıdır' };
-    }
     for (const id of order) {
         if (!allValid.has(id)) {
             return { error: 'Geçersiz slayt kimliği' };
+        }
+    }
+    for (const id of customIds) {
+        if (!unique.has(id)) {
+            return { error: 'Özel slaytlar sıra listesinde olmalıdır' };
         }
     }
     return { order };
@@ -1760,6 +1796,7 @@ module.exports = async (req, res) => {
                 slides: customSlides,
                 default_duration_ms: config.default_duration_ms,
                 slide_durations: config.slide_durations,
+                default_overrides: config.default_overrides,
             });
         }
 
@@ -1777,6 +1814,7 @@ module.exports = async (req, res) => {
                 order: config.order,
                 default_duration_ms: config.default_duration_ms,
                 slide_durations: config.slide_durations,
+                default_overrides: config.default_overrides,
             });
         }
 

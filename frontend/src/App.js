@@ -26,7 +26,7 @@ function App() {
             <SiteBackground />
             <AnnouncementPopup />
             <Header />
-            <main className="flex-1 overflow-x-hidden">
+            <main className="flex-1 overflow-x-hidden relative z-10">
               <AnimatedRoutes />
             </main>
             <Footer />

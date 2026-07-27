@@ -43,19 +43,19 @@ export function normalizeCarouselOrder(order, customIds, defaultCount = DEFAULT_
   const seen = new Set();
   const normalized = [];
 
-  (Array.isArray(order) ? order : []).forEach((id) => {
-    if (allIds.has(id) && !seen.has(id)) {
+  if (Array.isArray(order) && order.length > 0) {
+    order.forEach((id) => {
+      if (allIds.has(id) && !seen.has(id)) {
+        normalized.push(id);
+        seen.add(id);
+      }
+    });
+  } else {
+    defaultOrder.forEach((id) => {
       normalized.push(id);
       seen.add(id);
-    }
-  });
-
-  defaultOrder.forEach((id) => {
-    if (!seen.has(id)) {
-      normalized.push(id);
-      seen.add(id);
-    }
-  });
+    });
+  }
 
   customIds.forEach((id) => {
     if (!seen.has(id)) {
@@ -73,6 +73,7 @@ export function resolveOrderedCarouselSlides({
   customSlides,
   language,
   activeOnly = false,
+  defaultOverrides = {},
 }) {
   const customList = activeOnly
     ? customSlides.filter((slide) => slide.active !== false)
@@ -92,9 +93,53 @@ export function resolveOrderedCarouselSlides({
         const defIndex = getDefaultSlideIndex(slideId);
         const slide = defaultSlides[defIndex];
         if (!slide) return null;
-        const preset = DEFAULT_SLIDE_META[defIndex] || DEFAULT_SLIDE_META[0];
+        const override = defaultOverrides?.[slideId];
+        const preset = override
+          ? {
+              template: override.template || DEFAULT_SLIDE_META[defIndex]?.template || 'red',
+              icon: override.icon || DEFAULT_SLIDE_META[defIndex]?.icon || 'sparkles',
+            }
+          : DEFAULT_SLIDE_META[defIndex] || DEFAULT_SLIDE_META[0];
+
+        let title = slide.title;
+        let message = slide.message;
+        let ctaLink = slide.ctaLink || '';
+        let ctaLabel = slide.ctaLabel || '';
+
+        if (override) {
+          const lang = language || 'tr';
+          if (override.titles) {
+            title =
+              override.titles[lang] ||
+              override.titles.tr ||
+              override.titles.de ||
+              override.titles.en ||
+              title;
+          }
+          if (override.messages) {
+            message =
+              override.messages[lang] ||
+              override.messages.tr ||
+              override.messages.de ||
+              override.messages.en ||
+              message;
+          }
+          if (override.cta_link) ctaLink = override.cta_link;
+          if (override.cta_labels) {
+            ctaLabel =
+              override.cta_labels[lang] ||
+              override.cta_labels.tr ||
+              override.cta_labels.de ||
+              override.cta_labels.en ||
+              ctaLabel;
+          }
+        }
+
         return {
-          ...slide,
+          title,
+          message,
+          ctaLink,
+          ctaLabel,
           slideId,
           defIndex,
           isDefault: true,

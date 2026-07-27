@@ -234,7 +234,7 @@
   40%, 60% { opacity: 1; transform: translateX(8px) scale(1); }
 }
 
-/* ── Dog arena (bottom roam zone) ── */
+/* ── Dog arena (legacy / compact) ── */
 .robo-overlay__layout {
   position: relative;
   z-index: 2;
@@ -252,12 +252,19 @@
 .robo-arena {
   position: relative;
   flex-shrink: 0;
-  height: clamp(180px, 32vh, 280px);
-  margin: 0 1rem 1rem;
-  border-radius: 1.25rem;
+  height: clamp(72px, 12vh, 96px);
+  margin: 0 1rem 0.75rem;
+  border-radius: 0.85rem;
   border: 1px solid rgba(34, 211, 238, 0.08);
-  background: transparent;
+  background: rgba(8, 47, 73, 0.35);
   overflow: hidden;
+}
+
+.robo-arena--compact .robo-dog-wrap {
+  position: absolute;
+  bottom: 0.15rem;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .robo-arena__glow {
@@ -463,6 +470,205 @@
   overflow: hidden;
 }
 
+/* ── Floating shell (page stays visible, dog roams viewport) ── */
+.robo-shell {
+  position: fixed;
+  inset: 0;
+  z-index: 10040;
+  pointer-events: none;
+}
+
+.robo-shell__scrim {
+  position: fixed;
+  inset: 0;
+  border: none;
+  background: rgba(3, 7, 18, 0.28);
+  backdrop-filter: blur(2px);
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 10040;
+}
+
+.robo-panel-float {
+  position: fixed;
+  z-index: 10050;
+  pointer-events: auto;
+  right: max(0.75rem, env(safe-area-inset-right));
+  top: max(0.75rem, env(safe-area-inset-top));
+  bottom: max(0.75rem, env(safe-area-inset-bottom));
+  width: min(26rem, calc(100vw - 1.5rem));
+  display: flex;
+  flex-direction: column;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(15, 23, 42, 0.94);
+  backdrop-filter: blur(16px);
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(99, 102, 241, 0.15) inset;
+  overflow: hidden;
+  animation: robo-panel-float-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes robo-panel-float-in {
+  from {
+    opacity: 0;
+    transform: translateX(24px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.robo-panel-float__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1rem 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.robo-panel-float .robo-overlay__header {
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.85);
+  padding: 0.75rem 1rem;
+}
+
+/* ── Viewport-roaming dog ── */
+.robo-dog-roam {
+  position: fixed;
+  left: 12%;
+  top: 68%;
+  transform: translate(-50%, -50%);
+  z-index: 8;
+  pointer-events: none;
+  will-change: left, top, transform, z-index;
+}
+
+.robo-dog-roam--idle {
+  left: 18%;
+  top: 72%;
+  z-index: 8;
+  animation: robo-dog-idle-bob 3s ease-in-out infinite;
+}
+
+@keyframes robo-dog-idle-bob {
+  0%, 100% { transform: translate(-50%, -50%); }
+  50% { transform: translate(-50%, calc(-50% - 4px)); }
+}
+
+.robo-dog-roam--roam {
+  animation: robo-dog-roam-path 16s ease-in-out infinite;
+}
+
+.robo-dog-roam--search {
+  animation: robo-dog-search-path 3.8s ease-in-out infinite;
+}
+
+@keyframes robo-dog-roam-path {
+  0% {
+    left: 10%;
+    top: 78%;
+    z-index: 8;
+    transform: translate(-50%, -50%) scaleX(1);
+  }
+  12% {
+    left: 28%;
+    top: 62%;
+    z-index: 8;
+    transform: translate(-50%, -50%) scaleX(1);
+  }
+  24% {
+    left: 48%;
+    top: 38%;
+    z-index: 35;
+    transform: translate(-50%, -50%) scaleX(1);
+  }
+  36% {
+    left: 72%;
+    top: 28%;
+    z-index: 35;
+    transform: translate(-50%, -50%) scaleX(-1);
+  }
+  48% {
+    left: 88%;
+    top: 48%;
+    z-index: 8;
+    transform: translate(-50%, -50%) scaleX(-1);
+  }
+  60% {
+    left: 62%;
+    top: 72%;
+    z-index: 8;
+    transform: translate(-50%, -50%) scaleX(-1);
+  }
+  72% {
+    left: 38%;
+    top: 82%;
+    z-index: 35;
+    transform: translate(-50%, -50%) scaleX(1);
+  }
+  84% {
+    left: 22%;
+    top: 52%;
+    z-index: 35;
+    transform: translate(-50%, -50%) scaleX(1);
+  }
+  100% {
+    left: 10%;
+    top: 78%;
+    z-index: 8;
+    transform: translate(-50%, -50%) scaleX(1);
+  }
+}
+
+@keyframes robo-dog-search-path {
+  0% {
+    left: 20%;
+    top: 70%;
+    z-index: 8;
+    transform: translate(-50%, -50%) scaleX(1);
+  }
+  20% {
+    left: 42%;
+    top: 45%;
+    z-index: 35;
+    transform: translate(-50%, -50%) scaleX(1);
+  }
+  40% {
+    left: 68%;
+    top: 32%;
+    z-index: 35;
+    transform: translate(-50%, -50%) scaleX(-1);
+  }
+  60% {
+    left: 82%;
+    top: 58%;
+    z-index: 8;
+    transform: translate(-50%, -50%) scaleX(-1);
+  }
+  80% {
+    left: 52%;
+    top: 76%;
+    z-index: 8;
+    transform: translate(-50%, -50%) scaleX(1);
+  }
+  100% {
+    left: 20%;
+    top: 70%;
+    z-index: 8;
+    transform: translate(-50%, -50%) scaleX(1);
+  }
+}
+
+.robo-dog-roam .robo-dog {
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.35));
+}
+
 .robo-overlay__grid {
   position: absolute;
   inset: 0;
@@ -565,7 +771,7 @@
 
 .robo-panel {
   width: 100%;
-  max-width: 42rem;
+  max-width: 100%;
   animation: robo-panel-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
@@ -586,15 +792,15 @@
 .robo-bubble {
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(6, 182, 212, 0.12));
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 1.25rem 1.25rem 1.25rem 0.35rem;
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 1.5rem;
+  border-radius: 1rem;
+  padding: 1rem 1.15rem;
+  margin-bottom: 1rem;
   backdrop-filter: blur(8px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .robo-bubble__title {
-  font-size: clamp(1.35rem, 4vw, 1.75rem);
+  font-size: clamp(1.1rem, 3.5vw, 1.45rem);
   font-weight: 800;
   color: #fff;
   margin: 0 0 0.5rem;
@@ -626,8 +832,8 @@
 .robo-choice {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 1rem 1.1rem;
+  gap: 0.65rem;
+  padding: 0.75rem 0.9rem;
   border-radius: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.05);
@@ -897,6 +1103,8 @@
   .robo-choice,
   .robo-check-item,
   .robo-result__icon,
+  .robo-dog-roam,
+  .robo-panel-float,
   .robo-dog-wrap--roam .robo-dog,
   .robo-dog-wrap--still .robo-dog,
   .robo-dog-wrap--search .robo-dog,
@@ -924,12 +1132,41 @@
     right: max(1rem, env(safe-area-inset-right));
   }
 
+  .robo-panel-float {
+    right: 0;
+    left: 0;
+    top: auto;
+    bottom: 0;
+    width: 100%;
+    max-height: min(78vh, 640px);
+    border-radius: 1.25rem 1.25rem 0 0;
+    animation: robo-panel-float-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes robo-panel-float-up {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   .robo-fab__dog,
   .robo-dog-wrap--roam .robo-dog,
   .robo-dog-wrap--roam .robo-dog__tail,
   .robo-dog-wrap--search .robo-dog__head,
   .robo-arena .robo-dog-wrap--roam,
-  .robo-arena .robo-dog-wrap--search {
+  .robo-arena .robo-dog-wrap--search,
+  .robo-dog-roam--roam,
+  .robo-dog-roam--search {
     animation: none !important;
+  }
+
+  .robo-dog-roam--idle {
+    left: 14%;
+    top: 58%;
   }
 }
