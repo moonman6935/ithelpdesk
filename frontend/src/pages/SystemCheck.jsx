@@ -256,48 +256,75 @@ const SystemCheck = () => {
       title={t('systemCheck.title')}
       subtitle={t('systemCheck.subtitle')}
     >
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <Card>
-          <CardHeader>
-            <CardTitle>{t('systemCheck.requirementsTitle')}</CardTitle>
-            <CardDescription>{t('systemCheck.requirementsDesc')}</CardDescription>
+          <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-4">
+            <CardTitle className="text-base sm:text-xl">{t('systemCheck.requirementsTitle')}</CardTitle>
+            <CardDescription className="text-xs sm:text-sm hidden sm:block">{t('systemCheck.requirementsDesc')}</CardDescription>
           </CardHeader>
-          <CardContent>
-            <ul className="grid sm:grid-cols-2 gap-2 text-sm text-gray-700">
+          <CardContent className="p-4 sm:p-6 pt-0">
+            <details className="sm:hidden group">
+              <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden text-xs font-medium text-slate-600 flex items-center justify-between py-1">
+                <span className="line-clamp-1">{t('systemCheck.requirementsDesc')}</span>
+                <span className="text-slate-400 group-open:hidden shrink-0 ml-2">{t('systemCheck.showDetails')}</span>
+                <span className="text-slate-400 hidden group-open:inline shrink-0 ml-2">{t('systemCheck.hideDetails')}</span>
+              </summary>
+              <ul className="grid grid-cols-1 gap-1.5 text-xs text-gray-700 mt-2">
+                <li className="flex items-center gap-2">
+                  <Cpu className="w-3.5 h-3.5 text-slate-500 shrink-0" /> {t('systemCheck.reqCpu')}
+                </li>
+                <li className="flex items-center gap-2">
+                  <MemoryStick className="w-3.5 h-3.5 text-slate-500 shrink-0" /> {t('systemCheck.reqRam')}
+                </li>
+                <li className="flex items-center gap-2">
+                  <HardDrive className="w-3.5 h-3.5 text-slate-500 shrink-0" /> {t('systemCheck.reqDisk')}
+                </li>
+                <li className="flex items-center gap-2">
+                  <Monitor className="w-3.5 h-3.5 text-slate-500 shrink-0" /> {t('systemCheck.reqGpu')}
+                </li>
+                <li className="flex items-center gap-2">
+                  <Laptop className="w-3.5 h-3.5 text-slate-500 shrink-0" /> {t('systemCheck.reqOs')}
+                </li>
+                <li className="flex items-center gap-2">
+                  <Wifi className="w-3.5 h-3.5 text-slate-500 shrink-0" /> {t('systemCheck.reqNet')}
+                </li>
+              </ul>
+            </details>
+            <ul className="hidden sm:grid sm:grid-cols-2 gap-2 text-sm text-gray-700">
               <li className="flex items-center gap-2">
-                <Cpu className="w-4 h-4 text-slate-500" /> {t('systemCheck.reqCpu')}
+                <Cpu className="w-4 h-4 text-slate-500 shrink-0" /> {t('systemCheck.reqCpu')}
               </li>
               <li className="flex items-center gap-2">
-                <MemoryStick className="w-4 h-4 text-slate-500" /> {t('systemCheck.reqRam')}
+                <MemoryStick className="w-4 h-4 text-slate-500 shrink-0" /> {t('systemCheck.reqRam')}
               </li>
               <li className="flex items-center gap-2">
-                <HardDrive className="w-4 h-4 text-slate-500" /> {t('systemCheck.reqDisk')}
+                <HardDrive className="w-4 h-4 text-slate-500 shrink-0" /> {t('systemCheck.reqDisk')}
               </li>
               <li className="flex items-center gap-2">
-                <Monitor className="w-4 h-4 text-slate-500" /> {t('systemCheck.reqGpu')}
+                <Monitor className="w-4 h-4 text-slate-500 shrink-0" /> {t('systemCheck.reqGpu')}
               </li>
               <li className="flex items-center gap-2">
-                <Laptop className="w-4 h-4 text-slate-500" /> {t('systemCheck.reqOs')}
+                <Laptop className="w-4 h-4 text-slate-500 shrink-0" /> {t('systemCheck.reqOs')}
               </li>
               <li className="flex items-center gap-2">
-                <Wifi className="w-4 h-4 text-slate-500" /> {t('systemCheck.reqNet')}
+                <Wifi className="w-4 h-4 text-slate-500 shrink-0" /> {t('systemCheck.reqNet')}
               </li>
             </ul>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>{t('systemCheck.formTitle')}</CardTitle>
-            <CardDescription>{t('systemCheck.formDesc')}</CardDescription>
+          <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-4">
+            <CardTitle className="text-base sm:text-xl">{t('systemCheck.formTitle')}</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">{t('systemCheck.formDesc')}</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <Alert className="border-teal-200 bg-teal-50">
-              <AlertDescription className="text-teal-900 text-sm space-y-2">
+          <CardContent className="p-4 sm:p-6 pt-0 space-y-3 sm:space-y-4">
+            <Alert className="border-teal-200 bg-teal-50 py-3">
+              <AlertDescription className="text-teal-900 text-xs sm:text-sm space-y-2">
                 <p className="font-semibold">{t('systemCheck.hwToolTitle')}</p>
-                <p>{t('systemCheck.hwToolDesc')}</p>
+                <p className="hidden sm:block">{t('systemCheck.hwToolDesc')}</p>
                 <a href={hwToolUrl} download="DCS-Sistem-Donanim.cmd">
-                  <Button type="button" variant="outline" size="sm" className="mt-1 border-teal-600 text-teal-800">
+                  <Button type="button" variant="outline" size="sm" className="mt-1 border-teal-600 text-teal-800 w-full sm:w-auto">
                     <Download className="w-4 h-4 mr-2" />
                     {t('systemCheck.hwToolDownload')}
                   </Button>
@@ -306,8 +333,8 @@ const SystemCheck = () => {
             </Alert>
 
             {hwSource === 'cmd' && (
-              <Alert className="border-emerald-200 bg-emerald-50">
-                <AlertDescription className="text-emerald-900 text-sm">
+              <Alert className="border-emerald-200 bg-emerald-50 py-3">
+                <AlertDescription className="text-emerald-900 text-xs sm:text-sm">
                   {t('systemCheck.hwToolApplied')}
                   {probes?.cpuName ? ` — ${probes.cpuName}` : ''}
                 </AlertDescription>
@@ -315,46 +342,52 @@ const SystemCheck = () => {
             )}
 
             {probes && (
-              <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 text-sm text-gray-600 space-y-1">
-                <p className="font-medium text-gray-800">{t('systemCheck.autoTitle')}</p>
-                <p>
-                  {t('systemCheck.autoOs')}:{' '}
-                  {probes.os === 'windows11'
-                    ? t('systemCheck.osWin11')
-                    : probes.os === 'windows10'
-                      ? t('systemCheck.osWin10')
-                      : probes.os === 'other'
-                        ? t('systemCheck.osOther')
-                        : t('systemCheck.unknown')}
-                </p>
-                <p>
-                  {t('systemCheck.autoRam')}:{' '}
-                  {typeof probes.ramGb === 'number' ? `${probes.ramGb} GB` : t('systemCheck.unknown')}
-                </p>
-                {probes.cpuName && (
-                  <p className="break-all">
-                    {t('systemCheck.autoCpu')}: {probes.cpuName}
-                  </p>
-                )}
-                <p>
-                  {t('systemCheck.autoCores')}:{' '}
-                  {probes.cpuCores != null ? probes.cpuCores : t('systemCheck.unknown')}
-                </p>
-                <p className="break-all">
-                  {t('systemCheck.autoGpu')}: {probes.gpuName || t('systemCheck.unknown')}
-                </p>
-                {probes.storageEstimateGb != null && hwSource !== 'cmd' && (
+              <details className="rounded-xl bg-slate-50 border border-slate-200 text-sm text-gray-600 group">
+                <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden p-3 sm:p-4 font-medium text-gray-800 flex items-center justify-between gap-2">
+                  <span>{t('systemCheck.autoTitle')}</span>
+                  <span className="text-xs text-slate-500 group-open:hidden shrink-0">{t('systemCheck.showDetails')}</span>
+                  <span className="text-xs text-slate-500 hidden group-open:inline shrink-0">{t('systemCheck.hideDetails')}</span>
+                </summary>
+                <div className="px-3 sm:px-4 pb-3 sm:pb-4 space-y-1 text-xs sm:text-sm border-t border-slate-200 pt-2">
                   <p>
-                    {t('systemCheck.autoStorage')}: ~{probes.storageEstimateGb} GB
-                    <span className="text-amber-700"> ({t('systemCheck.autoStorageHint')})</span>
+                    {t('systemCheck.autoOs')}:{' '}
+                    {probes.os === 'windows11'
+                      ? t('systemCheck.osWin11')
+                      : probes.os === 'windows10'
+                        ? t('systemCheck.osWin10')
+                        : probes.os === 'other'
+                          ? t('systemCheck.osOther')
+                          : t('systemCheck.unknown')}
                   </p>
-                )}
-              </div>
+                  <p>
+                    {t('systemCheck.autoRam')}:{' '}
+                    {typeof probes.ramGb === 'number' ? `${probes.ramGb} GB` : t('systemCheck.unknown')}
+                  </p>
+                  {probes.cpuName && (
+                    <p className="break-all">
+                      {t('systemCheck.autoCpu')}: {probes.cpuName}
+                    </p>
+                  )}
+                  <p>
+                    {t('systemCheck.autoCores')}:{' '}
+                    {probes.cpuCores != null ? probes.cpuCores : t('systemCheck.unknown')}
+                  </p>
+                  <p className="break-all">
+                    {t('systemCheck.autoGpu')}: {probes.gpuName || t('systemCheck.unknown')}
+                  </p>
+                  {probes.storageEstimateGb != null && hwSource !== 'cmd' && (
+                    <p>
+                      {t('systemCheck.autoStorage')}: ~{probes.storageEstimateGb} GB
+                      <span className="text-amber-700"> ({t('systemCheck.autoStorageHint')})</span>
+                    </p>
+                  )}
+                </div>
+              </details>
             )}
 
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <label className="block text-sm">
-                <span className="font-medium text-gray-800 mb-1 block">{t('systemCheck.fieldOs')}</span>
+                <span className="font-medium text-gray-800 mb-1 block text-xs sm:text-sm">{t('systemCheck.fieldOs')}</span>
                 <select
                   className="w-full h-10 rounded-md border border-input bg-white px-3 text-sm"
                   value={osSelect}
@@ -373,7 +406,7 @@ const SystemCheck = () => {
               </label>
 
               <label className="block text-sm">
-                <span className="font-medium text-gray-800 mb-1 block">{t('systemCheck.fieldCpu')}</span>
+                <span className="font-medium text-gray-800 mb-1 block text-xs sm:text-sm">{t('systemCheck.fieldCpu')}</span>
                 <select
                   className="w-full h-10 rounded-md border border-input bg-white px-3 text-sm"
                   value={cpuSelect}
@@ -386,12 +419,12 @@ const SystemCheck = () => {
                     </option>
                   ))}
                 </select>
-                <span className="text-xs text-gray-500 mt-1 block">{t('systemCheck.fieldCpuHint')}</span>
+                <span className="text-xs text-gray-500 mt-1 hidden sm:block">{t('systemCheck.fieldCpuHint')}</span>
               </label>
 
               {needsRamManual && (
                 <label className="block text-sm">
-                  <span className="font-medium text-gray-800 mb-1 block">{t('systemCheck.fieldRam')}</span>
+                  <span className="font-medium text-gray-800 mb-1 block text-xs sm:text-sm">{t('systemCheck.fieldRam')}</span>
                   <select
                     className="w-full h-10 rounded-md border border-input bg-white px-3 text-sm"
                     value={ramSelect}
@@ -408,7 +441,7 @@ const SystemCheck = () => {
               )}
 
               <label className="block text-sm">
-                <span className="font-medium text-gray-800 mb-1 block">{t('systemCheck.fieldDisk')}</span>
+                <span className="font-medium text-gray-800 mb-1 block text-xs sm:text-sm">{t('systemCheck.fieldDisk')}</span>
                 <select
                   className="w-full h-10 rounded-md border border-input bg-white px-3 text-sm"
                   value={diskSelect}
@@ -421,11 +454,11 @@ const SystemCheck = () => {
                     </option>
                   ))}
                 </select>
-                <span className="text-xs text-gray-500 mt-1 block">{t('systemCheck.fieldDiskHint')}</span>
+                <span className="text-xs text-gray-500 mt-1 hidden sm:block">{t('systemCheck.fieldDiskHint')}</span>
               </label>
 
               <label className="block text-sm">
-                <span className="font-medium text-gray-800 mb-1 block">{t('systemCheck.fieldGpu')}</span>
+                <span className="font-medium text-gray-800 mb-1 block text-xs sm:text-sm">{t('systemCheck.fieldGpu')}</span>
                 <select
                   className="w-full h-10 rounded-md border border-input bg-white px-3 text-sm"
                   value={gpuSelect}
@@ -438,18 +471,18 @@ const SystemCheck = () => {
                     </option>
                   ))}
                 </select>
-                <span className="text-xs text-gray-500 mt-1 block">{t('systemCheck.fieldGpuHint')}</span>
+                <span className="text-xs text-gray-500 mt-1 hidden sm:block">{t('systemCheck.fieldGpuHint')}</span>
               </label>
             </div>
 
             {error && (
-              <Alert className="border-red-200 bg-red-50">
-                <AlertDescription className="text-red-800">{error}</AlertDescription>
+              <Alert className="border-red-200 bg-red-50 py-3">
+                <AlertDescription className="text-red-800 text-sm">{error}</AlertDescription>
               </Alert>
             )}
 
             {running && (
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-2">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 sm:p-4 space-y-2">
                 <p className="text-sm font-medium text-gray-800">
                   {phase === 'upload' ? t('systemCheck.testingUpload') : t('systemCheck.testingDownload')}
                 </p>
@@ -480,24 +513,24 @@ const SystemCheck = () => {
         </Card>
 
         {report && styles && (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <div
-              className={`relative overflow-hidden rounded-3xl bg-gradient-to-br ${styles.band} text-white shadow-xl p-8`}
+              className={`relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br ${styles.band} text-white shadow-xl p-5 sm:p-8`}
             >
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                <StatusIcon className="w-14 h-14 shrink-0" />
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                <StatusIcon className="w-10 h-10 sm:w-14 sm:h-14 shrink-0" />
                 <div className="flex-1">
-                  <p className="text-sm uppercase tracking-wide text-white/80 mb-1">
+                  <p className="text-xs sm:text-sm uppercase tracking-wide text-white/80 mb-1">
                     {t('systemCheck.reportTitle')}
                   </p>
-                  <h2 className="text-3xl font-bold">
+                  <h2 className="text-2xl sm:text-3xl font-bold">
                     {report.status === 'pass'
                       ? t('systemCheck.verdictPass')
                       : report.status === 'warn'
                         ? t('systemCheck.verdictWarn')
                         : t('systemCheck.verdictFail')}
                   </h2>
-                  <p className="text-white/90 mt-2">
+                  <p className="text-white/90 mt-1.5 sm:mt-2 text-sm sm:text-base">
                     {report.status === 'pass'
                       ? t('systemCheck.verdictPassDesc')
                       : report.status === 'warn'
@@ -508,9 +541,9 @@ const SystemCheck = () => {
               </div>
 
               {report.status === 'warn' && (
-                <div className="mt-6">
+                <div className="mt-4 sm:mt-6">
                   <Link to="/windows-11-upgrade">
-                    <Button size="lg" className="bg-white text-orange-700 hover:bg-orange-50">
+                    <Button size="lg" className="bg-white text-orange-700 hover:bg-orange-50 w-full sm:w-auto">
                       {t('systemCheck.goWin11')}
                       <ArrowRight className="ml-2 w-5 h-5" />
                     </Button>
@@ -520,10 +553,10 @@ const SystemCheck = () => {
             </div>
 
             {report.failReasons?.length > 0 && report.status === 'fail' && (
-              <Alert className="border-red-200 bg-red-50">
+              <Alert className="border-red-200 bg-red-50 py-3">
                 <AlertDescription>
-                  <p className="font-semibold text-red-900 mb-2">{t('systemCheck.reasonsTitle')}</p>
-                  <ul className="list-disc pl-5 space-y-1 text-red-800 text-sm">
+                  <p className="font-semibold text-red-900 mb-2 text-sm">{t('systemCheck.reasonsTitle')}</p>
+                  <ul className="list-disc pl-5 space-y-1 text-red-800 text-xs sm:text-sm">
                     {report.failReasons.map((id) => (
                       <li key={id}>{t(`systemCheck.reason.${id}`)}</li>
                     ))}
@@ -533,20 +566,20 @@ const SystemCheck = () => {
             )}
 
             <Card>
-              <CardHeader>
-                <CardTitle>{t('systemCheck.detailsTitle')}</CardTitle>
+              <CardHeader className="p-4 sm:p-6 pb-2">
+                <CardTitle className="text-base sm:text-xl">{t('systemCheck.detailsTitle')}</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="p-4 sm:p-6 pt-0 space-y-2 sm:space-y-3">
                 {report.checks.map((c) => {
                   const Icon = checkIcon(c.id);
                   const ok = c.pass || c.warn;
                   return (
                     <div
                       key={c.id}
-                      className="flex items-start gap-3 rounded-xl border border-gray-100 bg-white p-3"
+                      className="flex items-start gap-2.5 sm:gap-3 rounded-xl border border-gray-100 bg-white p-2.5 sm:p-3"
                     >
                       <div
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                        className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0 ${
                           c.pass
                             ? 'bg-emerald-100 text-emerald-700'
                             : c.warn
@@ -554,12 +587,12 @@ const SystemCheck = () => {
                               : 'bg-red-100 text-red-700'
                         }`}
                       >
-                        <Icon className="w-5 h-5" />
+                        <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <p className="font-semibold text-gray-900">{t(`systemCheck.check.${c.id}`)}</p>
-                          <Badge className={statusStyles(c.pass ? 'pass' : c.warn ? 'warn' : 'fail').badge}>
+                          <p className="font-semibold text-gray-900 text-sm sm:text-base">{t(`systemCheck.check.${c.id}`)}</p>
+                          <Badge className={`${statusStyles(c.pass ? 'pass' : c.warn ? 'warn' : 'fail').badge} text-[10px] sm:text-xs`}>
                             {c.pass
                               ? t('systemCheck.ok')
                               : c.warn
@@ -567,7 +600,7 @@ const SystemCheck = () => {
                                 : t('systemCheck.fail')}
                           </Badge>
                         </div>
-                        <p className="text-sm text-gray-600 mt-0.5">
+                        <p className="text-xs sm:text-sm text-gray-600 mt-0.5">
                           {formatCheckValue(c.id, c.value, t)}
                           {c.id === 'download' || c.id === 'upload'
                             ? ` · ${t('systemCheck.min')}: ${c.required} Mbps`
@@ -575,11 +608,11 @@ const SystemCheck = () => {
                         </p>
                       </div>
                       {ok && c.pass ? (
-                        <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                        <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 shrink-0" />
                       ) : c.warn ? (
-                        <AlertTriangle className="w-5 h-5 text-orange-600 shrink-0" />
+                        <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600 shrink-0" />
                       ) : (
-                        <XCircle className="w-5 h-5 text-red-600 shrink-0" />
+                        <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 shrink-0" />
                       )}
                     </div>
                   );
@@ -587,7 +620,7 @@ const SystemCheck = () => {
               </CardContent>
             </Card>
 
-            <p className="text-xs text-gray-500 text-center">{t('systemCheck.tpmNote')}</p>
+            <p className="text-[11px] sm:text-xs text-gray-500 text-center px-2">{t('systemCheck.tpmNote')}</p>
           </div>
         )}
       </div>

@@ -1,10 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAppOpenTransition } from '../contexts/AppOpenTransitionContext';
 import { Button } from './ui/button';
 import BrandLogo from './BrandLogo';
 import SiteSearch from './SiteSearch';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetClose,
+} from './ui/sheet';
 import {
   Home,
   Monitor,
@@ -14,6 +22,7 @@ import {
   ClipboardCheck,
   Truck,
   Video,
+  Menu,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -99,7 +108,7 @@ const LANGUAGES = [
   { code: 'ka', name: 'ქართული', flag: 'https://flagcdn.com/w80/ge.png' },
 ];
 
-function NavLinkButton({ item, active, className, size = 'sm' }) {
+function NavLinkButton({ item, active, className, size = 'sm', onNavigate }) {
   const { t } = useLanguage();
   const location = useLocation();
   const { openFromElement } = useAppOpenTransition();
@@ -107,8 +116,12 @@ function NavLinkButton({ item, active, className, size = 'sm' }) {
   const useDirectNav = location.pathname.startsWith('/admin') || location.pathname.startsWith('/login');
 
   const handleClick = (e) => {
-    if (active || useDirectNav) return;
+    if (active || useDirectNav) {
+      onNavigate?.();
+      return;
+    }
     e.preventDefault();
+    onNavigate?.();
     openFromElement(e.currentTarget, {
       to: item.path,
       gradientClasses: item.gradientClasses,
@@ -120,13 +133,14 @@ function NavLinkButton({ item, active, className, size = 'sm' }) {
   };
 
   return (
-    <Link to={item.path} onClick={handleClick}>
+    <Link to={item.path} onClick={handleClick} className="block">
       <Button
         data-app-card
         variant="ghost"
         size={size}
         className={`app-card-source transition-all duration-300 ${className}`}
       >
+        {item.Icon && <item.Icon className="w-4 h-4 mr-2 shrink-0 lg:hidden" />}
         {label}
       </Button>
     </Link>
@@ -136,6 +150,7 @@ function NavLinkButton({ item, active, className, size = 'sm' }) {
 const Header = () => {
   const { language, setLanguage, t } = useLanguage();
   const location = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const isActive = (path) => location.pathname === path;
 
@@ -147,52 +162,111 @@ const Header = () => {
   return (
     <header className="z-50 site-container pt-3 pb-1">
       <div className="w-full">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-red-500 via-red-600 to-orange-500 shadow-xl border border-white/25">
+        <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-r from-red-500 via-red-600 to-orange-500 shadow-xl border border-white/25">
           <div className="absolute inset-0 pointer-events-none overflow-hidden decorative-blur">
             <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-yellow-300/25 blur-2xl" />
             <div className="absolute -bottom-10 left-1/4 w-32 h-32 rounded-full bg-orange-300/20 blur-xl" />
-            <div className="absolute top-0 right-1/3 w-24 h-24 rounded-full bg-violet-400/15 blur-xl" />
           </div>
 
-          <div className="relative px-3 sm:px-5 py-3 md:py-4">
-            <div className="flex items-center justify-between gap-3">
+          <div className="relative px-3 sm:px-5 py-2.5 sm:py-3 md:py-4">
+            <div className="flex items-center justify-between gap-2 sm:gap-3">
               <Link
                 to="/"
-                className="flex items-center gap-3 sm:gap-4 min-w-0 hover:opacity-95 transition-opacity group"
+                className="flex items-center gap-2 sm:gap-3 min-w-0 hover:opacity-95 transition-opacity group"
               >
                 <BrandLogo
                   framed
                   frame="header"
                   crop="mark"
                   variant="light"
-                  className="h-11 sm:h-12 w-auto"
+                  className="h-9 sm:h-11 md:h-12 w-auto"
                 />
-                <span className="text-base sm:text-lg font-bold text-white truncate group-hover:text-orange-100 transition-colors">
+                <span className="text-sm sm:text-base md:text-lg font-bold text-white truncate group-hover:text-orange-100 transition-colors">
                   {t('header.title')}
                 </span>
               </Link>
 
-              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+              <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
                 <SiteSearch />
-                {LANGUAGES.map((lang) => (
-                  <button
-                    key={lang.code}
-                    type="button"
-                    onClick={() => setLanguage(lang.code)}
-                    title={lang.name}
-                    className={`relative rounded-xl overflow-hidden transition-all duration-300 border-2 ${
-                      language === lang.code
-                        ? 'border-white scale-110 shadow-lg ring-2 ring-white/50'
-                        : 'border-white/30 opacity-80 hover:opacity-100 hover:scale-105 hover:border-white/60'
-                    }`}
-                  >
-                    <img
-                      src={lang.flag}
-                      alt={lang.name}
-                      className="w-9 h-6 sm:w-10 sm:h-7 object-cover block"
-                    />
-                  </button>
-                ))}
+                <div className="hidden sm:flex items-center gap-1">
+                  {LANGUAGES.map((lang) => (
+                    <button
+                      key={lang.code}
+                      type="button"
+                      onClick={() => setLanguage(lang.code)}
+                      title={lang.name}
+                      className={`relative rounded-lg sm:rounded-xl overflow-hidden transition-all duration-300 border-2 ${
+                        language === lang.code
+                          ? 'border-white scale-105 shadow-lg ring-1 ring-white/50'
+                          : 'border-white/30 opacity-80 hover:opacity-100 hover:border-white/60'
+                      }`}
+                    >
+                      <img
+                        src={lang.flag}
+                        alt={lang.name}
+                        className="w-7 h-5 sm:w-9 sm:h-6 md:w-10 md:h-7 object-cover block"
+                      />
+                    </button>
+                  ))}
+                </div>
+
+                <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+                  <SheetTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="lg:hidden text-white hover:bg-white/15 rounded-xl h-9 w-9"
+                      aria-label={t('header.menu')}
+                    >
+                      <Menu className="w-5 h-5" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="right" className="w-[min(100%,20rem)] p-0 border-0">
+                    <div className="h-full flex flex-col bg-gradient-to-b from-red-600 via-red-600 to-orange-600 text-white">
+                      <SheetHeader className="px-5 pt-5 pb-3 text-left border-b border-white/20">
+                        <SheetTitle className="text-white text-lg">{t('header.menu')}</SheetTitle>
+                      </SheetHeader>
+
+                      <div className="px-4 py-3 flex flex-wrap gap-1.5 border-b border-white/15">
+                        {LANGUAGES.map((lang) => (
+                          <button
+                            key={lang.code}
+                            type="button"
+                            onClick={() => setLanguage(lang.code)}
+                            title={lang.name}
+                            className={`rounded-lg overflow-hidden border-2 transition-all ${
+                              language === lang.code
+                                ? 'border-white scale-105'
+                                : 'border-white/30 opacity-80'
+                            }`}
+                          >
+                            <img src={lang.flag} alt={lang.name} className="w-9 h-6 object-cover block" />
+                          </button>
+                        ))}
+                      </div>
+
+                      <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
+                        {NAV_ITEMS.map((item) => (
+                          <SheetClose asChild key={item.path}>
+                            <div>
+                              <NavLinkButton
+                                item={item}
+                                active={isActive(item.path)}
+                                onNavigate={() => setMenuOpen(false)}
+                                className={`w-full justify-start text-sm py-5 ${
+                                  isActive(item.path)
+                                    ? 'bg-white text-red-600 font-semibold'
+                                    : 'text-white hover:bg-white/15'
+                                }`}
+                              />
+                            </div>
+                          </SheetClose>
+                        ))}
+                      </nav>
+                    </div>
+                  </SheetContent>
+                </Sheet>
               </div>
             </div>
 
@@ -203,18 +277,6 @@ const Header = () => {
                   item={item}
                   active={isActive(item.path)}
                   className={navButtonClass(item.path, item.hover)}
-                />
-              ))}
-            </nav>
-
-            <nav className="lg:hidden flex flex-wrap items-center justify-center gap-1 mt-3 pt-3 border-t border-white/20">
-              {NAV_ITEMS.map((item) => (
-                <NavLinkButton
-                  key={item.path}
-                  item={item}
-                  active={isActive(item.path)}
-                  className={`text-xs ${navButtonClass(item.path, item.hover)}`}
-                  size="sm"
                 />
               ))}
             </nav>

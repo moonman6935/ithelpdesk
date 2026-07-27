@@ -7,7 +7,8 @@ export const translations = {
       "headsetTest": "Kulaklık Testi",
       "troubleshooting": "Sorun Giderme",
       "faq": "SSS",
-      "videoTutorials": "Sorun Giderme Videolu Anlatım"
+      "videoTutorials": "Sorun Giderme Videolu Anlatım",
+      "menu": "Menü"
     },
     "search": {
       "button": "Ara",
@@ -577,6 +578,8 @@ export const translations = {
       "formTitle": "Kontrol formu",
       "formDesc": "Mümkün olanlar otomatik okunur. CPU / SSD için donanım okuyucu aracını kullanın; GPU çoğu kartta otomatik tahmin edilir.",
       "autoTitle": "Otomatik tespit",
+      "showDetails": "Göster",
+      "hideDetails": "Gizle",
       "autoOs": "İşletim sistemi",
       "autoRam": "RAM (yaklaşık)",
       "autoCores": "Mantıksal çekirdek",
@@ -1078,7 +1081,8 @@ export const translations = {
       "headsetTest": "Headset-Test",
       "troubleshooting": "Fehlerbehebung",
       "faq": "FAQ",
-      "videoTutorials": "Video-Fehlerbehebung"
+      "videoTutorials": "Video-Fehlerbehebung",
+      "menu": "Menü"
     },
     "search": {
       "button": "Suche",
@@ -1648,6 +1652,8 @@ export const translations = {
       "formTitle": "Prüfformular",
       "formDesc": "Was möglich ist, wird automatisch gelesen. Für CPU/SSD das Hardware-Tool nutzen; GPU wird bei vielen Karten geschätzt.",
       "autoTitle": "Automatische Erkennung",
+      "showDetails": "Anzeigen",
+      "hideDetails": "Ausblenden",
       "autoOs": "Betriebssystem",
       "autoRam": "RAM (ca.)",
       "autoCores": "Logische Kerne",
@@ -2149,7 +2155,8 @@ export const translations = {
       "headsetTest": "Headset Test",
       "troubleshooting": "Troubleshooting",
       "faq": "FAQ",
-      "videoTutorials": "Video Troubleshooting"
+      "videoTutorials": "Video Troubleshooting",
+      "menu": "Menu"
     },
     "search": {
       "button": "Search",
@@ -2719,6 +2726,8 @@ export const translations = {
       "formTitle": "Check form",
       "formDesc": "What can be detected is filled automatically. Use the hardware reader for CPU/SSD; GPU is estimated for many cards.",
       "autoTitle": "Automatic detection",
+      "showDetails": "Show",
+      "hideDetails": "Hide",
       "autoOs": "Operating system",
       "autoRam": "RAM (approx.)",
       "autoCores": "Logical cores",
@@ -3220,7 +3229,8 @@ export const translations = {
       "headsetTest": "Test du casque",
       "troubleshooting": "Dépannage",
       "faq": "FAQ",
-      "videoTutorials": "Dépannage vidéo"
+      "videoTutorials": "Dépannage vidéo",
+      "menu": "Menu"
     },
     "search": {
       "button": "Rechercher",
@@ -3790,6 +3800,8 @@ export const translations = {
       "formTitle": "Formulaire de contrôle",
       "formDesc": "Ce qui peut être détecté est rempli automatiquement. Utilisez l'outil matériel pour CPU/SSD ; le GPU est estimé pour de nombreuses cartes.",
       "autoTitle": "Détection automatique",
+      "showDetails": "Afficher",
+      "hideDetails": "Masquer",
       "autoOs": "Système d'exploitation",
       "autoRam": "RAM (approx.)",
       "autoCores": "Cœurs logiques",
@@ -4291,7 +4303,8 @@ export const translations = {
       "headsetTest": "ყურსასმენის ტესტი",
       "troubleshooting": "პრობლემების მოგვარება",
       "faq": "FAQ",
-      "videoTutorials": "ვიდეო პრობლემების მოგვარება"
+      "videoTutorials": "ვიდეო პრობლემების მოგვარება",
+      "menu": "მენიუ"
     },
     "search": {
       "button": "ძიება",
@@ -4861,6 +4874,8 @@ export const translations = {
       "formTitle": "შემოწმების ფორმა",
       "formDesc": "რაც შესაძლებელია ავტომატურად ივსება. CPU/SSD-ისთვის გამოიყენეთ აპარატურის ხელსაწყო; GPU ბევრ ბარათზე ივარაუდება.",
       "autoTitle": "ავტომატური აღმოჩენა",
+      "showDetails": "ჩვენება",
+      "hideDetails": "დამალვა",
       "autoOs": "ოპერაციული სისტემა",
       "autoRam": "RAM (დაახლ.)",
       "autoCores": "ლოგიკური ბირთვები",

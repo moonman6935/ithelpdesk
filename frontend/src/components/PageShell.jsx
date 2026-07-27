@@ -64,23 +64,23 @@ const PageShell = ({
   }
 
   return (
-    <div className="py-10 md:py-14">
+    <div className="py-6 sm:py-10 md:py-14">
       <div className={`site-container ${maxWidth}`.trim()}>
         {!hideHero && Icon && title && (
           <div
-            className={`relative overflow-hidden rounded-3xl bg-gradient-to-br ${colors.gradient} text-white shadow-xl border border-white/20 mb-10 p-8 md:p-12 ft-page-enter`}
+            className={`relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br ${colors.gradient} text-white shadow-lg sm:shadow-xl border border-white/20 mb-5 sm:mb-10 p-5 sm:p-8 md:p-12 ft-page-enter`}
           >
             <div className="absolute inset-0 pointer-events-none overflow-hidden decorative-blur">
-              <div className={`absolute -top-10 -right-10 w-48 h-48 rounded-full ${colors.blob} blur-2xl`} />
-              <div className={`absolute bottom-0 left-8 w-32 h-32 rounded-full ${colors.accent} blur-xl`} />
+              <div className={`absolute -top-10 -right-10 w-36 sm:w-48 h-36 sm:h-48 rounded-full ${colors.blob} blur-2xl`} />
+              <div className={`absolute bottom-0 left-8 w-24 sm:w-32 h-24 sm:h-32 rounded-full ${colors.accent} blur-xl`} />
             </div>
-            <div className="relative flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
-              <div className="w-20 h-20 rounded-2xl bg-white/15 backdrop-blur-sm border border-white/25 flex items-center justify-center shrink-0">
-                <Icon className="w-10 h-10 text-white" strokeWidth={1.5} />
+            <div className="relative flex flex-row items-center gap-3 sm:gap-6 text-left">
+              <div className="w-12 h-12 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl bg-white/15 sm:backdrop-blur-sm border border-white/25 flex items-center justify-center shrink-0">
+                <Icon className="w-6 h-6 sm:w-10 sm:h-10 text-white" strokeWidth={1.5} />
               </div>
-              <div>
-                <h1 className="text-3xl md:text-4xl font-bold mb-2">{title}</h1>
-                {subtitle && <p className="text-lg text-white/90 max-w-2xl">{subtitle}</p>}
+              <div className="min-w-0">
+                <h1 className="text-xl sm:text-3xl md:text-4xl font-bold mb-0.5 sm:mb-2">{title}</h1>
+                {subtitle && <p className="text-sm sm:text-lg text-white/90 max-w-2xl line-clamp-2 sm:line-clamp-none">{subtitle}</p>}
               </div>
             </div>
           </div>

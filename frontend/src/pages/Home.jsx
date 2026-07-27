@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAppOpenTransition } from '../contexts/AppOpenTransitionContext';
+import { useIsMobile } from '../hooks/useMediaQuery';
 import { Button } from '../components/ui/button';
 import {
   Monitor,
@@ -135,33 +136,33 @@ function ColorCard({ gradient, blob, accent, Icon, title, description, cta, to, 
     <Link to={to} onClick={handleClick} className="block group h-full">
       <div
         data-app-card
-        className={`app-card-source relative overflow-hidden rounded-3xl bg-gradient-to-br ${gradient} text-white shadow-xl border border-white/10 h-full transition-shadow duration-300 sm:group-hover:shadow-2xl`}
+        className={`app-card-source relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br ${gradient} text-white shadow-lg sm:shadow-xl border border-white/10 h-full transition-shadow duration-300 sm:group-hover:shadow-2xl`}
       >
         <div className="absolute inset-0 pointer-events-none overflow-hidden decorative-blur">
-          <div className={`absolute -top-8 -right-8 w-40 h-40 rounded-full ${blob} blur-2xl`} />
-          <div className={`absolute bottom-4 left-4 w-24 h-24 rounded-full ${accent} blur-xl`} />
+          <div className={`absolute -top-8 -right-8 w-28 sm:w-40 h-28 sm:h-40 rounded-full ${blob} blur-2xl`} />
+          <div className={`absolute bottom-4 left-4 w-16 sm:w-24 h-16 sm:h-24 rounded-full ${accent} blur-xl`} />
         </div>
 
-        <div className={`relative ${compact ? 'p-6' : 'p-8'} flex flex-col h-full`}>
-          <div className="flex items-start justify-between gap-4 mb-5">
-            <div className="w-16 h-16 rounded-2xl bg-white/20 sm:bg-white/15 sm:backdrop-blur-sm border border-white/25 flex items-center justify-center shrink-0 sm:group-hover:scale-110 transition-transform duration-300">
-              <Icon className="w-8 h-8 text-white" strokeWidth={1.5} />
+        <div className={`relative ${compact ? 'p-4 sm:p-6' : 'p-4 sm:p-8'} flex flex-col h-full`}>
+          <div className="flex items-center sm:items-start justify-between gap-3 sm:gap-4 mb-3 sm:mb-5">
+            <div className="w-11 h-11 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white/20 sm:bg-white/15 sm:backdrop-blur-sm border border-white/25 flex items-center justify-center shrink-0 sm:group-hover:scale-110 transition-transform duration-300">
+              <Icon className="w-5 h-5 sm:w-8 sm:h-8 text-white" strokeWidth={1.5} />
             </div>
-            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <ArrowRight className="w-5 h-5" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/10 flex items-center justify-center sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
           </div>
 
-          <h3 className={`font-bold mb-2 ${compact ? 'text-xl' : 'text-2xl'}`}>{title}</h3>
-          <p className={`text-white/90 leading-relaxed flex-1 ${compact ? 'text-sm' : 'text-base'}`}>
+          <h3 className={`font-bold mb-1 sm:mb-2 ${compact ? 'text-base sm:text-xl' : 'text-lg sm:text-2xl'}`}>{title}</h3>
+          <p className={`text-white/90 leading-snug sm:leading-relaxed flex-1 line-clamp-2 sm:line-clamp-none ${compact ? 'text-xs sm:text-sm' : 'text-sm sm:text-base'}`}>
             {description}
           </p>
 
           {cta && (
-            <div className="mt-6 pt-4 border-t border-white/15">
-              <span className="inline-flex items-center text-sm font-semibold bg-white/15 group-hover:bg-white/25 px-4 py-2 rounded-full transition-colors">
+            <div className="mt-3 sm:mt-6 pt-3 sm:pt-4 border-t border-white/15 hidden sm:block">
+              <span className="inline-flex items-center text-xs sm:text-sm font-semibold bg-white/15 group-hover:bg-white/25 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition-colors">
                 {cta}
-                <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="ml-1.5 sm:ml-2 w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
               </span>
             </div>
           )}
@@ -254,7 +255,7 @@ const QUICK_LINKS = [
 function QuickLinkPill({ label, Icon, gradient, blob, accent, to, href }) {
   const { openFromElement } = useAppOpenTransition();
   const pillGradient = gradient;
-  const className = `app-card-source inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r ${pillGradient} text-white text-sm font-semibold shadow-md hover:shadow-lg transition-shadow duration-300`;
+  const className = `app-card-source inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gradient-to-r ${pillGradient} text-white text-xs sm:text-sm font-semibold shadow-md hover:shadow-lg transition-shadow duration-300`;
 
   if (href) {
     return (
@@ -313,19 +314,21 @@ function AppOpenButton({ to, gradientClasses, blob, accent, Icon, title, childre
 
 const Home = () => {
   const { t } = useLanguage();
+  const isMobile = useIsMobile();
+  const visibleQuickLinks = isMobile ? QUICK_LINKS.slice(0, 4) : QUICK_LINKS;
 
   return (
     <div className="min-h-screen">
       <HomeHeroCarousel />
 
-      <section className="pt-2 md:pt-4 pb-12 md:pb-16">
+      <section className="pt-2 md:pt-4 pb-8 md:pb-16">
         <div className="site-container">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-white to-red-50/60 sm:from-white/90 sm:via-white/80 sm:to-red-50/60 sm:backdrop-blur-md border border-white/70 shadow-lg p-6 md:p-10 mb-10">
+          <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-white via-white to-red-50/60 sm:from-white/90 sm:via-white/80 sm:to-red-50/60 sm:backdrop-blur-md border border-white/70 shadow-md sm:shadow-lg p-4 sm:p-6 md:p-10 mb-6 sm:mb-10">
             <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-violet-200/20 blur-3xl pointer-events-none decorative-blur" />
             <div className="absolute -bottom-8 -left-8 w-40 h-40 rounded-full bg-blue-200/20 blur-2xl pointer-events-none decorative-blur" />
             <div className="relative text-center w-full">
-              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-4">
-                {QUICK_LINKS.map((link) => (
+              <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-3 mb-3 sm:mb-4">
+                {visibleQuickLinks.map((link) => (
                   <QuickLinkPill
                     key={link.key}
                     label={t(link.labelKey)}
@@ -338,14 +341,14 @@ const Home = () => {
                   />
                 ))}
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-3">
                 {t('home.features.title')}
               </h2>
-              <p className="text-gray-600 text-lg">{t('home.description')}</p>
+              <p className="text-gray-600 text-sm sm:text-lg hidden sm:block">{t('home.description')}</p>
             </div>
           </div>
 
-          <StaggerChildren className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
+          <StaggerChildren className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-6 mb-3 sm:mb-6">
             {FEATURE_CARDS.map((card) => (
               <ColorCard
                 key={card.key}
@@ -359,7 +362,7 @@ const Home = () => {
             ))}
           </StaggerChildren>
 
-          <StaggerChildren className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <StaggerChildren className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
             {EXTRA_CARDS.map((card) => (
               <ColorCard
                 key={card.key}
@@ -376,21 +379,21 @@ const Home = () => {
         </div>
       </section>
 
-      <section className="py-12 md:py-16">
+      <section className="py-8 md:py-16">
         <div className="site-container">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-red-500 via-red-600 to-orange-600 text-white shadow-2xl border border-white/20">
+          <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-red-500 via-red-600 to-orange-600 text-white shadow-xl sm:shadow-2xl border border-white/20">
             <div className="absolute inset-0 pointer-events-none decorative-blur">
               <div className="absolute -top-16 -left-16 w-72 h-72 rounded-full bg-yellow-300/20 blur-3xl" />
               <div className="absolute -bottom-20 -right-10 w-80 h-80 rounded-full bg-orange-300/20 blur-3xl" />
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-white/5" />
             </div>
 
-            <div className="relative px-8 py-14 md:py-16 text-center">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">{t('home.cta.title')}</h2>
-              <p className="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+            <div className="relative px-5 sm:px-8 py-8 sm:py-14 md:py-16 text-center">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">{t('home.cta.title')}</h2>
+              <p className="text-sm sm:text-lg md:text-xl text-white/90 mb-5 sm:mb-8 max-w-2xl mx-auto">
                 {t('home.cta.description')}
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                 <AppOpenButton
                   to="/pc-setup"
                   gradientClasses="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800"
@@ -398,7 +401,7 @@ const Home = () => {
                   accent="bg-sky-400/20"
                   Icon={Monitor}
                   title={t('home.getStarted')}
-                  className="bg-white text-red-600 hover:bg-gray-100 text-lg px-8 py-6 shadow-lg w-full sm:w-auto"
+                  className="bg-white text-red-600 hover:bg-gray-100 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 shadow-lg w-full sm:w-auto"
                 >
                   {t('home.getStarted')}
                   <ArrowRight className="ml-2 w-5 h-5" />
@@ -411,7 +414,7 @@ const Home = () => {
                   Icon={Headphones}
                   title={t('home.testHeadset')}
                   variant="outline"
-                  className="border-2 border-white text-white hover:bg-white/10 text-lg px-8 py-6 w-full sm:w-auto"
+                  className="border-2 border-white text-white hover:bg-white/10 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 w-full sm:w-auto"
                 >
                   {t('home.testHeadset')}
                 </AppOpenButton>
@@ -423,7 +426,7 @@ const Home = () => {
                   Icon={HelpCircle}
                   title={t('header.faq')}
                   variant="outline"
-                  className="border-2 border-white/60 text-white hover:bg-white/10 text-lg px-8 py-6 w-full sm:w-auto"
+                  className="border-2 border-white/60 text-white hover:bg-white/10 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 w-full sm:w-auto hidden sm:inline-flex"
                 >
                   {t('header.faq')}
                 </AppOpenButton>
