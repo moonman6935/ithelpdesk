@@ -592,13 +592,23 @@ const SystemCheck = () => {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <p className="font-semibold text-gray-900 text-sm sm:text-base">{t(`systemCheck.check.${c.id}`)}</p>
-                          <Badge className={`${statusStyles(c.pass ? 'pass' : c.warn ? 'warn' : 'fail').badge} text-[10px] sm:text-xs`}>
-                            {c.pass
-                              ? t('systemCheck.ok')
-                              : c.warn
-                                ? t('systemCheck.warn')
-                                : t('systemCheck.fail')}
-                          </Badge>
+                          {c.warn && c.id === 'os' ? (
+                            <Link to="/windows-11-upgrade">
+                              <Badge
+                                className={`${statusStyles('warn').badge} text-[10px] sm:text-xs cursor-pointer hover:bg-orange-200 hover:border-orange-300 transition-colors`}
+                              >
+                                {t('systemCheck.warn')}
+                              </Badge>
+                            </Link>
+                          ) : (
+                            <Badge className={`${statusStyles(c.pass ? 'pass' : c.warn ? 'warn' : 'fail').badge} text-[10px] sm:text-xs`}>
+                              {c.pass
+                                ? t('systemCheck.ok')
+                                : c.warn
+                                  ? t('systemCheck.warn')
+                                  : t('systemCheck.fail')}
+                            </Badge>
+                          )}
                         </div>
                         <p className="text-xs sm:text-sm text-gray-600 mt-0.5">
                           {formatCheckValue(c.id, c.value, t)}
