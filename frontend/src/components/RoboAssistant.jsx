@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -89,8 +89,21 @@ function RoboOverlay({ onClose }) {
   const [phase, setPhase] = useState('flow');
   const [dogMode, setDogMode] = useState('roam');
   const [isSearching, setIsSearching] = useState(false);
+  const [dogLaunching, setDogLaunching] = useState(true);
+  const [launchOrigin, setLaunchOrigin] = useState(null);
+  const avatarRef = useRef(null);
 
   const node = getFlowNode(nodeId);
+
+  const measureLaunchOrigin = useCallback(() => {
+    const el = avatarRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    setLaunchOrigin({
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+    });
+  }, []);
 
   const syncDogModeForNode = useCallback((id, flowPhase) => {
     if (flowPhase === 'resolved' || flowPhase === 'escalate') {
@@ -98,21 +111,36 @@ function RoboOverlay({ onClose }) {
       return;
     }
     const n = getFlowNode(id);
-    if (n.type === 'choices') setDogMode(id === 'root' ? 'still' : 'roam');
+    if (n.type === 'choices') setDogMode('roam');
     else if (n.type === 'checklist') setDogMode('roam');
     else setDogMode('roam');
   }, []);
 
   useEffect(() => {
-    setDogMode('still');
-    const settle = window.setTimeout(() => {
+    setDogLaunching(true);
+    setDogMode('roam');
+
+    const measureSoon = window.setTimeout(measureLaunchOrigin, 80);
+    const measureAgain = window.setTimeout(measureLaunchOrigin, 420);
+
+    const launchDone = window.setTimeout(() => {
+      setDogLaunching(false);
       syncDogModeForNode('root', 'flow');
-    }, 1200);
-    return () => {
-      resetBodyInteraction();
-      window.clearTimeout(settle);
+    }, 1150);
+
+    const onResize = () => {
+      if (dogLaunching) measureLaunchOrigin();
     };
-  }, [syncDogModeForNode]);
+    window.addEventListener('resize', onResize);
+
+    return () => {
+      window.clearTimeout(measureSoon);
+      window.clearTimeout(measureAgain);
+      window.clearTimeout(launchDone);
+      window.removeEventListener('resize', onResize);
+      resetBodyInteraction();
+    };
+  }, [measureLaunchOrigin, syncDogModeForNode]);
 
   const goTo = (nextId, dir = 'forward') => {
     setSlideDir(dir);
@@ -380,7 +408,12 @@ function RoboOverlay({ onClose }) {
 
   return (
     <>
-      <RoboDogRoam mode={dogMode} visible />
+      <RoboDogRoam
+        mode={dogMode}
+        visible
+        launching={dogLaunching}
+        launchOrigin={launchOrigin}
+      />
 
       <div className="robo-shell" role="dialog" aria-modal="true" aria-label="Robo">
         <button
@@ -403,8 +436,11 @@ function RoboOverlay({ onClose }) {
                 <ArrowLeft className="w-5 h-5" />
               </button>
             )}
-            <div className="robo-overlay__avatar robo-overlay__avatar--dog">
-              <RoboDog mode="still" size="sm" />
+            <div
+              ref={avatarRef}
+              className={`robo-overlay__avatar robo-overlay__avatar--dog ${dogLaunching ? 'robo-overlay__avatar--launched' : ''}`}
+            >
+              {!dogLaunching && <RoboDog mode="still" size="sm" />}
             </div>
             <div>
               <p className="robo-overlay__name">Robo</p>

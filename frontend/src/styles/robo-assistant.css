@@ -362,6 +362,11 @@
   height: 3.25rem;
 }
 
+.robo-overlay__avatar--launched {
+  background: rgba(255, 248, 225, 0.35);
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.25);
+}
+
 .robo-fab__ring {
   position: absolute;
   inset: -4px;
@@ -557,6 +562,44 @@
   top: 72%;
   z-index: 8;
   animation: robo-dog-idle-bob 3s ease-in-out infinite;
+}
+
+.robo-dog-roam--launch {
+  left: var(--robo-launch-x, calc(100vw - 8rem));
+  top: var(--robo-launch-y, 5.5rem);
+  z-index: 10055;
+  animation:
+    robo-dog-launch-move 1.05s cubic-bezier(0.33, 1.05, 0.45, 1) forwards,
+    robo-dog-launch-arc 1.05s cubic-bezier(0.34, 1.35, 0.48, 1) forwards;
+}
+
+@keyframes robo-dog-launch-move {
+  0% {
+    left: var(--robo-launch-x, calc(100vw - 8rem));
+    top: var(--robo-launch-y, 5.5rem);
+  }
+  100% {
+    left: 10%;
+    top: 78%;
+  }
+}
+
+@keyframes robo-dog-launch-arc {
+  0% {
+    transform: translate(-50%, -50%) scale(0.32);
+    opacity: 0.75;
+  }
+  38% {
+    transform: translate(-50%, -115%) scale(1.18) rotate(-12deg);
+    opacity: 1;
+  }
+  68% {
+    transform: translate(-50%, -72%) scale(1.06) rotate(5deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    opacity: 1;
+  }
 }
 
 @keyframes robo-dog-idle-bob {
@@ -1157,6 +1200,7 @@
   .robo-check-item,
   .robo-result__icon,
   .robo-dog-roam,
+  .robo-dog-roam,
   .robo-panel-float,
   .robo-dog-wrap--roam .robo-dog,
   .robo-dog-wrap--still .robo-dog,
@@ -1216,6 +1260,10 @@
   .robo-dog-roam--roam,
   .robo-dog-roam--search {
     animation: none !important;
+  }
+
+  .robo-dog-roam--launch {
+    animation: robo-dog-launch-move 0.85s ease-out forwards !important;
   }
 
   .robo-dog-roam--idle {
