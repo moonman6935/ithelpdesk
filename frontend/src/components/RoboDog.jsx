@@ -14,7 +14,7 @@ const RoboDog = ({
     size === 'fab'
       ? 48
       : size === 'roam'
-        ? 52
+        ? 76
         : size === 'sm'
           ? 36
           : size === 'stage'
