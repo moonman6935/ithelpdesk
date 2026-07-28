@@ -128,9 +128,7 @@ function RoboOverlay({ onClose }) {
       syncDogModeForNode('root', 'flow');
     }, 1150);
 
-    const onResize = () => {
-      if (dogLaunching) measureLaunchOrigin();
-    };
+    const onResize = () => measureLaunchOrigin();
     window.addEventListener('resize', onResize);
 
     return () => {
