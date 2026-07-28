@@ -13,6 +13,7 @@ const SPLASH_DONE_EVENT = 'ithelpdesk:splash-done';
 const SPLASH_LANGS = [
   { code: 'de', flag: '🇩🇪', label: 'Deutsch' },
   { code: 'en', flag: '🇺🇸', label: 'English' },
+  { code: 'tr', flag: '🇹🇷', label: 'Türkçe' },
 ];
 
 const SplashScreen = () => {
