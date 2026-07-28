@@ -11,11 +11,8 @@ const EXIT_MS = 700;
 const SPLASH_DONE_EVENT = 'ithelpdesk:splash-done';
 
 const SPLASH_LANGS = [
-  { code: 'tr', flag: '🇹🇷', label: 'Türkçe' },
   { code: 'de', flag: '🇩🇪', label: 'Deutsch' },
   { code: 'en', flag: '🇺🇸', label: 'English' },
-  { code: 'fr', flag: '🇫🇷', label: 'Français' },
-  { code: 'ka', flag: '🇬🇪', label: 'ქართული' },
 ];
 
 const SplashScreen = () => {
@@ -81,7 +78,7 @@ const SplashScreen = () => {
       className={`splash-screen ${exiting ? 'splash-screen--exit' : ''}`}
       role="dialog"
       aria-modal="true"
-      aria-label={translations.tr.splash.title}
+      aria-label={translations.en.splash.title}
       onClick={handleSkip}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') handleSkip();
