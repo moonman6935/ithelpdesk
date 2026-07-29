@@ -5,7 +5,7 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Progress } from '../components/ui/progress';
-import { Headphones, Mic, Volume2, CheckCircle, XCircle, AlertCircle, ArrowRight } from 'lucide-react';
+import { Headphones, Mic, Volume2, CheckCircle, XCircle, AlertCircle, ArrowRight, ArrowLeft, AudioLines } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import HeadsetRepairToolCard from '../components/HeadsetRepairToolCard';
 
@@ -15,8 +15,9 @@ const HeadsetTest = () => {
   const [isStarting, setIsStarting] = useState(false);
   const [micLevel, setMicLevel] = useState(0);
   const [speakerTested, setSpeakerTested] = useState(false);
+  const [channelTests, setChannelTests] = useState({ left: false, right: false, stereo: false });
+  const [playingChannel, setPlayingChannel] = useState(null);
   const [micTested, setMicTested] = useState(false);
-  const [isPlayingSound, setIsPlayingSound] = useState(false);
   const [micError, setMicError] = useState('');
 
   const audioContextRef = useRef(null);
@@ -42,7 +43,9 @@ const HeadsetTest = () => {
     };
   }, []);
 
-  const playTestSound = async () => {
+  const playTestSound = async (channel) => {
+    stopTestSound();
+
     try {
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
       if (audioContext.state === 'suspended') {
@@ -51,18 +54,37 @@ const HeadsetTest = () => {
 
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
+      const merger = audioContext.createChannelMerger(2);
+      const leftGain = audioContext.createGain();
+      const rightGain = audioContext.createGain();
 
       oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
+      gainNode.connect(leftGain);
+      gainNode.connect(rightGain);
+      leftGain.connect(merger, 0, 0);
+      rightGain.connect(merger, 0, 1);
+      merger.connect(audioContext.destination);
 
       oscillator.frequency.value = 440;
       oscillator.type = 'sine';
       gainNode.gain.value = 0.3;
 
+      if (channel === 'left') {
+        leftGain.gain.value = 1;
+        rightGain.gain.value = 0;
+      } else if (channel === 'right') {
+        leftGain.gain.value = 0;
+        rightGain.gain.value = 1;
+      } else {
+        leftGain.gain.value = 1;
+        rightGain.gain.value = 1;
+      }
+
       oscillator.start();
       oscillatorRef.current = { oscillator, audioContext };
 
-      setIsPlayingSound(true);
+      setPlayingChannel(channel);
+      setChannelTests((prev) => ({ ...prev, [channel]: true }));
       setSpeakerTested(true);
     } catch (error) {
       console.error('Error playing test sound:', error);
@@ -79,7 +101,7 @@ const HeadsetTest = () => {
         console.error('Error stopping test sound:', error);
       }
     }
-    setIsPlayingSound(false);
+    setPlayingChannel(null);
   };
 
   const resolveMicError = (error) => {
@@ -233,10 +255,20 @@ const HeadsetTest = () => {
     };
   };
 
-  const speakerStatus = getTestStatus(speakerTested, speakerTested);
   const micStatus = getTestStatus(micTested, micTested && micLevel > 5);
-  const SpeakerIcon = speakerStatus.icon;
   const MicIcon = micStatus.icon;
+
+  const channelButtons = [
+    { id: 'left', icon: ArrowLeft, labelKey: 'headsetTest.playLeft', playingKey: 'headsetTest.playingLeft' },
+    { id: 'right', icon: ArrowRight, labelKey: 'headsetTest.playRight', playingKey: 'headsetTest.playingRight' },
+    { id: 'stereo', icon: AudioLines, labelKey: 'headsetTest.playStereo', playingKey: 'headsetTest.playingStereo' },
+  ];
+
+  const channelResultRows = [
+    { id: 'left', labelKey: 'headsetTest.results.left' },
+    { id: 'right', labelKey: 'headsetTest.results.right' },
+    { id: 'stereo', labelKey: 'headsetTest.results.stereo' },
+  ];
 
   return (
     <PageShell theme="emerald" icon={Headphones} title={t('headsetTest.title')} subtitle={t('headsetTest.subtitle')}>
@@ -256,36 +288,51 @@ const HeadsetTest = () => {
               </div>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="flex flex-col sm:flex-row gap-4">
-                {!isPlayingSound ? (
-                  <Button 
-                    type="button"
-                    onClick={playTestSound}
-                    variant="brand"
-                    className="flex-1"
-                    size="lg"
-                  >
-                    <Volume2 className="mr-2 w-5 h-5" />
-                    {t('headsetTest.playSound')}
-                  </Button>
-                ) : (
-                  <Button 
+              <div className="flex flex-col gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {channelButtons.map(({ id, icon: ChannelIcon, labelKey, playingKey }) => (
+                    <Button
+                      key={id}
+                      type="button"
+                      onClick={() => playTestSound(id)}
+                      variant={playingChannel === id ? 'brand' : 'brandOutline'}
+                      size="lg"
+                      className="w-full"
+                    >
+                      <ChannelIcon className="mr-2 w-5 h-5" />
+                      {playingChannel === id ? t(playingKey) : t(labelKey)}
+                    </Button>
+                  ))}
+                </div>
+
+                {playingChannel && (
+                  <Button
                     type="button"
                     onClick={stopTestSound}
                     variant="brandOutline"
-                    className="flex-1"
                     size="lg"
+                    className="w-full sm:w-auto"
                   >
                     {t('headsetTest.stopSound')}
                   </Button>
                 )}
               </div>
+
               {speakerTested && (
-                <div className={`mt-4 p-4 rounded-lg ${speakerStatus.bgColor} flex items-center space-x-3`}>
-                  <SpeakerIcon className={`w-6 h-6 ${speakerStatus.color}`} />
-                  <span className={`font-semibold ${speakerStatus.color}`}>
-                    {t('headsetTest.results.speaker')}: {speakerStatus.text}
-                  </span>
+                <div className="mt-4 space-y-2">
+                  {channelResultRows.map(({ id, labelKey }) => {
+                    const tested = channelTests[id];
+                    const status = getTestStatus(tested, tested);
+                    const StatusIcon = status.icon;
+                    return (
+                      <div key={id} className={`p-3 rounded-lg ${status.bgColor} flex items-center space-x-3`}>
+                        <StatusIcon className={`w-5 h-5 ${status.color}`} />
+                        <span className={`font-semibold text-sm ${status.color}`}>
+                          {t(labelKey)}: {status.text}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </CardContent>
@@ -384,16 +431,23 @@ const HeadsetTest = () => {
               </CardHeader>
               <CardContent className="pt-6">
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <Volume2 className="w-6 h-6 text-gray-600" />
-                      <span className="font-semibold text-gray-700">{t('headsetTest.results.speaker')}</span>
-                    </div>
-                    <div className={`flex items-center space-x-2 ${speakerStatus.color}`}>
-                      <SpeakerIcon className="w-5 h-5" />
-                      <span className="font-semibold">{speakerStatus.text}</span>
-                    </div>
-                  </div>
+                  {channelResultRows.map(({ id, labelKey }) => {
+                    const tested = channelTests[id];
+                    const status = getTestStatus(tested, tested);
+                    const StatusIcon = status.icon;
+                    return (
+                      <div key={id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <Volume2 className="w-6 h-6 text-gray-600" />
+                          <span className="font-semibold text-gray-700">{t(labelKey)}</span>
+                        </div>
+                        <div className={`flex items-center space-x-2 ${status.color}`}>
+                          <StatusIcon className="w-5 h-5" />
+                          <span className="font-semibold">{status.text}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
                   <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <Mic className="w-6 h-6 text-gray-600" />
