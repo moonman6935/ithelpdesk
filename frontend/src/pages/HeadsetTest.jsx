@@ -9,6 +9,9 @@ import { Headphones, Mic, Volume2, CheckCircle, XCircle, AlertCircle, ArrowRight
 import { Link } from 'react-router-dom';
 import HeadsetRepairToolCard from '../components/HeadsetRepairToolCard';
 
+const CYCLE_CHANNELS = ['left', 'right', 'stereo'];
+const CYCLE_MS = 3500;
+
 const HeadsetTest = () => {
   const { t } = useLanguage();
   const [isTesting, setIsTesting] = useState(false);
@@ -17,6 +20,8 @@ const HeadsetTest = () => {
   const [speakerTested, setSpeakerTested] = useState(false);
   const [channelTests, setChannelTests] = useState({ left: false, right: false, stereo: false });
   const [playingChannel, setPlayingChannel] = useState(null);
+  const [isSpeakerRunning, setIsSpeakerRunning] = useState(false);
+  const [speakerMode, setSpeakerMode] = useState(null);
   const [micTested, setMicTested] = useState(false);
   const [micError, setMicError] = useState('');
 
@@ -25,13 +30,34 @@ const HeadsetTest = () => {
   const micStreamRef = useRef(null);
   const micSourceRef = useRef(null);
   const animationFrameRef = useRef(null);
-  const oscillatorRef = useRef(null);
+  const speakerAudioRef = useRef(null);
+  const autoCycleRef = useRef(null);
+  const cycleIndexRef = useRef(0);
   const isTestingRef = useRef(false);
+
+  const cleanupSpeakerAudio = () => {
+    if (autoCycleRef.current) {
+      clearInterval(autoCycleRef.current);
+      autoCycleRef.current = null;
+    }
+    if (speakerAudioRef.current) {
+      try {
+        speakerAudioRef.current.audioContext.close();
+      } catch (error) {
+        console.error('Error stopping test sound:', error);
+      }
+      speakerAudioRef.current = null;
+    }
+  };
 
   useEffect(() => {
     const onVisibilityChange = () => {
-      if (document.hidden && isTestingRef.current) {
-        stopMicTest();
+      if (document.hidden) {
+        if (isTestingRef.current) stopMicTest();
+        cleanupSpeakerAudio();
+        setIsSpeakerRunning(false);
+        setSpeakerMode(null);
+        setPlayingChannel(null);
       }
     };
 
@@ -39,68 +65,98 @@ const HeadsetTest = () => {
     return () => {
       document.removeEventListener('visibilitychange', onVisibilityChange);
       stopMicTest();
-      stopTestSound();
+      cleanupSpeakerAudio();
     };
   }, []);
 
-  const playTestSound = async (channel) => {
-    stopTestSound();
-
-    try {
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      if (audioContext.state === 'suspended') {
-        await audioContext.resume();
-      }
-
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      const merger = audioContext.createChannelMerger(2);
-      const leftGain = audioContext.createGain();
-      const rightGain = audioContext.createGain();
-
-      oscillator.connect(gainNode);
-      gainNode.connect(leftGain);
-      gainNode.connect(rightGain);
-      leftGain.connect(merger, 0, 0);
-      rightGain.connect(merger, 0, 1);
-      merger.connect(audioContext.destination);
-
-      oscillator.frequency.value = 440;
-      oscillator.type = 'sine';
-      gainNode.gain.value = 0.3;
-
-      if (channel === 'left') {
-        leftGain.gain.value = 1;
-        rightGain.gain.value = 0;
-      } else if (channel === 'right') {
-        leftGain.gain.value = 0;
-        rightGain.gain.value = 1;
-      } else {
-        leftGain.gain.value = 1;
-        rightGain.gain.value = 1;
-      }
-
-      oscillator.start();
-      oscillatorRef.current = { oscillator, audioContext };
-
-      setPlayingChannel(channel);
-      setChannelTests((prev) => ({ ...prev, [channel]: true }));
-      setSpeakerTested(true);
-    } catch (error) {
-      console.error('Error playing test sound:', error);
+  const applyChannelGains = (channel, leftGain, rightGain) => {
+    if (channel === 'left') {
+      leftGain.gain.value = 1;
+      rightGain.gain.value = 0;
+    } else if (channel === 'right') {
+      leftGain.gain.value = 0;
+      rightGain.gain.value = 1;
+    } else {
+      leftGain.gain.value = 1;
+      rightGain.gain.value = 1;
     }
   };
 
-  const stopTestSound = () => {
-    if (oscillatorRef.current) {
-      try {
-        oscillatorRef.current.oscillator.stop();
-        oscillatorRef.current.audioContext.close();
-        oscillatorRef.current = null;
-      } catch (error) {
-        console.error('Error stopping test sound:', error);
-      }
+  const ensureSpeakerAudio = async () => {
+    if (speakerAudioRef.current) return speakerAudioRef.current;
+
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioContext.state === 'suspended') {
+      await audioContext.resume();
     }
+
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    const merger = audioContext.createChannelMerger(2);
+    const leftGain = audioContext.createGain();
+    const rightGain = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(leftGain);
+    gainNode.connect(rightGain);
+    leftGain.connect(merger, 0, 0);
+    rightGain.connect(merger, 0, 1);
+    merger.connect(audioContext.destination);
+
+    oscillator.frequency.value = 440;
+    oscillator.type = 'sine';
+    gainNode.gain.value = 0.3;
+
+    oscillator.start();
+    speakerAudioRef.current = { audioContext, leftGain, rightGain };
+    return speakerAudioRef.current;
+  };
+
+  const switchChannel = async (channel) => {
+    const audio = await ensureSpeakerAudio();
+    applyChannelGains(channel, audio.leftGain, audio.rightGain);
+    setPlayingChannel(channel);
+    setChannelTests((prev) => ({ ...prev, [channel]: true }));
+    setSpeakerTested(true);
+  };
+
+  const clearAutoCycle = () => {
+    if (autoCycleRef.current) {
+      clearInterval(autoCycleRef.current);
+      autoCycleRef.current = null;
+    }
+  };
+
+  const startAutoSpeakerTest = async () => {
+    stopSpeakerTest();
+    cycleIndexRef.current = 0;
+    setSpeakerMode('auto');
+    setIsSpeakerRunning(true);
+
+    const runCycleStep = async () => {
+      const channel = CYCLE_CHANNELS[cycleIndexRef.current];
+      cycleIndexRef.current = (cycleIndexRef.current + 1) % CYCLE_CHANNELS.length;
+      await switchChannel(channel);
+    };
+
+    await runCycleStep();
+    autoCycleRef.current = setInterval(runCycleStep, CYCLE_MS);
+  };
+
+  const playManualChannel = async (channel) => {
+    clearAutoCycle();
+    if (!speakerAudioRef.current) {
+      await ensureSpeakerAudio();
+      setIsSpeakerRunning(true);
+    }
+    setSpeakerMode('manual');
+    await switchChannel(channel);
+  };
+
+  const stopSpeakerTest = () => {
+    cleanupSpeakerAudio();
+    setIsSpeakerRunning(false);
+    setSpeakerMode(null);
     setPlayingChannel(null);
   };
 
@@ -259,10 +315,18 @@ const HeadsetTest = () => {
   const MicIcon = micStatus.icon;
 
   const channelButtons = [
-    { id: 'left', icon: ArrowLeft, labelKey: 'headsetTest.playLeft', playingKey: 'headsetTest.playingLeft' },
-    { id: 'right', icon: ArrowRight, labelKey: 'headsetTest.playRight', playingKey: 'headsetTest.playingRight' },
-    { id: 'stereo', icon: AudioLines, labelKey: 'headsetTest.playStereo', playingKey: 'headsetTest.playingStereo' },
+    { id: 'left', icon: ArrowLeft, labelKey: 'headsetTest.playLeft' },
+    { id: 'right', icon: ArrowRight, labelKey: 'headsetTest.playRight' },
+    { id: 'stereo', icon: AudioLines, labelKey: 'headsetTest.playStereo' },
   ];
+
+  const nowPlayingKey = playingChannel
+    ? {
+        left: 'headsetTest.nowPlayingLeft',
+        right: 'headsetTest.nowPlayingRight',
+        stereo: 'headsetTest.nowPlayingStereo',
+      }[playingChannel]
+    : null;
 
   const channelResultRows = [
     { id: 'left', labelKey: 'headsetTest.results.left' },
@@ -288,34 +352,90 @@ const HeadsetTest = () => {
               </div>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="flex flex-col gap-4">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {channelButtons.map(({ id, icon: ChannelIcon, labelKey, playingKey }) => (
-                    <Button
-                      key={id}
-                      type="button"
-                      onClick={() => playTestSound(id)}
-                      variant={playingChannel === id ? 'brand' : 'brandOutline'}
-                      size="lg"
-                      className="w-full"
-                    >
-                      <ChannelIcon className="mr-2 w-5 h-5" />
-                      {playingChannel === id ? t(playingKey) : t(labelKey)}
-                    </Button>
-                  ))}
-                </div>
-
-                {playingChannel && (
+              <div className="flex flex-col gap-5">
+                {!isSpeakerRunning ? (
                   <Button
                     type="button"
-                    onClick={stopTestSound}
-                    variant="brandOutline"
+                    onClick={startAutoSpeakerTest}
+                    variant="brand"
                     size="lg"
                     className="w-full sm:w-auto"
                   >
-                    {t('headsetTest.stopSound')}
+                    <Volume2 className="mr-2 w-5 h-5" />
+                    {t('headsetTest.startSpeakerTest')}
                   </Button>
+                ) : (
+                  <>
+                    <div
+                      className="rounded-xl border-2 border-emerald-400 bg-emerald-50 px-5 py-6 text-center"
+                      role="status"
+                      aria-live="polite"
+                    >
+                      <p className="text-lg sm:text-xl font-bold text-emerald-800 mb-4">
+                        {nowPlayingKey ? t(nowPlayingKey) : ''}
+                      </p>
+                      <div className="flex justify-center items-end gap-4 sm:gap-8">
+                        {channelButtons.map(({ id, icon: ChannelIcon, labelKey }) => {
+                          const active = playingChannel === id;
+                          return (
+                            <div
+                              key={id}
+                              className={`flex flex-col items-center gap-2 transition-all ${
+                                active ? 'scale-110 opacity-100' : 'scale-95 opacity-40'
+                              }`}
+                            >
+                              <div
+                                className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center ${
+                                  active
+                                    ? 'bg-emerald-500 text-white shadow-lg ring-4 ring-emerald-200 animate-pulse'
+                                    : 'bg-gray-200 text-gray-500'
+                                }`}
+                              >
+                                <ChannelIcon className="w-7 h-7" />
+                              </div>
+                              <span className={`text-xs sm:text-sm font-semibold ${active ? 'text-emerald-700' : 'text-gray-500'}`}>
+                                {t(labelKey)}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      {speakerMode === 'auto' && (
+                        <p className="mt-4 text-sm text-emerald-700">{t('headsetTest.autoCycleHint')}</p>
+                      )}
+                    </div>
+
+                    <Button
+                      type="button"
+                      onClick={stopSpeakerTest}
+                      variant="brandOutline"
+                      size="lg"
+                      className="w-full sm:w-auto"
+                    >
+                      {t('headsetTest.stopSound')}
+                    </Button>
+                  </>
                 )}
+
+                <div className="border-t pt-5">
+                  <p className="text-sm font-semibold text-gray-700 mb-1">{t('headsetTest.manualTest')}</p>
+                  <p className="text-sm text-gray-500 mb-3">{t('headsetTest.manualTestHint')}</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {channelButtons.map(({ id, icon: ChannelIcon, labelKey }) => (
+                      <Button
+                        key={id}
+                        type="button"
+                        onClick={() => playManualChannel(id)}
+                        variant={isSpeakerRunning && playingChannel === id && speakerMode === 'manual' ? 'brand' : 'brandOutline'}
+                        size="lg"
+                        className="w-full"
+                      >
+                        <ChannelIcon className="mr-2 w-5 h-5" />
+                        {t(labelKey)}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               {speakerTested && (
