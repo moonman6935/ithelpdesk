@@ -151,22 +151,32 @@ const Header = () => {
   const { language, setLanguage, t } = useLanguage();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const isAdmin = location.pathname.startsWith('/admin');
 
   const isActive = (path) => location.pathname === path;
 
   const navButtonClass = (path, hover) =>
     isActive(path)
-      ? 'bg-white text-red-600 shadow-md font-semibold rounded-xl'
+      ? `bg-white ${isAdmin ? 'text-black' : 'text-red-600'} shadow-md font-semibold rounded-xl`
       : `text-white rounded-xl ${hover}`;
+
+  const bannerBg = isAdmin
+    ? 'bg-black border-white/10'
+    : 'bg-gradient-to-r from-red-500 via-red-600 to-orange-500 border-white/25';
+  const mobileMenuBg = isAdmin
+    ? 'bg-black'
+    : 'bg-gradient-to-b from-red-600 via-red-600 to-orange-600';
 
   return (
     <header className="z-50 site-container pt-3 pb-1">
       <div className="w-full">
-        <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-r from-red-500 via-red-600 to-orange-500 shadow-xl border border-white/25">
-          <div className="absolute inset-0 pointer-events-none overflow-hidden decorative-blur">
-            <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-yellow-300/25 blur-2xl" />
-            <div className="absolute -bottom-10 left-1/4 w-32 h-32 rounded-full bg-orange-300/20 blur-xl" />
-          </div>
+        <div className={`relative overflow-hidden rounded-2xl sm:rounded-3xl shadow-xl border ${bannerBg}`}>
+          {!isAdmin && (
+            <div className="absolute inset-0 pointer-events-none overflow-hidden decorative-blur">
+              <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-yellow-300/25 blur-2xl" />
+              <div className="absolute -bottom-10 left-1/4 w-32 h-32 rounded-full bg-orange-300/20 blur-xl" />
+            </div>
+          )}
 
           <div className="relative px-3 sm:px-5 py-2.5 sm:py-3 md:py-4">
             <div className="flex items-center justify-between gap-2 sm:gap-3">
@@ -223,7 +233,7 @@ const Header = () => {
                     </Button>
                   </SheetTrigger>
                   <SheetContent side="right" className="w-[min(100%,20rem)] p-0 border-0">
-                    <div className="h-full flex flex-col bg-gradient-to-b from-red-600 via-red-600 to-orange-600 text-white">
+                    <div className={`h-full flex flex-col text-white ${mobileMenuBg}`}>
                       <SheetHeader className="px-5 pt-5 pb-3 text-left border-b border-white/20">
                         <SheetTitle className="text-white text-lg">{t('header.menu')}</SheetTitle>
                       </SheetHeader>
@@ -256,7 +266,7 @@ const Header = () => {
                                 onNavigate={() => setMenuOpen(false)}
                                 className={`w-full justify-start text-sm py-5 ${
                                   isActive(item.path)
-                                    ? 'bg-white text-red-600 font-semibold'
+                                    ? `bg-white ${isAdmin ? 'text-black' : 'text-red-600'} font-semibold`
                                     : 'text-white hover:bg-white/15'
                                 }`}
                               />

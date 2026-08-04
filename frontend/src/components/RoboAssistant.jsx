@@ -471,10 +471,12 @@ const RoboAssistant = () => {
   const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
   const [showBubble, setShowBubble] = useState(false);
+  const isAdmin = location.pathname.startsWith('/admin');
 
   useEffect(() => {
-    if (isMobile) {
+    if (isAdmin || isMobile) {
       setShowBubble(false);
+      setOpen(false);
       return undefined;
     }
 
@@ -487,7 +489,11 @@ const RoboAssistant = () => {
       window.clearTimeout(showTimer);
       window.clearTimeout(hideTimer);
     };
-  }, [location.pathname, isMobile]);
+  }, [location.pathname, isMobile, isAdmin]);
+
+  if (isAdmin) {
+    return null;
+  }
 
   const dismissBubble = () => {
     setShowBubble(false);
