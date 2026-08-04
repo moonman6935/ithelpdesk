@@ -152,6 +152,15 @@ const Header = () => {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const isAdmin = location.pathname.startsWith('/admin');
+  const adminUsername = isAdmin
+    ? (localStorage.getItem('admin_username') || '').trim()
+    : '';
+  const adminDisplayName = adminUsername
+    ? adminUsername.charAt(0).toUpperCase() + adminUsername.slice(1)
+    : '';
+  const adminPanelLabel = adminDisplayName
+    ? t('header.authorizedPanel').replace('{name}', adminDisplayName)
+    : '';
 
   const isActive = (path) => location.pathname === path;
 
@@ -182,7 +191,7 @@ const Header = () => {
             <div className="flex items-center justify-between gap-2 sm:gap-3">
               <Link
                 to="/"
-                className="flex items-center gap-2 sm:gap-3 min-w-0 hover:opacity-95 transition-opacity group"
+                className="flex items-center gap-2 sm:gap-3 min-w-0 hover:opacity-95 transition-opacity group shrink-0"
               >
                 <BrandLogo
                   framed
@@ -195,6 +204,14 @@ const Header = () => {
                   {t('header.title')}
                 </span>
               </Link>
+
+              {adminPanelLabel && (
+                <div className="hidden md:flex flex-1 min-w-0 justify-center px-2">
+                  <span className="text-sm md:text-base lg:text-lg font-semibold tracking-wide text-white/95 truncate">
+                    {adminPanelLabel}
+                  </span>
+                </div>
+              )}
 
               <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
                 <SiteSearch />
@@ -236,6 +253,9 @@ const Header = () => {
                     <div className={`h-full flex flex-col text-white ${mobileMenuBg}`}>
                       <SheetHeader className="px-5 pt-5 pb-3 text-left border-b border-white/20">
                         <SheetTitle className="text-white text-lg">{t('header.menu')}</SheetTitle>
+                        {adminPanelLabel && (
+                          <p className="text-sm text-white/80 font-medium mt-1">{adminPanelLabel}</p>
+                        )}
                       </SheetHeader>
 
                       <div className="px-4 py-3 flex flex-wrap gap-1.5 border-b border-white/15">
@@ -279,6 +299,12 @@ const Header = () => {
                 </Sheet>
               </div>
             </div>
+
+            {adminPanelLabel && (
+              <p className="md:hidden text-center text-sm font-semibold text-white/95 mt-2 truncate">
+                {adminPanelLabel}
+              </p>
+            )}
 
             <nav className="hidden lg:flex items-center justify-center flex-wrap gap-1 mt-3 pt-3 border-t border-white/20">
               {NAV_ITEMS.map((item) => (

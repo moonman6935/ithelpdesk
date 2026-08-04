@@ -8,7 +8,8 @@ export const translations = {
       "troubleshooting": "Sorun Giderme",
       "faq": "SSS",
       "videoTutorials": "Sorun Giderme Videolu Anlatım",
-      "menu": "Menü"
+      "menu": "Menü",
+      "authorizedPanel": "{name} yetkili paneli"
     },
     "search": {
       "button": "Ara",
@@ -1103,7 +1104,8 @@ export const translations = {
       "troubleshooting": "Fehlerbehebung",
       "faq": "FAQ",
       "videoTutorials": "Video-Fehlerbehebung",
-      "menu": "Menü"
+      "menu": "Menü",
+      "authorizedPanel": "{name} Berechtigtenpanel"
     },
     "search": {
       "button": "Suche",
@@ -2198,7 +2200,8 @@ export const translations = {
       "troubleshooting": "Troubleshooting",
       "faq": "FAQ",
       "videoTutorials": "Video Troubleshooting",
-      "menu": "Menu"
+      "menu": "Menu",
+      "authorizedPanel": "{name} authorized panel"
     },
     "search": {
       "button": "Search",
@@ -3293,7 +3296,8 @@ export const translations = {
       "troubleshooting": "Dépannage",
       "faq": "FAQ",
       "videoTutorials": "Dépannage vidéo",
-      "menu": "Menu"
+      "menu": "Menu",
+      "authorizedPanel": "Panneau autorisé {name}"
     },
     "search": {
       "button": "Rechercher",
@@ -4388,7 +4392,8 @@ export const translations = {
       "troubleshooting": "პრობლემების მოგვარება",
       "faq": "FAQ",
       "videoTutorials": "ვიდეო პრობლემების მოგვარება",
-      "menu": "მენიუ"
+      "menu": "მენიუ",
+      "authorizedPanel": "{name} უფლებამოსილი პანელი"
     },
     "search": {
       "button": "ძიება",
