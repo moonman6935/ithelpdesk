@@ -1,0 +1,8 @@
+{
+  "ack": "İşleme alındı, bağlanılıyor... (AnyDesk: {id})",
+  "in_progress": "Ses/kulaklık ayarları düzeltiliyor, lütfen bekleyin.",
+  "done": "İşlem tamamlandı. Kulaklığınızı test edin; sorun devam ederse tekrar yazın.",
+  "connect_failed": "Bağlantı kurulamadı. AnyDesk açık mı ve isteği kabul ettiniz mi? Lütfen tekrar deneyin.",
+  "skipped_scope": "Talebiniz alındı. Bu konu (ses/kulaklık dışı) için IT ekibi manuel inceleme yapacak.",
+  "error": "İşlem sırasında hata oluştu: {reason}"
+}
